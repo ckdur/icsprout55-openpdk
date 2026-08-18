@@ -11,3 +11,7 @@ generate_rcx_rules/5v1*
 generate_rcx_rules/5v2*
 generate_rcx_rules/Dielectrics*
 generate_rcx_rules/Wires*
+generate_rcx_rules/gen
+generate_rcx_rules/ou_parse*
+generate_rcx_rules/du_parse*
+generate_rcx_rules/M1uM3_parse*

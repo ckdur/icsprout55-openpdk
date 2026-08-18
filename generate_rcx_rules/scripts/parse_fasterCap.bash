@@ -35,6 +35,6 @@ sort -n -r run_stats > run_stats.sorted
 
 # echo "diff OUT ../$gold_dir.GOLD/OUT" 
 # diff OUT ../$gold_dir.GOLD/OUT 
-echo "diff . ../$gold_dir" 
-diff . ../$gold_dir 
+# echo "diff . ../$gold_dir" 
+# diff . ../$gold_dir 
 

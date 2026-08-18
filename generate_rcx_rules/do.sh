@@ -11,25 +11,24 @@
 #make 5v1 5v2
 
 # We need only the following:
-make 1v1 1v2 3v1 3v2
+make 1v1 1v2 3v1
 
 # Run FasterCap
 
-# 1-Wire All Patterns       
-#make 1v1_fc 1v2_fc
-# 2-Wire OverUnder Patterns : 
-#make 2v1_fc_overUnder 2v2_fc_overUnder
-# 3-Wire Over Patterns      : 
-#make 3v1_fc_over3 3v2_fc_over3
-# 3-Wire M3oM2uM6 Patterns  : 
-#make 3v2_fc_M3oM2uM6
+# We base our extraction on whatever IHP did also
+# They have: RESOVER OVER UNDER DIAGUNDER OVERUNDER 
+# M2oM1uM3 M2oM1uM4 M2oM1uM5 M2oM1uM6 M2oM1uM7
+# M3oM1uM4 M3oM1uM5 M3oM1uM6 M3oM1uM7
+# (and so on...)
 
-# We require the following:
-make 1v2_fc 3v1_fc_over3 3v2_fc_over3 3v2_fc_M3oM2uM6
+# We require the following
+make 1v2_fc 3v1_fc_over3 3v1_fc_under3 3v1_fc_underdiag3 3v1_fc_overunder3
 
 # Parse it
-make 
+make parse
 
+# Make the rcx model file
+make gen
 
 #openroad -exit -no_splash ./generate_patterns.tcl
 #openroad -exit -no_splash ./generate_rules.tcl

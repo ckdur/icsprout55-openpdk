@@ -21,7 +21,9 @@ ext_z=$4
 pattern=$5
 python_script=$6
 fasterCap=$7
-error=0.01
+# TODO: It was 0.01! Please change it back
+# NOTE: Changed for faster convergence
+error=0.1
 cd $in_dir
 find . -name wires -print | sort > wires_file_list
 

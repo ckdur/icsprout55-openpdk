@@ -9,30 +9,35 @@ CONDUCTOR MET1 {
         thickness 0.25
         min_width 0.09
         min_spacing 0.09
+        resistivity 0.1122
 }
 CONDUCTOR MET2 {
         distance 0.27
         thickness 0.30
         min_width 0.10
         min_spacing 0.10
+        resistivity 0.0914
 }
 CONDUCTOR MET3 {
         distance 0.27
         thickness 0.30
         min_width 0.10
         min_spacing 0.10
+        resistivity 0.0914
 }
 CONDUCTOR MET4 {
         distance 0.270
         thickness 0.30
         min_width 0.10
         min_spacing 0.10
+        resistivity 0.0914
 }
 CONDUCTOR MET5 {
         distance 0.27
         thickness 0.30
         min_width 0.10
         min_spacing 0.10
+        resistivity 0.0914
 }
 CONDUCTOR T4M2 {
         distance 0.60
