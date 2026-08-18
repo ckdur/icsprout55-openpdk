@@ -1,0 +1,300 @@
+# NOTE: We took the example from OpenROAD/src/rcx/test/rcxv2/data/process
+# Replace this with the actual values whenever the technology gets released
+# missing: distance, thickness for CONDUCTORs
+# missing: ALL for DIELECTRICs
+
+CONDUCTOR MET1 {
+# POLY dist=0.25 and thickness= 0.13
+        distance 0.65
+        thickness 0.25
+        min_width 0.09
+        min_spacing 0.09
+}
+CONDUCTOR MET2 {
+        distance 0.27
+        thickness 0.30
+        min_width 0.10
+        min_spacing 0.10
+}
+CONDUCTOR MET3 {
+        distance 0.27
+        thickness 0.30
+        min_width 0.10
+        min_spacing 0.10
+}
+CONDUCTOR MET4 {
+        distance 0.270
+        thickness 0.30
+        min_width 0.10
+        min_spacing 0.10
+}
+CONDUCTOR MET5 {
+        distance 0.27
+        thickness 0.30
+        min_width 0.10
+        min_spacing 0.10
+}
+CONDUCTOR T4M2 {
+        distance 0.60
+        thickness 0.90
+        min_width 0.40
+        min_spacing 0.40
+        resistivity 0.0239
+}
+CONDUCTOR RDL {
+        distance 0.85
+        thickness 1.20
+        min_width 3.00
+        min_spacing 2.00
+        resistivity 0.0151
+}
+DIELECTRIC p1_1 {
+        epsilon 4.1
+        thickness 0.25
+        next_met 1
+}
+
+DIELECTRIC m1_1 {
+        epsilon 7.0
+        thickness 0.05
+        next_met 1
+}
+
+DIELECTRIC m1_2 {
+        epsilon 4.3
+        thickness 0.35
+        next_met 1
+}
+
+DIELECTRIC m1_3 {
+        epsilon 4.3
+        thickness 0.05
+        met 1
+}
+
+DIELECTRIC m1_4 {
+        epsilon 4.9
+        thickness 0.05
+        met 1
+}
+
+DIELECTRIC m1_5 {
+        epsilon 4.1
+        thickness 0.15
+        met 1
+}
+
+# M2-M5 
+DIELECTRIC m2_1 {
+        epsilon 4.9
+        thickness 0.05
+        next_met 2
+}
+
+DIELECTRIC m2_2 {
+        epsilon 2.9
+        thickness 0.20
+        next_met 2
+}
+
+DIELECTRIC m2_3 {
+        epsilon 4.4
+        thickness 0.02
+        next_met 2
+}
+
+DIELECTRIC m2_4 {
+        epsilon 4.9
+        thickness 0.05
+        met 2
+}
+
+DIELECTRIC m2_5 {
+        epsilon 2.9
+        thickness 0.20
+        met 2
+}
+
+DIELECTRIC m2_6 {
+        epsilon 4.4
+        thickness 0.05
+        met 2
+}
+
+DIELECTRIC m3_1 {
+        epsilon 4.9
+        thickness 0.05
+        next_met 3
+}
+
+DIELECTRIC m3_2 {
+        epsilon 2.9
+        thickness 0.20
+        next_met 3
+}
+
+DIELECTRIC m3_3 {
+        epsilon 4.4
+        thickness 0.02
+        next_met 3
+}
+
+DIELECTRIC m3_4 {
+        epsilon 4.9
+        thickness 0.05
+        met 3
+}
+
+DIELECTRIC m3_5 {
+        epsilon 2.9
+        thickness 0.20
+        met 3
+}
+
+DIELECTRIC m3_6 {
+        epsilon 4.4
+        thickness 0.05
+        met 3
+}
+
+DIELECTRIC m4_1 {
+        epsilon 4.9
+        thickness 0.05
+        next_met 4
+}
+
+DIELECTRIC m4_2 {
+        epsilon 2.9
+        thickness 0.20
+        next_met 4
+}
+
+DIELECTRIC m4_3 {
+        epsilon 4.4
+        thickness 0.02
+        next_met 4
+}
+
+DIELECTRIC m4_4 {
+        epsilon 4.9
+        thickness 0.05
+        met 4
+}
+
+DIELECTRIC m4_5 {
+        epsilon 2.9
+        thickness 0.20
+        met 4
+}
+
+DIELECTRIC m4_6 {
+        epsilon 4.4
+        thickness 0.05
+        met 4
+}
+
+DIELECTRIC m5_1 {
+        epsilon 4.9
+        thickness 0.05
+        next_met 5
+}
+
+DIELECTRIC m5_2 {
+        epsilon 2.9
+        thickness 0.20
+        next_met 5
+}
+
+DIELECTRIC m5_3 {
+        epsilon 4.4
+        thickness 0.02
+        next_met 5
+}
+
+DIELECTRIC m5_4 {
+        epsilon 4.9
+        thickness 0.05
+        met 5
+}
+
+DIELECTRIC m5_5 {
+        epsilon 2.9
+        thickness 0.20
+        met 5
+}
+
+DIELECTRIC m5_6 {
+        epsilon 4.4
+        thickness 0.05
+        met 5
+}
+
+DIELECTRIC m6_1 {
+        epsilon 4.9
+        thickness 0.10
+        next_met 6
+}
+
+DIELECTRIC m6_2 {
+        epsilon 4.4
+        thickness 0.50
+        next_met 6
+}
+
+DIELECTRIC m6_3 {
+        epsilon 4.4
+        thickness 0.10
+        met 6
+}
+
+DIELECTRIC m6_4 {
+        epsilon 4.9
+        thickness 0.10
+        met 6
+}
+
+DIELECTRIC m6_5 {
+        epsilon 4.4
+        thickness 0.70
+        met 6
+}
+
+DIELECTRIC m7_1 {
+        epsilon 4.9
+        thickness 0.10
+        next_met 7
+}
+
+DIELECTRIC m7_2 {
+        epsilon 4.4
+        thickness 0.75
+        next_met 7
+}
+
+DIELECTRIC m7_3 {
+        epsilon 4.4
+        thickness 0.05
+        met 7
+}
+
+DIELECTRIC m7_4 {
+        epsilon 4.9
+        thickness 0.12
+        met 7
+}
+
+DIELECTRIC m7_5 {
+        epsilon 4.4
+        thickness 1.03
+        met 7
+}
+
+DIELECTRIC air_1 {
+        epsilon 6.0
+        thickness 0.30
+}
+
+DIELECTRIC air_2 {
+        epsilon 2.90
+        thickness 6.90
+}

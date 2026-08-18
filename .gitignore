@@ -1,1 +1,13 @@
 icsprout55/libs.ref/*
+generate_rcx_rules/EXT
+generate_rcx_rules/EXT/*
+generate_rcx_rules/1v1*
+generate_rcx_rules/1v2*
+generate_rcx_rules/2v1*
+generate_rcx_rules/2v2*
+generate_rcx_rules/3v1*
+generate_rcx_rules/3v2*
+generate_rcx_rules/5v1*
+generate_rcx_rules/5v2*
+generate_rcx_rules/Dielectrics*
+generate_rcx_rules/Wires*

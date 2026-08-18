@@ -57,8 +57,10 @@ set ::env(KLAYOUT_PROPERTIES) "/dev/null"
 set ::env(KLAYOUT_DEF_LAYER_MAP) "/dev/null"
 
 # TODO: This is the only file that is left to implement for RCX
+# the one put here is just a copy of IHP. Obviously it won't work.
+# REPLACE ME REPLACE ME REPLACE ME
 set ::env(RCX_RULESETS) [list \
-    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.ref/prtech/techLEF/N551P6M_ecos.lef" \
+    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/$::env(STD_CELL_LIBRARY)/rcx.rules" \
 ]
 
  # icsprout55-pdk/libs.tech/librelane/ics55_LLSC_H7CR/config.tcl
