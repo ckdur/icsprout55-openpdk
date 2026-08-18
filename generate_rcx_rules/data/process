@@ -3,6 +3,18 @@
 # missing: distance, thickness for CONDUCTORs
 # missing: ALL for DIELECTRICs
 
+# fron src/rcx/src/extprocess.cpp:
+# syntax for CONDUCTOR is:
+#  distance, height, thickness, min_width, min_spacing, origin_x,
+#  bottom_left_x, bottom_right_x, top_left_x, top_right_x,
+#  var_table, resistivity, min_cw_del, max_cw_del, min_ct_del, max_ct_del,
+#  min_ca, max_ca, top_extension, bottom_extension
+
+# syntax for DIELECTRIC is:
+#  non_conformal_metal, conformal, trench, epsilon, met, next_met,
+#  height, thickness, bottom_thickness, top_thickness, left_thickness, 
+#  right_thickness, bottom_ext, slope
+ 
 CONDUCTOR MET1 {
 # POLY dist=0.25 and thickness= 0.13
         distance 0.65

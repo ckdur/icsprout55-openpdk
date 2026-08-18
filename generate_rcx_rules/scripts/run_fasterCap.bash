@@ -16,11 +16,11 @@ in_dir=$1
 outDir=$2
 std_normal=$3
 ext_x=$4
-ext_y=$4
-ext_z=$4
-pattern=$5
-python_script=$6
-fasterCap=$7
+ext_y=$5
+ext_z=$6
+pattern=$7
+python_script=$8
+fasterCap=$9
 # TODO: It was 0.01! Please change it back
 # NOTE: Changed for faster convergence
 error=0.1

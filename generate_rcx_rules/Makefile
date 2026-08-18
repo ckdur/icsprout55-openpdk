@@ -70,20 +70,20 @@ fasterCap_exec=$(shell which FasterCap)
 #fasterCap_exec=/home/dimitris-ic/fasterCap/920/FasterCAP_v2/FasterCap_v2/build_fasterCap_920/FasterCap
 
 1v2_fc:
-	$(run_fasterCap) 1v2 $@ standard 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+	$(run_fasterCap) 1v2 $@ normalized 20 20 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
 2v2_fc:
-	$(run_fasterCap) 2v2 $@ standard 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+	$(run_fasterCap) 2v2 $@ normalized 20 20 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
 3v1_fc:
-	$(run_fasterCap) 3v1 $@ normalized 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+	$(run_fasterCap) 3v1 $@ normalized 20 20 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
 # We keep these examples whenever we need to do the actual extraction...
 3v2_fc_M3oM2uM6:
-	$(run_fasterCap) 3v2 $@ standard 20 M3oM2uM6 $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+	$(run_fasterCap) 3v2 $@ normalized 20 20 20 M3oM2uM6 $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
 3v1_fc_M1uM3:
-	$(run_fasterCap) 3v1 $@ normalized 20 M1uM3 $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+	$(run_fasterCap) 3v1 $@ normalized 20 20 20 M1uM3 $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
 # -------------------------------------------------------------------------------------
 #                        fasterCapParse parse of fasterCap Output
@@ -95,7 +95,7 @@ fasterCapParsePython=$(top_dir)/scripts/fasterCapParse.py
 parse: 1v2_parse 3v1_parse
 
 1v2_parse:
-	$(parse_fasterCap_bash) $@  $(top_dir) 1v2_fc.standard.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
+	$(parse_fasterCap_bash) $@  $(top_dir) 1v2_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
 
 3v1_parse:
 	$(parse_fasterCap_bash) $@  $(top_dir) 3v1_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
@@ -113,9 +113,9 @@ gen:
         rm -rf $@ ; \
         mkdir $@ ; \
         cd $@ ; \
-	echo "init_rcx_model -corner_names \"TYP MIN\" -met_cnt 7" > $(readCaps_tcl) ; \
+	echo "init_rcx_model -corner_names \"TYP\" -met_cnt 7" > $(readCaps_tcl) ; \
 	echo "read_rcx_tables -corner TYP -file  $(top_dir)/3v1_parse/3v1_fc.normalized.20.20.20.ALL.caps" >>  $(readCaps_tcl) ; \
-	echo "read_rcx_tables -corner TYP -file  $(top_dir)/1v2_parse/1v2_fc.standard.20.20.20.ALL.caps" >>  $(readCaps_tcl) ; \
+	echo "read_rcx_tables -corner TYP -file  $(top_dir)/1v2_parse/1v2_fc.normalized.20.20.20.ALL.caps" >>  $(readCaps_tcl) ; \
 	echo "read_rcx_tables -corner TYP -file  $(top_dir)/1v1/resistance.TYP " >>  $(readCaps_tcl) ; \
 	echo "write_rcx_model -file sept24.rcx.model " >> $(readCaps_tcl) ; \
 	$(or_exec) < $(readCaps_tcl) > OUT

@@ -22,7 +22,7 @@ make 1v1 1v2 3v1
 # (and so on...)
 
 # We require the following
-make 1v2_fc 3v1_fc_over3 3v1_fc_under3 3v1_fc_underdiag3 3v1_fc_overunder3
+make 1v2_fc 3v1_fc
 
 # Parse it
 make parse
