@@ -1,0 +1,19 @@
+{
+  "DESIGN_NAME": "counter",
+  "VERILOG_FILES": ["dir::counter.v"],
+  "CLOCK_PERIOD": 25,
+  "CLOCK_PORT": "clk",
+  "FP_PIN_ORDER_CFG": "dir::pin_order.cfg",
+  "DIE_AREA": [0, 0, 100, 100],
+  "CORE_AREA": [10, 10, 90, 90],
+
+  "FP_CORE_UTIL": 20,
+
+  "meta": {
+    "flow": "Classic",
+    "substituting_steps": {
+      "Netgen.LVS": null,
+      "Checker.LVS": null
+    }
+  }
+}

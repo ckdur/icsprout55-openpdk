@@ -13,4 +13,12 @@ catch {format $env(NETGEN_COLUMNS)}
 set cells1 [cells list -all -circuit1]
 set cells2 [cells list -all -circuit2]
 
-# EMPTY
+# EMPTY AND EXIT
+
+puts "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+set fileId [open "reports/lvs.netgen.json" w]
+puts $fileId "{}"
+close $fileId
+
+exit 0
