@@ -122,7 +122,7 @@ end
 
 cifoutput
   style gdsii
-  scalefactor 1 nanometers
+  scalefactor 0.5 nanometers
 
   layer act act
     calma 2 1
@@ -194,7 +194,7 @@ end
 
 cifinput
   style gdsii
-  scalefactor 1 nanometers
+  scalefactor 0.5 nanometers
 
   layer l1 act
   layer l2 nw

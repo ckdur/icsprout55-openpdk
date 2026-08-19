@@ -58,13 +58,13 @@ set ::env(MAGIC_PDK_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.t
 set ::env(KLAYOUT_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyt"
 set ::env(KLAYOUT_PROPERTIES) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyp"
 set ::env(KLAYOUT_DEF_LAYER_MAP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.map"
-set ::env(KLAYOUT_DRC_RUNSET) "/dev/null"
+set ::env(KLAYOUT_DRC_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.drc"
 set ::env(KLAYOUT_DRC_OPTIONS) [dict create densityRules 0 ]
-set ::env(KLAYOUT_LVS_SCRIPT) "/dev/null"
+set ::env(KLAYOUT_LVS_SCRIPT) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lvs"
 set ::env(KLAYOUT_LVS_OPTIONS) [dict create run_mode deep ]
 
-set ::env(NETGEN_SETUP) "/dev/null"
-
+set ::env(NETGEN_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/netgen/ics55.tcl"
+    
 # TODO: This is the only file that is left to implement for RCX
 # the one put here is just a copy of IHP. Obviously it won't work.
 # REPLACE ME REPLACE ME REPLACE ME

@@ -172,7 +172,7 @@ def generate_tech_file(planes, types, gds_mappings, styles, routing, cut, tech_n
     # 5. CIF/GDS Output Mapping Section
     lines.append("cifoutput")
     lines.append("  style gdsii")
-    lines.append("  scalefactor 1 nanometers")
+    lines.append("  scalefactor 0.5 nanometers")
     lines.append("")
     for layer, gds_num, gds_type, style in gds_mappings:
         lines.append(f"  layer {layer} {layer}")
@@ -184,7 +184,7 @@ def generate_tech_file(planes, types, gds_mappings, styles, routing, cut, tech_n
     # 6. CIF/GDS Input Mapping Section
     lines.append("cifinput")
     lines.append("  style gdsii")
-    lines.append("  scalefactor 1 nanometers")
+    lines.append("  scalefactor 0.5 nanometers")
     lines.append("")
     for layer, gds_num, gds_type, style in gds_mappings:
         lines.append(f"  layer {style} {layer}")

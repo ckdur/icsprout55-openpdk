@@ -1,9 +1,9 @@
 puts stdout "Sourcing design .magicrc for technology ics55 ..."
 
-set scalefac [tech lambda]
-if {[lindex $scalefac 1] < 2} {
-    scalegrid 1 2
-}
+#set scalefac [tech lambda]
+#if {[lindex $scalefac 1] < 2} {
+#    scalegrid 1 2
+#}
 
 drc on
 

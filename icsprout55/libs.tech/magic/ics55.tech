@@ -205,16 +205,16 @@ cifoutput
     calma 191 12
 
 style drc
- scalefactor 1  nanometers
+ scalefactor 1 nanometers
  options calma-permissive-labels
 
 style density
- scalefactor 1  nanometers
+ scalefactor 1 nanometers
  options calma-permissive-labels
  gridlimit 5
 
 style patternfill
- scalefactor 10  nanometers
+ scalefactor 1 nanometers
  options calma-permissive-labels
  gridlimit 5
 end
@@ -294,7 +294,7 @@ end
 
 drc
   style drc variants (fast),(full),(routing)
-  scalefactor 10 
+  scalefactor 10
   cifstyle drc
 
   variants (fast),(full)
