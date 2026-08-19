@@ -78,6 +78,9 @@ fasterCap_exec=$(shell which FasterCap)
 3v1_fc:
 	$(run_fasterCap) 3v1 $@ normalized 20 20 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
 
+3v2_fc:
+	$(run_fasterCap) 3v2 $@ normalized 20 20 20 ALL $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
+
 # We keep these examples whenever we need to do the actual extraction...
 3v2_fc_M3oM2uM6:
 	$(run_fasterCap) 3v2 $@ normalized 20 20 20 M3oM2uM6 $(UniversalFormat2FasterCap_python_script) $(fasterCap_exec)
@@ -97,8 +100,14 @@ parse: 1v2_parse 3v1_parse
 1v2_parse:
 	$(parse_fasterCap_bash) $@  $(top_dir) 1v2_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
 
+2v2_parse:
+	$(parse_fasterCap_bash) $@  $(top_dir) 2v2_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
+
 3v1_parse:
 	$(parse_fasterCap_bash) $@  $(top_dir) 3v1_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
+
+3v2_parse:
+	$(parse_fasterCap_bash) $@  $(top_dir) 3v2_fc.normalized.20.20.20.ALL  $(fasterCapParsePython) 1 $@.GOLD
 
 # -------------------------------------------------------------------------------------
 #                        rcx generates model file

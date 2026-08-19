@@ -11,7 +11,7 @@
 #make 5v1 5v2
 
 # We need only the following:
-make 1v1 1v2 3v1
+make 1v1 1v2 3v1 3v2
 
 # Run FasterCap
 
@@ -22,7 +22,7 @@ make 1v1 1v2 3v1
 # (and so on...)
 
 # We require the following
-make 1v2_fc 3v1_fc
+make 1v2_fc 3v1_fc 3v2_fc
 
 # Parse it
 make parse

@@ -9,8 +9,9 @@ set ::env(GND_PIN) "VSS"
 
 # Technology LEF, as a map of corner patterns to files.
 # NOTE: the bring-up config used the plain N551P6M.lef (not the _ecos variant).
+# NOTE2: The resistance in VIAs is not defined. Using a modified version here
 set ::env(TECH_LEFS) [list \
-    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.ref/prtech/techLEF/N551P6M_ecos.lef" \
+    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tecn/librelane/N551P6M_ecos.lef" \
 ]
 
 # Timing corners (IPVT). Corner names match the bring-up configuration exactly.
