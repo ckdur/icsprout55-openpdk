@@ -1,0 +1,33 @@
+conducting_layers
+  MET1	M1
+  MET2	M2
+  MET3	M3
+  MET4	M4
+  MET5	M5
+  T4M2	TM
+  RDL	RDL
+
+via_layers
+  VIA1	V1
+  VIA2	V2
+  VIA3	V3
+  VIA4	V4
+  T4V2	TV
+  RV	RV
+
+marker_layers
+
+remove_layers
+  GT
+  POLY
+  VTNH
+  VTPH
+  LVN
+  LVP
+  NW
+  SN
+  CT
+  ACT
+  NP
+  PP
+  NW1
