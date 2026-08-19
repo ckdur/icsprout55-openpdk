@@ -52,7 +52,7 @@ set ::env(DPL_CELL_PADDING) 0
 ## magic setup
 set ::env(MAGICRC) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.magicrc"
 set ::env(MAGIC_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.tech"
-set ::env(MAGIC_PDK_SETUP) "/dev/null"
+set ::env(MAGIC_PDK_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.tcl"
 
 # Klayout setup
 set ::env(KLAYOUT_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyt"

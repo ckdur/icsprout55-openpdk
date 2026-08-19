@@ -38,34 +38,31 @@ planes
   p9
 end
 
-# This part is HEAVILY modified
-# Basically, we just match the layer name with the via in the same plane, so we can form a cut
-# BUT we put the mX in a different plane, to avoid mistakenly identified as cut
 types
-  p1 l1
+  p1 act,l1
   p2 nw,l2
   p3 poly
-  p4 ct,l4,act
+  p4 ct,l4
   p5 np,l5
   p6 pp,l6
-  p7 met1,via1
+  p7 met1,m1
   p8 met1_pin,l8
-  p9 m1
-  p10 met2,via2
+  p9 via1
+  p10 met2,m2
   p11 met2_pin,l11
-  p12 m2
-  p13 met3,via3
+  p12 via2
+  p13 met3,m3
   p14 met3_pin,l14
-  p15 m3
-  p16 met4,via4
+  p15 via3
+  p16 met4,m4
   p17 met4_pin,l17
-  p18 m4
-  p19 met5,t4v2,via5
+  p18 via4
+  p19 met5,m5
   p20 met5_pin,l20
-  p21 m5
-  p22 t4m2,rv,via6
+  p21 t4v2,via5
+  p22 t4m2,m6
   p23 t4m2_pin,l23
-  p24 m6
+  p24 rv,via6
   p25 rdl,m7
   p26 rdl_pin,l26
   p27 ap,l27
@@ -77,17 +74,7 @@ types
   p33 unk_191_12,l33
 end
 
-# The cuts are also modified
 contact
-  ct act met1
-  via1 met1 met2
-  via2 met2 met3
-  via3 met3 met4
-  via4 met4 met5
-  t4v2 met5 t4m2
-  rv   t4m2 rdl
-
-  stackable
 end
 
 styles
@@ -203,20 +190,6 @@ cifoutput
     calma 71 1
   layer unk_191_12 unk_191_12
     calma 191 12
-
-style drc
- scalefactor 1  nanometers
- options calma-permissive-labels
-
-style density
- scalefactor 1  nanometers
- options calma-permissive-labels
- gridlimit 5
-
-style patternfill
- scalefactor 10  nanometers
- options calma-permissive-labels
- gridlimit 5
 end
 
 cifinput
@@ -291,24 +264,37 @@ cifinput
   calma unk_71_1 71 1
   calma unk_191_12 191 12
 end
+lef
+  masterslice poly POLY
+  routing m1 MET1
+  routing m2 MET2
+  routing m3 MET3
+  routing m4 MET4
+  routing m5 MET5
+  routing m7 RDL
+  routing m6 T4M2
+  cut via6 RV
+  cut via5 T4V2
+  cut via1 VIA1
+  cut via2 VIA2
+  cut via3 VIA3
+  cut via4 VIA4
+  obs m1 MET1
+  obs m2 MET2
+  obs m3 MET3
+  obs m4 MET4
+  obs m5 MET5
+  obs m7 RDL
+  obs m6 T4M2
+  obs m6,m7 RV
+  obs m5,m6 T4V2
+  obs m1,m2 VIA1
+  obs m2,m3 VIA2
+  obs m3,m4 VIA3
+  obs m4,m5 VIA4
+end
 
 drc
-  style drc variants (fast),(full),(routing)
-  scalefactor 10 
-  cifstyle drc
-
-  variants (fast),(full)
-
-  width act 100 "dummy act width"
-  width poly 100 "dummy poly width"
-  width m1 100 "dummy m1 width"
-  width m2 100 "dummy m2 width"
-  width m3 100 "dummy m3 width"
-  width m4 100 "dummy m4 width"
-  width m5 100 "dummy m5 width"
-  width m6 100 "dummy m6 width"
-  width m7 100 "dummy m7 width"
-
 end
 
 extract
@@ -346,36 +332,3 @@ extract
   planeorder p7 30
   planeorder p8 31
   planeorder p9 32
-end
-lef
-  masterslice l1 ACT
-  masterslice poly POLY
-  routing m1 MET1
-  routing m2 MET2
-  routing m3 MET3
-  routing m4 MET4
-  routing m5 MET5
-  routing m7 RDL
-  routing m6 T4M2
-  cut ct CT
-  cut via6 RV
-  cut via5 T4V2
-  cut via1 VIA1
-  cut via2 VIA2
-  cut via3 VIA3
-  cut via4 VIA4
-  obs m1 MET1
-  obs m2 MET2
-  obs m3 MET3
-  obs m4 MET4
-  obs m5 MET5
-  obs m7 RDL
-  obs m6 T4M2
-  obs poly,ct CT
-  obs m6,m7 RV
-  obs m5,m6 T4V2
-  obs m1,m2 VIA1
-  obs m2,m3 VIA2
-  obs m3,m4 VIA3
-  obs m4,m5 VIA4
-end
