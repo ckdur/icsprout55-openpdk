@@ -15,3 +15,5 @@ generate_rcx_rules/gen
 generate_rcx_rules/ou_parse*
 generate_rcx_rules/du_parse*
 generate_rcx_rules/M1uM3_parse*
+hacking/*.lyp
+hacking/*.pyc

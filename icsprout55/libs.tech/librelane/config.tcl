@@ -46,15 +46,23 @@ set ::env(DPL_CELL_PADDING) 0
 
 # ----------------------------------------------------------------------------
 # Signoff tool collateral NOT shipped with this PDK.
-#
+# ... but we will do our best!
 # ----------------------------------------------------------------------------
-set ::env(MAGICRC) "/dev/null"
-set ::env(MAGIC_TECH) "/dev/null"
+## magic setup
+set ::env(MAGICRC) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.magicrc"
+set ::env(MAGIC_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/magic/ics55.tech"
 set ::env(MAGIC_PDK_SETUP) "/dev/null"
+
+# Klayout setup
+set ::env(KLAYOUT_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyt"
+set ::env(KLAYOUT_PROPERTIES) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyp"
+set ::env(KLAYOUT_DEF_LAYER_MAP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.map"
+set ::env(KLAYOUT_DRC_RUNSET) "/dev/null"
+set ::env(KLAYOUT_DRC_OPTIONS) [dict create densityRules 0 ]
+set ::env(KLAYOUT_LVS_SCRIPT) "/dev/null"
+set ::env(KLAYOUT_LVS_OPTIONS) [dict create run_mode deep ]
+
 set ::env(NETGEN_SETUP) "/dev/null"
-set ::env(KLAYOUT_TECH) "/dev/null"
-set ::env(KLAYOUT_PROPERTIES) "/dev/null"
-set ::env(KLAYOUT_DEF_LAYER_MAP) "/dev/null"
 
 # TODO: This is the only file that is left to implement for RCX
 # the one put here is just a copy of IHP. Obviously it won't work.
