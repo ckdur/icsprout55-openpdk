@@ -193,39 +193,16 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# SRAM macros
+# NOTE: This is highly manual. If the macros do not intersect with a stripe, this wont work
+# (This is already done tho)
+#add_pdn_connect \
+#    -grid macro \
+#    -layers "MET4 MET5"
 
-define_pdn_grid \
-    -macro \
-    -instances "\
-    i_chip_core.counter_1" \
-    -name counter_N1 \
-    -starts_with POWER
+# set ::env(VDD_NET) "VDD"
+# set ::env(GND_NET) "VSS"
 
-add_pdn_stripe \
-    -grid counter_N1 \
-    -layer MET5 \
-    -width 2.81 \
-    -pitch 11.24 \
-    -offset 2.81 \
-    -spacing 2.81 \
-    -nets "VSS VDD" \
-    -starts_with POWER
+# source runs/debug_ics/22-openroad-generatepdn/_env.tcl
+# source pdn_cfg.tcl
+# pdngen
 
-add_pdn_connect \
-    -grid counter_N1 \
-    -layers "MET4 MET5"
-add_pdn_connect \
-    -grid counter_N1 \
-    -layers "MET5 T4M2"
-
-define_pdn_grid \
-    -macro \
-    -instances "\
-    i_chip_core.counter_2" \
-    -name counter_N2 \
-    -starts_with POWER
-
-add_pdn_connect \
-    -grid counter_N2 \
-    -layers "MET4 T4M2"

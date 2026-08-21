@@ -27,12 +27,30 @@ set ::env(PAD_FILLERS) "\
 # Pad bondpad information (if needed)
 # The bonds are actually inside of the IO
 set ::env(PAD_BONDPAD_NAME) ""
-set ::env(PAD_BONDPAD_WIDTH) "0"
-set ::env(PAD_BONDPAD_HEIGHT) "0"
+set ::env(PAD_BONDPAD_WIDTH) "10"
+set ::env(PAD_BONDPAD_HEIGHT) "10"
 set ::env(PAD_BONDPAD_OFFSETS) [dict create]
+#dict set ::env(PAD_BONDPAD_OFFSETS) "P65_1233_PBMUX" "10.0, 10.0"
+#dict set ::env(PAD_BONDPAD_OFFSETS) "P65_1233_PWE" "10.0, 10.0"
+#dict set ::env(PAD_BONDPAD_OFFSETS) "P65_1233_V*" "10.0, 10.0"
+#dict set ::env(PAD_BONDPAD_OFFSETS) "P65_1233_PAR*" "10.0, 10.0"
 
-# Pad io terminals (if needed)
-#set ::env(PAD_PLACE_IO_TERMINALS)
+# Pad io terminals
+set ::env(PAD_PLACE_IO_TERMINALS) [list \
+    P65_1233_PAR/PAD \
+    P65_1233_PAR_5/PAD \
+    P65_1233_PBMUX/PAD \
+    P65_1233_PWE/XIN \
+    P65_1233_PWE/XOUT \
+    P65_1233_VDD1/VDD1 \
+    P65_1233_VDD1A/VDDA1 \
+    P65_1233_VDD3/VDD \
+    P65_1233_VDDIO3/VDDIO \
+    P65_1233_VSS1A/VSSA \
+    P65_1233_VSS1/VSS1 \
+    P65_1233_VSS3/VSS \
+    P65_1233_VSSIO3/VSSIO \
+]
 
 # Sealring offset
 # NOTE: Sealring is included in the IO as well

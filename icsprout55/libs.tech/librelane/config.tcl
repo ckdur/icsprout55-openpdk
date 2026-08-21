@@ -13,6 +13,8 @@ if { ![info exist ::env(PAD_CELL_LIBRARY)] } {
 }
 
 # Power/ground pins
+set ::env(VDD_NET) "VDD"
+set ::env(GND_NET) "VSS"
 set ::env(VDD_PIN) "VDD"
 set ::env(GND_PIN) "VSS"
 

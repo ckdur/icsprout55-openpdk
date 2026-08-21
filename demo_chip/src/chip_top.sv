@@ -13,10 +13,12 @@ module chip_top #(
     parameter NUM_IOVSS_PADS = 1,
     
     // Signal pads
+`ifdef ANALOG_COMPATIBLE
+    parameter NUM_ANALOG_PADS = 0,
+`endif
     parameter NUM_INPUT_PADS  = 10,
     parameter NUM_OUTPUT_PADS = 8,
-    parameter NUM_BIDIR_PADS  = 8,
-    parameter NUM_ANALOG_PADS = 8
+    parameter NUM_BIDIR_PADS  = 8
     )(
     `ifdef USE_POWER_PINS
     inout wire IOVDD,
@@ -25,12 +27,14 @@ module chip_top #(
     inout wire VSS,
     `endif
     inout  wire clk_XI_PAD,
-    inout  wire clk_XO_PAD,
+    //inout  wire clk_XO_PAD,
     inout  wire rst_n_PAD,
+`ifdef ANALOG_COMPATIBLE
+    inout  wire [NUM_ANALOG_PADS-1:0] analog_PAD,
+`endif
     inout  wire [NUM_INPUT_PADS-1 :0] input_PAD,
     inout  wire [NUM_OUTPUT_PADS-1:0] output_PAD,
-    inout  wire [NUM_BIDIR_PADS-1 :0] bidir_PAD,
-    inout  wire [NUM_ANALOG_PADS-1:0] analog_PAD
+    inout  wire [NUM_BIDIR_PADS-1 :0] bidir_PAD
 );
 
     wire clk_PAD2CORE;
@@ -40,7 +44,9 @@ module chip_top #(
     wire [NUM_BIDIR_PADS-1 :0] bidir_PAD2CORE;
     wire [NUM_BIDIR_PADS-1 :0] bidir_CORE2PAD;
     wire [NUM_BIDIR_PADS-1 :0] bidir_CORE2PAD_OE;
+`ifdef ANALOG_COMPATIBLE
     wire [NUM_ANALOG_PADS-1:0] analog_PADRES;
+`endif
 
     // Power/ground pad instances
     generate
@@ -100,10 +106,11 @@ module chip_top #(
         .E      (1'b1),
         .XC     (clk_PAD2CORE),
         .XIN    (clk_XI_PAD),
-        .XOUT   (clk_XO_PAD)
+        .XOUT   ()  // clk_XO_PAD
     );
     
     // Normal input
+    wire rst_n_A_unused;
     P65_1233_PBMUX rst_n_pad (
         `ifdef USE_POWER_PINS
         .VDDIO  (IOVDD),
@@ -112,7 +119,7 @@ module chip_top #(
         .VSS    (VSS),
         `endif
         .C      (rst_n_PAD2CORE),
-        .A      (),
+        .A      (rst_n_A_unused),
         .PAD    (rst_n_PAD),
         .IE     (1'b1),
         .CS     (1'b0),
@@ -125,6 +132,7 @@ module chip_top #(
         .DS1    (1'b0)
     );
 
+    wire [NUM_INPUT_PADS-1:0] input_A_unused;
     generate
     for (genvar i=0; i<NUM_INPUT_PADS; i++) begin : inputs
         P65_1233_PBMUX input_pad (
@@ -135,7 +143,7 @@ module chip_top #(
             .VSS    (VSS),
             `endif
             .C      (input_PAD2CORE[i]),
-            .A      (),
+            .A      (input_A_unused[i]),
             .PAD    (input_PAD[i]),
             .IE     (1'b1),
             .CS     (1'b0),
@@ -150,6 +158,8 @@ module chip_top #(
     end
     endgenerate
 
+    wire [NUM_OUTPUT_PADS-1:0] output_A_unused;
+    wire [NUM_OUTPUT_PADS-1:0] output_C_unused;
     generate
     for (genvar i=0; i<NUM_OUTPUT_PADS; i++) begin : outputs
         P65_1233_PBMUX output_pad (
@@ -159,8 +169,8 @@ module chip_top #(
             .VDD    (VDD),
             .VSS    (VSS),
             `endif
-            .C      (),
-            .A      (),
+            .C      (output_C_unused[i]),
+            .A      (output_A_unused[i]),
             .PAD    (output_PAD[i]),
             .IE     (1'b0),
             .CS     (1'b0),
@@ -175,6 +185,7 @@ module chip_top #(
     end
     endgenerate
 
+    wire [NUM_BIDIR_PADS-1:0] bidir_A_unused;
     generate
     for (genvar i=0; i<NUM_BIDIR_PADS; i++) begin : bidirs
         P65_1233_PBMUX bidir_pad (
@@ -185,8 +196,8 @@ module chip_top #(
             .VSS    (VSS),
             `endif
             .C      (bidir_PAD2CORE[i]),
-            .A      (),
-            .PAD    (output_PAD[i]),
+            .A      (bidir_A_unused[i]),
+            .PAD    (bidir_PAD[i]),
             .IE     (!bidir_CORE2PAD_OE[i]),
             .CS     (1'b0),
             .I      (bidir_CORE2PAD[i]),
@@ -199,7 +210,8 @@ module chip_top #(
         );
     end
     endgenerate
-    
+
+`ifdef ANALOG_COMPATIBLE
     generate
     for (genvar i=0; i<NUM_ANALOG_PADS; i++) begin : analogs
         (* keep *)
@@ -216,23 +228,28 @@ module chip_top #(
         );
     end
     endgenerate
+`endif
 
     // Core design
 
     (* keep *) chip_core #(
+`ifdef ANALOG_COMPATIBLE
+        .NUM_ANALOG_PADS (NUM_ANALOG_PADS),
+`endif
         .NUM_INPUT_PADS  (NUM_INPUT_PADS),
         .NUM_OUTPUT_PADS (NUM_OUTPUT_PADS),
-        .NUM_BIDIR_PADS  (NUM_BIDIR_PADS),
-        .NUM_ANALOG_PADS (NUM_ANALOG_PADS)
+        .NUM_BIDIR_PADS  (NUM_BIDIR_PADS)
     ) i_chip_core (
         .clk        (clk_PAD2CORE),
         .rst_n      (rst_n_PAD2CORE),
+`ifdef ANALOG_COMPATIBLE
+        .analog     (analog_PADRES)
+`endif
         .input_in   (input_PAD2CORE),
         .output_out (output_CORE2PAD),
         .bidir_in   (bidir_PAD2CORE),
         .bidir_out  (bidir_CORE2PAD),
-        .bidir_oe   (bidir_CORE2PAD_OE),
-        .analog     (analog_PADRES)
+        .bidir_oe   (bidir_CORE2PAD_OE)
     );
 
 endmodule
