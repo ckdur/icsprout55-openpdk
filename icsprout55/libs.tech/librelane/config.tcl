@@ -1,7 +1,16 @@
 # icsprout55/libs.tech/librelane/config.tcl
 
+set ::env(PROCESS) 55
+set ::env(DEF_UNITS_PER_MICRON) 1000
+
 # Standard cell library default (also settable via --scl/STD_CELL_LIBRARY)
-set ::env(STD_CELL_LIBRARY) "ics55_LLSC_H7CR"
+if { ![info exist ::env(STD_CELL_LIBRARY)] } {
+    set ::env(STD_CELL_LIBRARY) "ics55_LLSC_H7CR"
+}
+
+if { ![info exist ::env(PAD_CELL_LIBRARY)] } {
+	set ::env(PAD_CELL_LIBRARY) "ICsprout_55LLULP1233_IO_251013"
+}
 
 # Power/ground pins
 set ::env(VDD_PIN) "VDD"
@@ -39,12 +48,6 @@ set ::env(GRT_LAYER_ADJUSTMENTS) [list 0.99 0 0 0 0 0]
 # cannot be primary.
 set ::env(PRIMARY_GDSII_STREAMOUT_TOOL) "klayout"
 
-# Placement cell padding in sites. 0 matches the bring-up configuration
-# (DFFRAM RAM blocks are macro-dominated; >0 is only needed for diode
-# insertion flows, which are inactive as long as DIODE_CELL is unset).
-set ::env(GPL_CELL_PADDING) 0
-set ::env(DPL_CELL_PADDING) 0
-
 # ----------------------------------------------------------------------------
 # Signoff tool collateral NOT shipped with this PDK.
 # ... but we will do our best!
@@ -72,9 +75,8 @@ set ::env(RCX_RULESETS) [list \
     "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/$::env(STD_CELL_LIBRARY)/rcx.rules" \
 ]
 
- # icsprout55-pdk/libs.tech/librelane/ics55_LLSC_H7CR/config.tcl
-
 set scl_dir "$::env(PDK_ROOT)/$::env(PDK)/libs.ref/$::env(STD_CELL_LIBRARY)"
+set io_dir "$::env(PDK_ROOT)/$::env(PDK)/libs.ref/$::env(PAD_CELL_LIBRARY)"
 
 # SCL-specific power/ground pins
 set ::env(SCL_POWER_PINS) [list "VDD"]
@@ -83,74 +85,41 @@ set ::env(SCL_GROUND_PINS) [list "VSS"]
 # --- Views ------------------------------------------------------------------
 # The bring-up configuration used the "_ecos" cell LEF with the plain
 # (non-ecos) tech LEF; keep that proven combination.
-set ::env(CELL_LEFS) [list \
-    "$scl_dir/lef/ics55_LLSC_H7CR_ecos.lef" \
-]
-set ::env(CELL_GDS) [list \
-    "$scl_dir/gds/ics55_LLSC_H7CR.gds" \
-]
-set ::env(CELL_VERILOG_MODELS) [list \
-    "$scl_dir/verilog/ics55_LLSC_H7CR.v" \
-]
-set ::env(CELL_CDLS) [list \
-    "$scl_dir/cdl/ics55_LLSC_H7CR.cdl" \
-]
+
+# Standard cells
+set ::env(CELL_LEFS) [list "$scl_dir/lef/$::env(STD_CELL_LIBRARY)_ecos.lef"]
+set ::env(CELL_GDS) [list "$scl_dir/gds/$::env(STD_CELL_LIBRARY).gds"]
+set ::env(CELL_VERILOG_MODELS) [list "$scl_dir/verilog/$::env(STD_CELL_LIBRARY).v"]
+set ::env(CELL_SPICE_MODELS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]
+set ::env(CELL_CDLS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]
+
+set ::env(PAD_LEFS) "$io_dir/lef/ICSIOA_N55_3P3_1P6M1TM_ecos.lef"
+set ::env(PAD_GDS) "$io_dir/gds/ICSIOA_N55_3P3_1P6M1TM.gds"
+set ::env(PAD_VERILOG_MODELS) "$io_dir/verilog/icsIOA_N55_3P3.v"
+set ::env(PAD_SPICE_MODELS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
+set ::env(PAD_CDLS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
 
 # --- Timing libraries (tech.yml: sta.libs) ------------------------------------
 # Exactly one entry must match DEFAULT_CORNER (nom_tt_025C_1v20).
-set ::env(LIB) [list \
-    "nom_tt_025C_1v20" "$scl_dir/liberty/ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib" \
-    "nom_ss_125C_1v08" "$scl_dir/liberty/ics55_LLSC_H7CR_ss_rcworst_1p08_125_nldm.lib" \
-    "nom_ff_n40C_1v32" "$scl_dir/liberty/ics55_LLSC_H7CR_ff_rcbest_1p32_m40_nldm.lib" \
-]
+# Also, we only include one lib file for the standard cells.
+set ::env(LIB) [dict create]
+dict set ::env(LIB) "nom_tt_025C_1v20" "\
+    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_typ_tt_1p2_25_nldm.lib\
+    $io_dir/liberty/ICSIOA_N55_3P3_tt_1p2_3p3_25c.lib\
+"
+dict set ::env(LIB) "nom_ss_125C_1v08" "\
+    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ss_rcworst_1p08_125_nldm.lib\
+    $io_dir/liberty/ICSIOA_N55_3P3_ss_1p08_2p97_125c.lib\
+"
+dict set ::env(LIB) "nom_ff_n40C_1v32" "\
+    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ff_rcbest_1p32_m40_nldm.lib\
+    $io_dir/liberty/ICSIOA_N55_3P3_ff_1p32_3p63_m40c.lib\
+"
 
 # --- Excluded cells ------------------------------------------------------------
 # No exclusions. /dev/null satisfies the required-Path check and reads empty.
 set ::env(SYNTH_EXCLUDED_CELL_FILE) "/dev/null"
 set ::env(PNR_EXCLUDED_CELL_FILE) "/dev/null"
-
-# --- Constraints (tech.yml: sta + bring-up configuration) ----------------------
-set ::env(OUTPUT_CAP_LOAD) 33.5
-set ::env(MAX_FANOUT_CONSTRAINT) 10
-set ::env(CLOCK_UNCERTAINTY_CONSTRAINT) 0.25
-set ::env(CLOCK_TRANSITION_CONSTRAINT) 0.15
-set ::env(TIME_DERATING_CONSTRAINT) 5
-set ::env(IO_DELAY_CONSTRAINT) 20
-
-# --- Synthesis cells (tech.yml: sta.driving_cell, tie) --------------------------
-set ::env(SYNTH_DRIVING_CELL) "INVX8H7R/Y"
-set ::env(SYNTH_BUFFER_CELL) "BUFX4H7R/A/Y"
-set ::env(SYNTH_TIEHI_CELL) "TIEHIH7R/Z"
-set ::env(SYNTH_TIELO_CELL) "TIELOH7R/Z"
-
-# Tri-state buffers exist in the library (TBUF*H7R) but were not part of the
-# bring-up configuration; uncomment if needed.
-# set ::env(TRISTATE_CELLS) [list "TBUF*H7R"]
-
-# --- Fill / decap / tap cells (tech.yml: fills) ---------------------------------
-# tech.yml gives regular expressions; LibreLane wants shell wildcards.
-set ::env(DECAP_CELLS) [list "FILLCAP*H7R"]
-set ::env(FILL_CELLS) [list "FILLER*H7R"]
-set ::env(CELL_PAD_EXCLUDE) [list "FILLCAP*H7R" "TIEHIH7R" "TIELOH7R"]
-
-# Welltap insertion (tech.yml: fills.tap + tap_distance).
-set ::env(WELLTAP_CELL) "FILLTAPH7R"
-set ::env(FP_TAPCELL_DIST) 15
-
-# No endcap cells in this library; ENDCAP_CELL intentionally unset.
-# see: https://github.com/openecos-projects/ecos-studio/issues/47
-
-# Antenna diode: tech.yml fills.diode is empty -- this library has no diode
-# cell. DIODE_CELL intentionally left unset; all diode insertion steps skip
-# themselves when it is null.
-# set ::env(DIODE_CELL) "..."
-
-# --- Clock tree synthesis --------------------------------------------------------
-set ::env(CTS_ROOT_BUFFER) "BUFX16H7R"
-set ::env(CTS_CLK_BUFFERS) [list "BUFX4H7R" "BUFX8H7R" "BUFX16H7R"]
-
-# --- Placement site (tech.yml: site) ----------------------------------------------
-set ::env(PLACE_SITE) "core7"
 
 # --- Tracks -----------------------------------------------------------------------
 # Explicit track grid (pitch/offset from the tech LEF), copied from the
@@ -160,18 +129,20 @@ set ::env(FP_TRACKS_INFO) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/$::e
 # directions (MET4 VERTICAL, MET5 HORIZONTAL).
 set ::env(PDN_MULTILAYER) 1
 set ::env(PDN_RAIL_LAYER) "MET1"
-set ::env(PDN_RAIL_WIDTH) 0.16
 set ::env(PDN_RAIL_OFFSET) 0.0
+
 set ::env(PDN_VERTICAL_LAYER) "MET4"
 set ::env(PDN_HORIZONTAL_LAYER) "MET5"
+
 set ::env(PDN_VWIDTH) 1
-set ::env(PDN_HWIDTH) 1
-set ::env(PDN_VPITCH) 16
-set ::env(PDN_HPITCH) 16
-set ::env(PDN_VOFFSET) 0.5
-set ::env(PDN_HOFFSET) 0.5
 set ::env(PDN_VSPACING) 1.0
+set ::env(PDN_VPITCH) 16
+set ::env(PDN_VOFFSET) 0.5
+
+set ::env(PDN_HWIDTH) 1
 set ::env(PDN_HSPACING) 1.0
+set ::env(PDN_HPITCH) 16
+set ::env(PDN_HOFFSET) 0.5
 
 # PDN core ring (disabled; parameters kept from the bring-up configuration).
 set ::env(PDN_CORE_RING) 0
@@ -181,3 +152,8 @@ set ::env(PDN_CORE_RING_VSPACING) 1.7
 set ::env(PDN_CORE_RING_HSPACING) 1.7
 set ::env(PDN_CORE_RING_VOFFSET) 12.45
 set ::env(PDN_CORE_RING_HOFFSET) 12.45
+
+# PDN Macro blockages list
+set ::env(MACRO_BLOCKAGES_LAYER) "MET1 MET2 MET3 MET4 MET5"
+
+# TODO: LAYERS_RC and VIAS_R are not defined!

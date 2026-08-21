@@ -107,7 +107,7 @@ export PDK=icsprout55
 Finally, you can use the librelane flow. You can use the included `counter` example:
 
 ```bash
-librelane --pdk icsprout55 config.json --run-tag debug_ics
+librelane --pdk icsprout55 config.json --run-tag debug_ics --manual-pdk
 ```
 
 It is important to disable `Netgen.LVS` and `Checker.LVS` as LVS is not supported.
