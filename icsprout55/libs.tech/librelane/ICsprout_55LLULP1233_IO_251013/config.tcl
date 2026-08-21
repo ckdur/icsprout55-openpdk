@@ -44,12 +44,16 @@ set ::env(PAD_PLACE_IO_TERMINALS) [list \
     P65_1233_PWE/XOUT \
     P65_1233_VDD1/VDD1 \
     P65_1233_VDD1A/VDDA1 \
-    P65_1233_VDD3/VDD \
     P65_1233_VDDIO3/VDDIO \
     P65_1233_VSS1A/VSSA \
     P65_1233_VSS1/VSS1 \
-    P65_1233_VSS3/VSS \
     P65_1233_VSSIO3/VSSIO \
+]
+
+# NOTE: These ones are excluded on purpose. It damages the VDD connectivity step
+set ::env(EXCLUDED_PAD_PLACE_IO_TERMINALS) [list \
+    P65_1233_VDD3/VDD \
+    P65_1233_VSS3/VSS \
 ]
 
 # Sealring offset

@@ -24,9 +24,9 @@ meta:
     
     # Save time
     #OpenROAD.IRDropReport: null
-    #KLayout.XOR: null
-    #Netgen.LVS: null
-    #Checker.LVS: null
+    KLayout.XOR: null
+    Netgen.LVS: null
+    Checker.LVS: null
 
     # Use Magic.Filler instead of KLayout.Filler
     # This can help in some cases where the target
@@ -171,3 +171,7 @@ PDN_MACRO_CONNECTIONS:
 
 # Custom PDN config to connect to SRAMs
 PDN_CFG: dir::pdn_cfg.tcl
+
+# Ignore some stuff
+IGNORE_DISCONNECTED_MODULES:
+- P65_1233_PWE
