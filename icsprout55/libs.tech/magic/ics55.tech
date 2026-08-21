@@ -4,6 +4,14 @@ end
 
 planes
   p1
+  p2
+  p3
+  p4
+  p5
+  p6
+  p7
+  p8
+  p9
   p10
   p11
   p12
@@ -14,7 +22,6 @@ planes
   p17
   p18
   p19
-  p2
   p20
   p21
   p22
@@ -25,17 +32,12 @@ planes
   p27
   p28
   p29
-  p3
   p30
   p31
   p32
   p33
-  p4
-  p5
-  p6
-  p7
-  p8
-  p9
+  p34
+  p35
 end
 
 # This part is HEAVILY modified
@@ -75,6 +77,8 @@ types
   p31 unk_55_1,l31
   p32 unk_71_1,l32
   p33 unk_191_12,l33
+  p34 unk_81_2,l34
+  p35 bound,l35
 end
 
 # The cuts are also modified
@@ -125,6 +129,8 @@ styles
   l31 comment
   l32 comment
   l33 comment
+  l34 comment
+  l35 subcircuit
 end
 
 compose
@@ -203,6 +209,8 @@ cifoutput
     calma 71 1
   layer unk_191_12 unk_191_12
     calma 191 12
+  layer bound bound
+    calma 351 12
 
 style drc
  scalefactor 1 nanometers
@@ -256,6 +264,8 @@ cifinput
   layer l31 unk_55_1
   layer l32 unk_71_1
   layer l33 unk_191_12
+  layer l34 unk_81_2
+  layer l35 bound
 
   calma act 2 1
   calma nw 9 1
@@ -290,6 +300,24 @@ cifinput
   calma unk_55_1 55 1
   calma unk_71_1 71 1
   calma unk_191_12 191 12
+  calma unk_81_2 81 2
+  calma bound 351 12
+
+  # FIXME: Once magic supports anything more than 255
+  # for the calma layers, this will remain to be the
+  # boundary definition
+  templayer allbound act
+  or nw
+  or pp
+  or np
+  or met1
+  or met2
+  or met3
+  or met4
+  or met5
+  or t4m2
+  or rdl
+    boundary
 end
 
 drc
@@ -346,6 +374,8 @@ extract
   planeorder p7 30
   planeorder p8 31
   planeorder p9 32
+  planeorder p34 33
+  planeorder p35 34
 end
 lef
   masterslice l1 ACT

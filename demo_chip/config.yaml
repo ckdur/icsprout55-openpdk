@@ -10,9 +10,9 @@ meta:
     #KLayout.DRC: null
     #Checker.KLayoutDRC: null
 
-    # Disable magic DRC
-    #Magic.DRC: null
-    #Checker.MagicDRC: null
+    # Disable magic DRC (Takes too much time for something that is not accurate)
+    Magic.DRC: null
+    Checker.MagicDRC: null
 
     # Disable KLayout antenna check
     #KLayout.Antenna: null
@@ -24,6 +24,7 @@ meta:
     
     # Save time
     #OpenROAD.IRDropReport: null
+    Magic.SpiceExtraction: null
     KLayout.XOR: null
     Netgen.LVS: null
     Checker.LVS: null
@@ -169,7 +170,7 @@ PDN_MACRO_CONNECTIONS:
 - "i_chip_core.counter_1 VDD VSS VDD VSS"
 - "i_chip_core.counter_2 VDD VSS VDD VSS"
 
-# Custom PDN config to connect to SRAMs
+# Custom PDN config to connect macros
 PDN_CFG: dir::pdn_cfg.tcl
 
 # Ignore some stuff
