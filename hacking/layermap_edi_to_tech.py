@@ -22,7 +22,7 @@ def parse_layermap(filename):
             parts = line.split()
             if len(parts) >= 4:
                 layer_name = parts[0]
-                layer_type = parts[1]
+                layer_type = parts[1].split(",")
                 gds_num = parts[2]
                 gds_type = parts[3]
                 if layer_name == "NAME":
@@ -32,8 +32,21 @@ def parse_layermap(filename):
                     continue # What?
                 
                 # Format layer name for Magic types
-                magic_layer = layer_name.lower() if layer_type.lower() == "drawing" else f"{layer_name.lower()}_{layer_type.lower()}"
-                layer_name_ext = layer_name if layer_type.lower() == "drawing" else f"{layer_name}_{layer_type}"
+                if "NET" in layer_type or "VIA" in layer_type:
+                    magic_layer = layer_name.lower()
+                    layer_name_ext = layer_name
+                elif "PIN" in layer_type:
+                    magic_layer = f"{layer_name.lower()}_pin"
+                    layer_name_ext =  f"{layer_name}_pin"
+                elif "FILL" in layer_type:
+                    magic_layer = f"{layer_name.lower()}_fill"
+                    layer_name_ext = f"{layer_name}_fill"
+                elif "LEFOBS" in layer_type:
+                    magic_layer = f"{layer_name.lower()}_obs"
+                    layer_name_ext = f"{layer_name}_obs"
+                else:
+                    magic_layer = layer_name.lower()
+                    layer_name_ext = layer_name
 
                 if magic_layer in layers_seen:
                     continue  # Skip duplicates based on Magic layer name
@@ -113,7 +126,7 @@ def parse_layermap(filename):
 
     return natsorted(list(planes)), types, gds_mappings, styles, routing, cut
 
-def generate_tech_file(planes, types, gds_mappings, styles, routing, cut, tech_name="ics55"):
+def generate_tech_file(planes, types, gds_mappings, styles, routing, cut, tech_name="ptc06"):
     lines = []
     
     # 1. Tech Header
@@ -210,7 +223,7 @@ def generate_tech_file(planes, types, gds_mappings, styles, routing, cut, tech_n
     return "\n".join(lines)
 
 if __name__ == "__main__":
-    planes, types, gds_mappings, styles, routing, cut = parse_layermap("../icsprout55-pdk/techfile/icsprout55.layermap")
+    planes, types, gds_mappings, styles, routing, cut = parse_layermap("layermap")
     tech_content = generate_tech_file(planes, types, gds_mappings, styles, routing, cut)
 
     print(tech_content)

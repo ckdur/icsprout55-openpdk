@@ -45,7 +45,16 @@ def parse_layermap(filename):
                 gds_type = parts[3]
                 
                 # Format name according to type (e.g. MET1.pin vs MET1.drawing)
-                suffix = layer_type[0].lower()
+                if "NET" in layer_type or "VIA" in layer_type:
+                    suffix = "drawing"
+                elif "PIN" in layer_type:
+                    suffix = "pin"
+                elif "FILL" in layer_type:
+                    suffix = "filler"
+                elif "LEFOBS" in layer_type:
+                    suffix = "obs"
+                else:
+                    suffix = "drawing"
 
                 if (gds_num, gds_type) in done:
                     continue  # Skip duplicates based on GDS number and type
@@ -83,7 +92,7 @@ def build_lyp_xml(entries):
     return parsed_xml.toprettyxml(indent="  ", encoding="UTF-8").decode("utf-8")
 
 if __name__ == "__main__":
-    entries = parse_layermap("../icsprout55-pdk/techfile/icsprout55.layermap")
+    entries = parse_layermap("layermap")
     lyp_content = build_lyp_xml(entries)
     
     with open("ics55.lyp", "w", encoding="utf-8") as f:
