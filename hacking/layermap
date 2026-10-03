@@ -148,6 +148,9 @@ RPOLY            ALL                          41                 4
 UNK_17_1 ALL 17 1
 UNK_18_1 ALL 18 1
 
+# Probably an IO marker
+UNK_28_1 ALL 28 1
+
 # Some sort of diode
 UNK_55_1 ALL 55 1
 UNK_71_1 ALL 71 1
