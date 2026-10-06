@@ -17,7 +17,7 @@
 *                       55nm MOM Capacitor 2t                   *
 *****************************************************************
 * a=port1, b=port2
-.subckt mom_2t a b lf=1u nf=6 bm=1 tm=3 mr=1 mismod_mom=0 
+.subckt mom_2t a b lf=1u nf=6 bm=1 tm=3 mr=1 mismod_mom=1 
 .PARAM
 +nm      = 'tm-bm+1'      
 +dc0_mis = '1.025*(a11+a12+a13)*sigma_mis_mom*mismod_mom'
@@ -51,7 +51,7 @@ cab a b 'mr*cf*(1+dc0_mis)*(1+dmom_mnx)*tcoef*(1.0+v(a,b)*(cvc1+cvc2*v(a,b)))/2'
 *****************************************************************
 *                       55nm MOM Capacitor 3t                    *
  *****************************************************************
-.subckt mom_3t a b p lf=1u nf=6 bm=1 tm=3 mr=1 mismod_mom=0 shielding=0 
+.subckt mom_3t a b p lf=1u nf=6 bm=1 tm=3 mr=1 mismod_mom=1 shielding=0 
 .PARAM
 +nm      = 'tm-bm+1'      
 +dc0_mis = '1.025*(a11+a12+a13)*sigma_mis_mom*mismod_mom'

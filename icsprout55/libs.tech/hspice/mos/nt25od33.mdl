@@ -52,7 +52,7 @@
 +wlc     = 0               wwc     = 0               wwlc    = 0              
 +dwg     = 5.9251E-10      dwb     = 0               xl      = '3.00e-09+dxl_nnatod3p3_lp'
 +xw      = '2.00e-08+dxw_nnatod3p3_lp' dlc     = 4.0E-8          dwc     = 0              
-+lmin    = 1.79982e-06          lmax    = 1.0E-4          wmin    = 4.49955e-07         
++lmin    = 1.8E-6          lmax    = 1.0E-4          wmin    = 4.5E-7         
 +wmax    = 1.0E-4          dlcig   = 0              
 
 ****************************************************************

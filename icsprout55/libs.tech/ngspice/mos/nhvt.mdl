@@ -657,7 +657,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 5.4E-8                      	lmax = 7.2E-8                      	wmin = 9E-7                        	
++lmin = 5.39946e-08                      	lmax = 7.2E-8                      	wmin = 9E-7                        	
 +wmax = 9.09E-6                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -671,7 +671,7 @@
 +wwlc = 0                           	dwg = 0                            	dwb = 0                            	
 +xl = '-2E-9 + dxl_nm1p2_hvt_lp'    	xw = '1.5E-8 + dxw_nm1p2_hvt_lp'   	dmcg = 9E-8                        	
 +dmci = 2.75E-7                     	dwj = 0                            	xgw = 0                            	
-+xgl = 0                            	vth0 = '( 0.463182 + dvth0_nm1p2_hvt_lp +dvth0_nm1p2_hvt_lp_mismatch) -0.036226471'	lvth0 = '( -3.966262E-8 + dlvth0_nm1p2_hvt_lp) + + 2.609461643E-9'	
++xgl = 0                            	vth0 = '( 0.463182 + dvth0_nm1p2_hvt_lp +dvth0_nm1p2_hvt_lp_mismatch) -0.036226471'	lvth0 = '( -3.966262E-8 + dlvth0_nm1p2_hvt_lp) + 2.609461643E-9'	
 +wvth0 = '( -1.368826E-7 + dwvth0_nm1p2_hvt_lp) + 3.238390763E-8'	pvth0 = '( 6.285081E-15 + dpvth0_nm1p2_hvt_lp) + -2.332700185E-15'	k1 = 0.530007                      	
 +lk1 = -2.700809E-9                 	wk1 = -2.745578E-10                	pk1 = 2.582333E-17                 	
 +k2 = 7.93289E-2                    	lk2 = -8.833561E-9                 	wk2 = 3.416848E-8                  	
@@ -1432,7 +1432,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 5.4E-8                      	lmax = 7.2E-8                      	wmin = 4.5E-7                      	
++lmin = 5.39946e-08                      	lmax = 7.2E-8                      	wmin = 4.5E-7                      	
 +wmax = 9E-7                        	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -2210,7 +2210,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 5.4E-8                      	lmax = 7.2E-8                      	wmin = 2.7E-7                      	
++lmin = 5.39946e-08                      	lmax = 7.2E-8                      	wmin = 2.7E-7                      	
 +wmax = 4.5E-7                      	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -2993,7 +2993,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 5.4E-8                      	lmax = 7.2E-8                      	wmin = 1.35E-7                     	
++lmin = 5.39946e-08                      	lmax = 7.2E-8                      	wmin = 1.35E-7                     	
 +wmax = 2.7E-7                      	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3126,7 +3126,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 9E-7                        	lmax = 9.09E-6                     	wmin = 1.08E-7                     	
++lmin = 9E-7                        	lmax = 9.09E-6                     	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3253,7 +3253,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 6.3E-7                      	lmax = 9E-7                        	wmin = 1.08E-7                     	
++lmin = 6.3E-7                      	lmax = 9E-7                        	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3382,7 +3382,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 4.5E-7                      	lmax = 6.3E-7                      	wmin = 1.08E-7                     	
++lmin = 4.5E-7                      	lmax = 6.3E-7                      	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3511,7 +3511,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 1.8E-7                      	lmax = 4.5E-7                      	wmin = 1.08E-7                     	
++lmin = 1.8E-7                      	lmax = 4.5E-7                      	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3644,7 +3644,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 7.2E-8                      	lmax = 1.8E-7                      	wmin = 1.08E-7                     	
++lmin = 7.2E-8                      	lmax = 1.8E-7                      	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	
@@ -3779,7 +3779,7 @@
 +fnoimod = 1                        	tnoimod = 0                        	diomod = 2                         	
 +tempmod = 0                        	permod = 1                         	geomod = 0                         	
 +rgeomod = 1                        	rgatemod = 0                       	wpemod = 1                         	
-+lmin = 5.4E-8                      	lmax = 7.2E-8                      	wmin = 1.08E-7                     	
++lmin = 5.39946e-08                      	lmax = 7.2E-8                      	wmin = 1.07989e-07                     	
 +wmax = 1.35E-7                     	epsrox = 3.9                       	toxe = '2.58E-9 + dtoxe_nm1p2_hvt_lp+dtoxe_nm1p2_hvt_lp_mismatch'	
 +dtox = 3.57E-10                    	xj = 1.15E-7                       	ndep = 2.1E17                      	
 +ngate = 1E21                       	nsd = 1E20                         	rsh = 12                           	

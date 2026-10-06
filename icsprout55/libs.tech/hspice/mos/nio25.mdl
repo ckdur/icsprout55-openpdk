@@ -25,7 +25,7 @@
 **************************************************************
 *               MODEL FLAG PARAMETERS
 **************************************************************
-+lmin    = 1.9798e-07       lmax    = 0.0001          wmin    = 1.88981e-07       wmax    = 0.0001
++lmin    = 1.98e-007       lmax    = 0.0001          wmin    = 1.89e-007       wmax    = 0.0001
 +version = 4.5             binunit = 2               paramchk= 1               mobmod  = 0
 +capmod  = 2               igcmod  = 0               igbmod  = 0               geomod  = 0
 +diomod  = 2               rdsmod  = 0               rbodymod= 0               rgeomod = 1
@@ -87,7 +87,7 @@
 +cgso = '4.35E-10 + dcgso_nm2p5_lp'          cgdo = '4.35E-10 + dcgdo_nm2p5_lp'         cgbo    = 0               cgdl = '0 + dcgdl_nm2p5_lp'
 +cgsl = '0 + dcgsl_nm2p5_lp'                 clc     = 1e-018          cf = '2.79E-11 +dcf_nm2p5_lp'           acde = 0.2864
 +moin = 5.0                lmoin = 4.0E-6          noff = 2.3008             lnoff = 3.0E-7
-+voffcv = -0.112352 lcf = '0 + dlcf_nm2p5_lp'	wcf = '2.0E-16 + dwcf_nm2p5_lp'	pcf = '-4.0E-23 + dpcf_nm2p5_lp'
++voffcv = -0.112352 lcf = '0 + +dlcf_nm2p5_lp'	wcf = '2.0E-16 + dwcf_nm2p5_lp'	pcf = '-4.0E-23 + dpcf_nm2p5_lp'
 **************************************************************
 *               TEMPERATURE PARAMETERS
 **************************************************************

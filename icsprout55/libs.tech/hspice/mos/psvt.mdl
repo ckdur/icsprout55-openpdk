@@ -710,7 +710,7 @@
 +wlc     = 0               wwc     = 0               wwlc    = 0              
 +dwg     = 0               dwb     = 0               xl      = '-2e-009+dxl_pm1p2_svt_lp'
 +xw      = '8e-009+dxw_pm1p2_svt_lp' dlc     = 1.12E-8         dwc     = -1.2E-8        
-+lmin    = 5.39946e-08          lmax    = 1.0E-4          wmin    = 1.07989e-07        
++lmin    = 5.4E-8          lmax    = 1.0E-4          wmin    = 1.08E-7        
 +wmax    = 1.0E-4          dlcig   = 1.0E-9         
 
 ****************************************************************
@@ -731,13 +731,13 @@
 +luc     = 2.0E-18         wuc     = 1.0E-17         puc     = -1.0E-24       
 +ud      = 0               eu      = 1.67            vsat    = '95000.0 + vsat_qq + dvsat_pm1p2_svt_lp_mis'
 +lvsat   = '(-0.004)+dlvsat_pm1p2_svt_lp' pvsat   = '(-1.8E-11)+dpvsat_pm1p2_svt_lp' a0      = 2.9            
-+la0     = -5.9344E-7      pa0     = -3.0E-14        ags     = '0.7 + ags_qq + dags_pm1p2_svt_lp'
++la0     = -5.9344E-7      pa0     = -3.0E-14        ags     = '0.7 + ags_qq + +dags_pm1p2_svt_lp'
 +lags    = 2.0E-7          wags    = '2.0E-8 + dwags_pm1p2_svt_lp' b0      = 1.0E-8         
 +b1      = 0               keta    = 0.02            lketa   = -5.0E-9        
 +wketa   = -2.0E-9         pketa   = 7.0E-16         a1      = 0              
 +a2      = 1.0             voff    = '(-0.0585)+dvoff_pm1p2_svt_lp + dvoff_pm1p2_svt_lp_mis' lvoff   = 1.0E-11        
 +pvoff   = 2.5E-16         voffl   = -2.0E-10        minv    = 1.5            
-+lminv   = -6.1E-8         nfactor = 1.1             eta0    = '0.35 + deta0_pm1p2_svt_lp_mis'
++lminv   = -6.1E-8         nfactor = 1.1             eta0    = '0.35 + +deta0_pm1p2_svt_lp_mis'
 +leta0   = '1.00e-007+dleta0_pm1p2_svt_lp' peta0   = '(-8.0E-15)+dpeta0_pm1p2_svt_lp' etab    = -0.3           
 +letab   = -2.9E-8         petab   = 4.7E-15         dsub    = 0.58           
 +cit     = -0.001          lcit    = 3.7E-10         wcit    = -5.0E-11       

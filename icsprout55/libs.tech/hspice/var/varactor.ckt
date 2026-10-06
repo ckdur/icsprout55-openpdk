@@ -19,7 +19,7 @@
 *This model is empirical model, and is provided for special customer.
 * 1=port1, 2=port2
 * Area=wwr*llr*nf
-.subckt var1p2_npd_nw_lp 1 2 lr=l wr=w nf=finger mismod_var=0 mr=1
+.subckt var1p2_npd_nw_lp 1 2 lr=l wr=w nf=finger mismod_var=1 mr=1
 * 1.2v mos varactor scalable model parameters
 .param
 +scalevar=0.9
@@ -122,7 +122,7 @@ Cgg   1  2  C='max((Cgg_A2+(Cgg_A1-Cgg_A2)/(1+EXP((V(1,2)-Cgg_x0)/(Cgg_dx*(0.001
 
 
 
-.subckt var2p5_npd_nw_lp n1 n2 lr=1e-6 wr=1e-6 nf=1 mr=1 mismod_var=0 
+.subckt var2p5_npd_nw_lp n1 n2 lr=1e-6 wr=1e-6 nf=1 mr=1 mismod_var=1 
 .PARAM
 +_scale  = 0.9 
 +geo_fac = '1.0/sqrt(wr*lr*nf*mr)'

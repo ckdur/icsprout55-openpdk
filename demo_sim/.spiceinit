@@ -1,0 +1,3 @@
+* ngspice init for the ICsprout55 HSPICE-format models
+set ngbehavior=hsa
+set num_threads=4

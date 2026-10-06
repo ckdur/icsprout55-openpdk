@@ -52,7 +52,7 @@
 +wlc     = 0               wwc     = 0               wwlc    = 0              
 +dwg     = 0               dwb     = 0               xl      = '3.0E-9 + dxl_nm2p5od33_lp'         
 +xw      = '2.0E-8 + dxw_nm2p5od33_lp'          dlc     = 4.4E-8          dwc     = -1.0E-8        
-+lmin    = 1.9798e-07         lmax    = 1.0E-4          wmin    = 1.88981e-07        
++lmin    = 1.98E-7         lmax    = 1.0E-4          wmin    = 1.89E-7        
 +wmax    = 1.0E-4          dlcig   = 1.0E-9         
 
 ****************************************************************
@@ -138,7 +138,7 @@
 ****************************************************************
 +cgso    = '4.35E-10 + dcgso_nm2p5od33_lp' cgdo    = '4.35E-10 + dcgdo_nm2p5od33_lp' cgbo    = 0              
 +ckappas = 0.6             ckappad = 0.6             cf      = '2.79E-11 +dcf_nm2p5od33_lp'
-+lcf     = '0 + dlcf_nm2p5od33_lp' wcf     = '2.0E-16 + dwcf_nm2p5od33_lp' pcf     = '-4.0E-23 + dpcf_nm2p5od33_lp'
++lcf     = '0 + +dlcf_nm2p5od33_lp' wcf     = '2.0E-16 + dwcf_nm2p5od33_lp' pcf     = '-4.0E-23 + dpcf_nm2p5od33_lp'
 +clc     = 1.0E-18         noff    = 2.3008          lnoff   = 3.0E-7         
 +voffcv  = -0.112352       lvoffcv = -2.0E-8         acde    = 0.2664         
 +moin    = 5.0             lmoin   = 4.0E-6          cgsl    = '0 + dcgsl_nm2p5od33_lp'              

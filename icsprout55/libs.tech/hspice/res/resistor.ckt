@@ -249,7 +249,7 @@ c2 n1 sub '(cox*weff*l/2+capsw*weff+capsw*l)*mr'
 ************************************************************************************  
 *          non-silicide hr poly resistor subcircuit netlist                        *  
 ************************************************************************************ 
-.subckt re_hrpo_2t n2 n1 l=lr w=wr mr=1 resmis_mod=0  
+.subckt re_hrpo_2t n2 n1 l=lr w=wr mr=1 resmis_mod=1  
 .param
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -269,7 +269,7 @@ r1 n2 n1 'r0*tcoef*(0.5+1/(2+rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *        non-silicide hr poly resistor subcircuit netlist(three terminal)          *  
 ************************************************************************************ 
-.subckt re_hrpo_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=0  flag_cc=1
+.subckt re_hrpo_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=1  flag_cc=1
 .param
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -294,7 +294,7 @@ c2 n1 sub '(cox*weff*l/2+capsw*weff+capsw*l)*mr'
 ************************************************************************************  
 *          nwell resistor under sti subcircuit netlist                             *  
 ************************************************************************************ 
-.subckt re_nwsti_2t n2 n1 l=lr w=wr  mr=1 resmis_mod=0
+.subckt re_nwsti_2t n2 n1 l=lr w=wr  mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -316,7 +316,7 @@ r1    n2   n1 'rsh*leff/weff*tcoef*(2 - 1/(1+ rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *          nwell resistor under sti subcircuit netlist  (three terminal)                              *  
 ************************************************************************************ 
-.subckt re_nwsti_3t n2 n1 sub l=lr w=wr  mr=1 resmis_mod=0
+.subckt re_nwsti_3t n2 n1 sub l=lr w=wr  mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -346,7 +346,7 @@ d5    sub  n1 dio_1p2_nw_psub_lp area='(w-(2/0.9)*dw)*l/5*mr' pj='((w-(2/0.9)*dw
 ************************************************************************************  
 *           nwell resistor under aa subcircuit netlist                             *  
 ************************************************************************************ 
-.subckt re_nwaa_2t n2 n1 l=lr w=wr  mr=1 resmis_mod=0
+.subckt re_nwaa_2t n2 n1 l=lr w=wr  mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -368,7 +368,7 @@ r1    n2   n1 'r0*tcoef*min(max(2 - 1/(1+ rvc*v(n2,n1)*v(n2,n1)), 0.85), 1.15)'
 ************************************************************************************  
 *           nwell resistor under aa subcircuit netlist(three terminal)                              *  
 ************************************************************************************ 
-.subckt re_nwaa_3t n2 n1 sub l=lr w=wr  mr=1 resmis_mod=0
+.subckt re_nwaa_3t n2 n1 sub l=lr w=wr  mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -398,7 +398,7 @@ d5    sub  n1 dio_1p2_nw_psub_lp area='(w-(2/0.9)*dw)*l/5*mr' pj='((w-(2/0.9)*dw
 ************************************************************************************  
 *      non-silicide n+ diffusion resistor subcircuit netlist                       *  
 ************************************************************************************ 
-.subckt re_ndif_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=0
+.subckt re_ndif_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=1
 .param 
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -420,7 +420,7 @@ r1    n2   n1 'r0*tcoef*(2-1/(1+rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *      non-silicide n+ diffusion resistor subcircuit netlist  (three terminal)                       *  
 ************************************************************************************ 
-.subckt re_ndif_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=0
+.subckt re_ndif_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=1
 .param 
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -451,7 +451,7 @@ d5    sub  n1 dio_1p2_np_pw_lp area='(w-(2/0.9)*dw)*(l-(2/0.9)*dl)/5*mr' pj='((w
 ************************************************************************************  
 *      non-silicide p+ diffusion resistor subcircuit netlist                       *  
 ************************************************************************************ 
-.subckt re_pdif_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=0
+.subckt re_pdif_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -475,7 +475,7 @@ r1    n2   n1 'r0*tcoef*(2-1/(1+rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *      non-silicide p+ diffusion resistor subcircuit netlist (three terminal)      *  
 ************************************************************************************ 
-.subckt re_pdif_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=0
+.subckt re_pdif_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -507,7 +507,7 @@ d5    n1   sub dio_1p2_pp_nw_lp area='(w-(2/0.9)*dw)*(l-(2/0.9)*dl)/5*mr' pj='((
 ************************************************************************************  
 *        non-silicide n+ poly resistor subcircuit netlist                          *  
 ************************************************************************************ 
-.subckt re_npo_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=0
+.subckt re_npo_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -528,7 +528,7 @@ r1    n2 n1 'r0*tcoef*(0.5+1/(2+rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *        non-silicide n+ poly resistor subcircuit netlist (three terminal)         *  
 ************************************************************************************ 
-.subckt re_npo_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=0 flag_cc=1  
+.subckt re_npo_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=1 flag_cc=1  
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -554,7 +554,7 @@ c2    n1 sub '(cox*weff*leff/2+capsw*weff+capsw*leff)*mr'
 ************************************************************************************  
 *        non-silicide p+ poly resistor subcircuit netlist                          *  
 ************************************************************************************ 
-.subckt re_ppo_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=0 
+.subckt re_ppo_sab_2t n2 n1 l=lr w=wr mr=1 resmis_mod=1 
 .param 
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'
@@ -576,7 +576,7 @@ r1    n2 n1 'r0*tcoef*(0.5+1/(2+rvc*v(n2,n1)*v(n2,n1)))'
 ************************************************************************************  
 *        non-silicide p+ poly resistor subcircuit netlist (three terminal)         *  
 ************************************************************************************ 
-.subckt re_ppo_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=0  flag_cc=1
+.subckt re_ppo_sab_3t n2 n1 sub l=lr w=wr mr=1 resmis_mod=1  flag_cc=1
 .param  
 *****mismatch parameters*****
 +rshmis = 'arsh*geo_fac*sigma_mis_r*resmis_mod'

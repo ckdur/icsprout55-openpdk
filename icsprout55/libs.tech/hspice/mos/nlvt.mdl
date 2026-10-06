@@ -381,8 +381,8 @@
 +llc     = 0               lwlc    = -4.8E-23        wwc     = 0              
 +wwlc    = 0               dwg     = 0               dwb     = 0              
 +xl      = '-2e-009+dxl_nm1p2_lvt_lp' xw      = '1.5e-008+dxw_nm1p2_lvt_lp' dlc     = 1.08E-8        
-+dwc     = -1.0E-8         lmin    = 5.39946e-08          lmax    = 1.0E-4         
-+wmin    = 1.07989e-07         wmax    = 1.0E-4          dlcig   = 5.4E-9         
++dwc     = -1.0E-8         lmin    = 5.4E-8          lmax    = 1.0E-4         
++wmin    = 1.08E-7         wmax    = 1.0E-4          dlcig   = 5.4E-9         
 
 ****************************************************************
 *                    Basic Model Parameters

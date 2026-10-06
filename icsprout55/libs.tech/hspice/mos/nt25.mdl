@@ -9,19 +9,19 @@
 *  model name         :
 *    mosfet           :
 *        *----------------------------------------------------------------------------------------------------*
-*        |     mosfet type        |   2.5v(od 3.3v)    | 
+*        |     mosfet type     |   2.5v      |   
 *        |====================================================================================================|
 *        *----------------------------------*
-*        |      nmos      | nnatod3p3_lp    |
+*        |     native  nmos      | nnat2p5_lp    |
 *        *----------------------------------*
 *  valid temperature range is from -40c to 125c
 *
 
 
 ***********************************************************************************
-*                              2.5v(od 3.3v) io native nmos model                               *
+*                              2.5v io native nmos model                               *
 ***********************************************************************************
-.MODEL nnatod3p3_lp_core nmos
+.MODEL nnat2p5_lp_core nmos
 ****************************************************************
 *                        Model selector
 ****************************************************************
@@ -37,7 +37,7 @@
 ****************************************************************
 *                       Process Parameter
 ****************************************************************
-+epsrox  = 3.9             toxe    = '5.69e-09+dtoxe_nnatod3p3_lp+dtoxe_nnatod3p3_lp_mis' dtox    = 0              
++epsrox  = 3.9             toxe    = '5.69e-09+dtoxe_nnat2p5_lp+dtoxe_nnat2p5_lp_mis' dtox    = 0              
 +toxref  = 5.76E-9         xj      = 1.15E-7         ndep    = 1.3E17         
 +ngate   = 3.9E20          nsd     = 1.0E20          rsh     = 12.91          
 
@@ -50,15 +50,15 @@
 +lw      = 0               lwn     = 1.0             lwl     = -1.733E-20     
 +llc     = 9.0E-15         lwc     = 0               lwlc    = 0              
 +wlc     = 0               wwc     = 0               wwlc    = 0              
-+dwg     = 5.9251E-10      dwb     = 0               xl      = '3.00e-09+dxl_nnatod3p3_lp'
-+xw      = '2.00e-08+dxw_nnatod3p3_lp' dlc     = 4.0E-8          dwc     = 0              
-+lmin    = 1.79982e-06          lmax    = 1.0E-4          wmin    = 4.49955e-07         
++dwg     = 5.9251E-10      dwb     = 0               xl      = '3.00e-09+dxl_nnat2p5_lp'
++xw      = '2.00e-08+dxw_nnat2p5_lp' dlc     = 4.0E-8          dwc     = 0              
++lmin    = 1.8E-6          lmax    = 1.0E-4          wmin    = 4.5E-7         
 +wmax    = 1.0E-4          dlcig   = 0              
 
 ****************************************************************
 *                    Basic Model Parameters
 ****************************************************************
-+vth0    = '(-0.132)+dvth0_nnatod3p3_lp+dvth0_nnatod3p3_lp_mis' lvth0   = '(-2.18E-8)+dlvth0_nnatod3p3_lp' wvth0   = -2.22156E-8    
++vth0    = '(-0.132)+dvth0_nnat2p5_lp+dvth0_nnat2p5_lp_mis' lvth0   = '(-2.18E-8)+dlvth0_nnat2p5_lp' wvth0   = -2.22156E-8    
 +pvth0   = 1.0E-14         phin    = 0               k1      = 0.082          
 +k2      = 0.0015          lk2     = -2.56E-9        wk2     = -5.051E-9      
 +pk2     = -1.628E-15      k3      = 4.36            k3b     = -2.123         
@@ -66,21 +66,21 @@
 +vbm     = -3.0            dvtp0   = 0               dvtp1   = 0              
 +dvt0    = 3.1499          wdvt0   = -9.7E-7         dvt1    = 0.11866        
 +dvt2    = 0.015           dvt0w   = 0               dvt1w   = 0              
-+dvt2w   = 0               u0      = '0.05398+du0_nnatod3p3_lp+du0_nnatod3p3_lp_mis' lu0     = '(-1.36E-10)+dlu0_nnatod3p3_lp'
-+wu0     = '(6.87649E-9)+dwu0_nnatod3p3_lp' pu0     = 6.9097E-15      ua      = 8.4E-10        
++dvt2w   = 0               u0      = '0.05398+du0_nnat2p5_lp+du0_nnat2p5_lp_mis' lu0     = '(-1.36E-10)+dlu0_nnat2p5_lp'
++wu0     = '6.87649E-9+dwu0_nnat2p5_lp' pu0     = 6.9097E-15      ua      = 8.5E-10        
 +lua     = 0               wua     = 4.0283E-16      pua     = 7.0E-23        
-+ub      = 2.0094E-18      lub     = -1.0755E-25     wub     = -3.916E-25     
++ub      = 1.8494E-18      lub     = -1.0755E-25     wub     = -3.916E-25     
 +pub     = 2.0307E-31      uc      = 1.3E-11         luc     = 0              
 +wuc     = -1.5E-17        ud      = 0               up      = 0              
-+lp      = 1.0E-8          eu      = 1.67            vsat    = '76000.0+dvsat_nnatod3p3_lp+dvsat_nnatod3p3_lp_mis'
++lp      = 1.0E-8          eu      = 1.67            vsat    = '80000.0+dvsat_nnat2p5_lp'
 +lvsat   = 0               pvsat   = 2.2212E-8       a0      = 6.1            
-+la0     = -5.6858E-6      pa0     = -2.15111E-12    ags     = 0.656          
++la0     = -5.6858E-6      pa0     = -2.35111E-12    ags     = '0.656+dags_nnat2p5_lp'
 +lags    = 9.691E-7        wags    = -8.0E-8         pags    = 3.3792E-14     
 +b0      = -7.0E-7         b1      = 0               keta    = -0.047         
 +wketa   = 2.0E-9          pketa   = 1.8E-14         a1      = 0              
-+a2      = 1.0             voff    = '(-0.0820000)+dvoff_nnatod3p3_lp+dvoff_nnatod3p3_lp_mis' lvoff   = -1.4E-9        
++a2      = 1.0             voff    = '(-0.0820000)+dvoff_nnat2p5_lp+dvoff_nnat2p5_lp_mis' lvoff   = -1.4E-9        
 +voffl   = 0               minv    = -0.38892        nfactor = 0.01           
-+eta0    = '0.094+deta0_nnatod3p3_lp_mis' etab    = 0.021           dsub    = 0.05589        
++eta0    = 0.094           etab    = 0.021           dsub    = 0.05589        
 +cit     = -3.66E-4        lcit    = 2.72E-10        cdsc    = 2.4E-4         
 +cdscb   = 0               cdscd   = 0               pclm    = 1.2            
 +lpclm   = -5.819E-7       ppclm   = -1.28E-13       pdiblc1 = 0.39           
@@ -123,28 +123,28 @@
 ****************************************************************
 *          Flicker and Thermal Noise Model Parameters
 ****************************************************************
-+noia    = 6.6E40          noib    = 8.0E24          noic    = 8.0E7          
-+em      = 1.0E7           ef      = 1.04            ntnoi   = 0.96           
++noia    = 4.7331E40       noib    = 3.9063E24       noic    = 5.912E7        
++em      = 1.0E7           ef      = 0.92            ntnoi   = 0.73           
 
 ****************************************************************
 *                     Capacitance Parameter
 ****************************************************************
-+cgso    = '2.8E-10+0*prelayout+dcgso_nnatod3p3_lp' cgdo    = '2.8E-10+0*prelayout+dcgdo_nnatod3p3_lp' cgbo    = 0              
-+ckappas = 0.61            ckappad = 0.61            cf      = '2.79e-011+dcf_nnatod3p3_lp'
++cgso    = '2.8E-10+0*prelayout+dcgso_nnat2p5_lp' cgdo    = '2.8E-10+0*prelayout+dcgdo_nnat2p5_lp' cgbo    = 0              
++ckappas = 0.61            ckappad = 0.61            cf      = '2.79e-011+dcf_nnat2p5_lp'
 +vfbcv   = -1.0            noff    = 4.0             voffcv  = 0.002          
-+acde    = 0.22            moin    = 9.2             cgsl    = '1.0E-10+dcgsl_nnatod3p3_lp'
-+cgdl    = '3.5E-10+dcgdl_nnatod3p3_lp'
++acde    = 0.22            moin    = 9.2             cgsl    = '1.0E-10+dcgsl_nnat2p5_lp'
++cgdl    = '3.5E-10+dcgdl_nnat2p5_lp'
 
 ****************************************************************
 *          Souce/Drain Junction Diode Model Parameter
 ****************************************************************
 +ijthsrev= 0.1             ijthsfwd= 0.1             xjbvs   = 1.0            
 +bvs     = 16.2            jss     = 1.85E-7         jsws    = 4.5E-13        
-+jswgs   = 5.0E-13         cjs     = '0.00099171574+dcjs_nnatod3p3_lp' cjsws   = '1.1598664e-10+dcjsws_nnatod3p3_lp'
-+cjswgs  = '2.0343e-010+dcjswgs_nnatod3p3_lp' mjs     = 0.353           mjsws   = 0              
++jswgs   = 5.0E-13         cjs     = '0.00099171574+dcjs_nnat2p5_lp' cjsws   = '1.1598664e-10+dcjsws_nnat2p5_lp'
++cjswgs  = '2.0343e-010+dcjswgs_nnat2p5_lp' mjs     = 0.353           mjsws   = 0              
 +mjswgs  = 0.7             pbs     = 0.82            pbsws   = 1.171          
 +pbswgs  = 0.85            njs     = 1.041           xtis    = 3.0            
-+tpb     = 0.00195         tpbsw   = 0.002342        tpbswg  = 0.001          
++tpb     = 0.00195         tpbsw   = 7.22E-4         tpbswg  = 0.001          
 +tcj     = 8.767E-4        tcjsw   = 4.2938E-4       tcjswg  = 0.0024         
 +jtss    = 0               jtsd    = 0               jtssws  = 0              
 +jtsswd  = 0               jtsswgs = 0               jtsswgd = 0              
@@ -168,21 +168,23 @@
 ****************************************************************
 *                    Temperature coefficient
 ****************************************************************
-+tnom    = 25.0            ute     = -1.0876         wute    = 0              
-+kt1     = -0.161          pkt1    = 1.4002E-13      kt1l    = -2.937E-8      
-+pkt1l   = -1.3629E-19     kt2     = -0.02           lkt2    = -1.3235E-10    
-+pkt2    = 1.4191E-14      ua1     = 4.6E-10         lua1    = 2.6641E-15     
-+pua1    = -1.7495E-21     ub1     = 6.8E-19         lub1    = -4.6003E-24    
-+pub1    = 3.173E-30       uc1     = -9.8855E-12     luc1    = 0              
-+ud1     = 0               at      = 69000.0         lat     = -0.085         
-+pat     = -4.0313E-8      prt     = 0               tvoff   = 0.0067         
-+ltvoff  = 0              
++tnom    = 25.0            ute     = -1.7476         lute    = 3.0E-7         
++wute    = 0               pute    = 0               kt1     = -0.16039       
++wkt1    = 0               pkt1    = 1.0202E-13      kt1l    = -2.337E-8      
++pkt1l   = -1.3629E-19     kt2     = -0.009671       lkt2    = 1.9765E-10     
++pkt2    = 0               ua1     = -6.3815E-10     lua1    = 6.1141E-15     
++pua1    = -1.4495E-21     ub1     = 4.87E-19        lub1    = -1.37003E-23   
++pub1    = 3.173E-30       uc1     = -3.6855E-11     luc1    = 0              
++puc1    = 0               ud1     = 0               at      = 71174.0        
++lat     = -0.085          pat     = -4.0313E-8      prt     = 0              
++tvoff   = 0.005266        ltvoff  = -5.0E-10        wtvoff  = 0              
++ptvoff  = 1.7E-15        
 
 ****************************************************************
 *                Stress Effect Related Parameter
 ****************************************************************
 +saref   = 4.14E-7         sbref   = 4.14E-7         wlod    = 0              
-+ku0     = -6.4317365E-8   kvsat   = 0               kvth0   = 8.9E-10        
++ku0     = -6.5E-8         kvsat   = 0               kvth0   = 8.9E-10        
 +tku0    = 0               llodku0 = 0               wlodku0 = 0              
 +llodvth = 0               wlodvth = 0               lku0    = 0              
 +wku0    = 0               pku0    = 0               lkvth0  = 0              
