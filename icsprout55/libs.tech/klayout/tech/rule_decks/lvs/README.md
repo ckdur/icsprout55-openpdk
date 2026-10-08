@@ -70,6 +70,17 @@ varactors, MOM/MIM, metal/diffusion/well/HRP resistors, eFuse, ERC checks.
   a cell becomes a pin even when the parent does not connect it.
 - **Split gates.** Calibre `LVS REDUCE SPLIT GATES YES`: `split_gates` on the
   layout, plus joining of symmetric nets on both sides (leaf circuits only).
+- **Metals are not merged.** `m1`..`m6` and the vias are joined with `+`, not
+  `|`. In deep mode a merge with a parent wire that touches a cell pin moves the
+  polygon to the parent and the cell label loses its shape, so the pins of placed
+  standard cells came out unnamed (and the top level did not match).
+- **Pins swapped by the layout.** Some cells match only with input pins paired
+  crosswise: the transistor order of the GDS differs from the CDL
+  (NAND2X0P5H7R/X8/X16: A and B; AOI22X3H7R: A0/B1 and A1/B0). The cell
+  matches, but every instance looks miswired at the top. Calibre accepts this
+  with gate recognition; here, when the first comparison fails, the permutations
+  found in the cells that matched are declared as `equivalent_pins` and the
+  netlists are compared again (logged as "pins ... are swapped in the layout").
 - **Pins shorted by all parents.** Two pins of a cell that connect to the same
   net in every instance are joined into one pin. In a placed design this ties
   the well / substrate pins of the tapless standard cells to VDD / VSS (through

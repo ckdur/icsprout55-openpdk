@@ -66,28 +66,32 @@ So, I offer this repository to implement the same RTL-to-GDS, but using the regu
 
 ## Missing features
 
-This is a list of known features that ECOS offer, but they are not totally implemented:
+This is a list of known features that ECOS offer, and their state in this repository:
 
-- Implement DRC in both Magic and Klayout. This repository puts a placeholder with just checking the width of 
-  MET1. ECOS can support all the DRC written in the technology LEF file, mainly width, spacing, and enclosures.
-  Go [here](https://github.com/openecos-projects/ecc-tools/tree/main/src/operation/iDRC) for more info.
+- DRC. KLayout DRC (`icsprout55/libs.tech/klayout/tech/ics55.drc`) is a partial translation of the vendor Calibre
+  runset (`icsprout55-pdk/pv/DRC`): widths, spaces, areas and the basic via enclosures of the main FEOL layers,
+  M1-M5, the vias and the top metal. Density, connectivity-based rules, antenna and dummy fill are not translated yet.
+  A few values are relaxed so the released standard cells pass; each one is marked in the deck and listed in
+  `icsprout55/libs.tech/klayout/tech/testing/README.md`. Magic DRC is a placeholder and is not used.
+- LVS. KLayout LVS (`icsprout55/libs.tech/klayout/tech/ics55.lvs`) is translated from the vendor Calibre runset
+  (`icsprout55-pdk/pv/LVS`). It extracts the devices used by the standard cells and the IO library (core svt/hvt/lvt
+  and 3.3V MOS, diodes, poly resistors). LibreLane only runs KLayout LVS for the IHP PDKs, so this PDK ships a
+  LibreLane plugin with the step `ICS55.KLayoutLVS` (see below). Magic/Netgen LVS is not supported.
+  Full-chip LVS (`demo_chip`) is disabled for now, it is too slow on a chip with fill.
 - RCX true translation. This repository used the `FasterCap` offered from `OpenROAD`, but this repository contains
   the hacked-out StarRC files. the idea is to translate the files found in `hacking/decrypted_output/` into
   OpenRCX format. For now, the RCX will be VERY imprecise for two reasons:
   - Dielectric epsilons, distances, and metal thicknesses are not specified anywhere. Put some arbritary values.
   - The FasterCap implementation has the precision of their solver into 10% instead of 1% for faster convergence.
-- LVS implementation. No idea how to do it for Magic, and librelane flow doesn't support Klayout by default.
-  for now it is unimplemented.
 
 ## Missing PDK features
 
-These are the missing PDK pieces for reliable implementation:
+The vendor PDK (`icsprout55-pdk`) now includes the SPICE models (HSPICE, adapted for ngspice in
+`icsprout55/libs.tech/ngspice`, see `demo_sim`) and the Calibre DRC/LVS runsets, whose layer maps give the GDS
+layer and datatype of every layer. Still missing for a reliable implementation:
 
-- Spice models.
-- A complete DRC document (at least), or the Klayout/Magic implementation of full DRC.
-- The layermap, or the cross-section of the fabrication, or the table of layers with GDS layer and datatype.
-
-It seems they won't release those unless they are available in ECOS first.
+- A complete DRC document, to check the translated rules against.
+- The cross-section of the fabrication (dielectrics, metal thicknesses) for RCX.
 
 ## How to use this repository:
 
@@ -97,6 +101,9 @@ First, we download the PDK and organize them into a OpenPDK infrastructure
 bash ./install.sh
 ```
 
+Besides copying the vendor libraries, `install.sh` converts their CDL netlists into LVS-ready ones
+(`hacking/cdl_convert.py`) and generates ngspice netlists of the standard cells (`hacking/cdl_to_spice.py`).
+
 Next, you need to set the `PDK_ROOT` and `PDK` environment variables:
 
 ```bash
@@ -104,10 +111,46 @@ export PDK_ROOT=$(pwd)
 export PDK=icsprout55
 ```
 
-Finally, you can use the librelane flow. You can use the included `counter` example:
+Finally, you can use the librelane flow. You can use the included `counter` example (`demo_counter/run.sh`):
 
 ```bash
+export PYTHONPATH=$PDK_ROOT/$PDK/libs.tech/librelane${PYTHONPATH:+:$PYTHONPATH}
 librelane --pdk icsprout55 config.json --run-tag debug_ics --manual-pdk
 ```
 
-It is important to disable `Netgen.LVS` and `Checker.LVS` as LVS is not supported.
+The `PYTHONPATH` entry loads the PDK LibreLane plugin. To use KLayout LVS and skip the Magic verifications, the
+design config needs these substitutions (as in `demo_counter/config.json`):
+
+```json
+"meta": {
+  "substituting_steps": {
+    "Magic.DRC": null,
+    "Checker.MagicDRC": null,
+    "Magic.SpiceExtraction": null,
+    "Checker.IllegalOverlap": null,
+    "KLayout.XOR": null,
+    "Checker.XOR": null,
+    "-Netgen.LVS": "OpenROAD.WriteCDL",
+    "Netgen.LVS": "ICS55.KLayoutLVS"
+  }
+}
+```
+
+`Checker.LVS` then checks the KLayout LVS result. KLayout DRC still reports some findings of the standard cells
+themselves (see `icsprout55/libs.tech/klayout/tech/testing/README.md`), so the demos set
+`ERROR_ON_KLAYOUT_DRC: false`.
+
+`demo_chip` is a full chip with a pad ring that uses the `counter` as a macro, so run `demo_counter` first.
+
+The DRC and LVS decks have a regression on the standard cells and the IO library:
+
+```bash
+cd icsprout55/libs.tech/klayout/tech/testing
+python3 run_regression.py
+```
+
+All the tools are available in the `factory.symbioticeda.com/asic-all:dev` container, e.g.:
+
+```bash
+docker run --rm -v "$PWD":/work -w /work/demo_counter factory.symbioticeda.com/asic-all:dev bash -lc 'bash run.sh'
+```

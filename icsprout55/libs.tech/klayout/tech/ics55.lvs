@@ -319,7 +319,48 @@ DIODE_DEVICES.each do |model, _p, _n|
   tolerance(model, 'P', relative: PROP_TOL)
 end
 
-if !compare
+# Pins swapped by the layout. Some cells match only with input pins paired
+# crosswise, because the transistor order of the GDS differs from the CDL (e.g.
+# NAND2X0P5H7R: A drives the NMOS next to the output in the GDS, next to VSS in
+# the CDL; AOI22X3H7R: the A and B AND groups). The cell matches, but every
+# instance then looks miswired. Calibre accepts these through gate recognition
+# (LVS RECOGNIZE GATES); here the permutation found by the cell comparison is
+# declared as equivalent pins and the netlists are compared again. Only the
+# permutations of cells that matched are used.
+def crossed_pins(xref)
+  ok = [RBA::NetlistCrossReference::Match, RBA::NetlistCrossReference::MatchWithWarning]
+  swaps = []
+  xref.each_circuit_pair do |cp|
+    lay, sch = cp.first, cp.second
+    next unless lay && sch && ok.include?(cp.status)
+
+    sch_pins = sch.each_pin.map(&:name)
+    xref.each_pin_pair(cp) do |pp|
+      next unless pp.first && pp.second
+
+      # Layout pin names can be joined ones (e.g. SUBSTRATE|VSS). A swap is only
+      # between two pins of the schematic cell (not e.g. SUBSTRATE vs VSS).
+      names = pp.first.name.to_s.split('|')
+      next if names.empty? || names.include?(pp.second.name)
+
+      other = names.find { |n| sch_pins.include?(n) }
+      swaps << [sch.name, [other, pp.second.name].sort] if other
+    end
+  end
+  swaps.uniq
+end
+
+matched = compare
+unless matched
+  swaps = crossed_pins(lvs_data.xref)
+  swaps.each do |cell, pins|
+    logger.info("#{cell}: pins #{pins.join(' and ')} are swapped in the layout, declared equivalent")
+    equivalent_pins(cell, *pins)
+  end
+  matched = compare unless swaps.empty?
+end
+
+if !matched
   logger.info('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
   logger.error("ERROR : Netlists don't match")
   logger.info('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')

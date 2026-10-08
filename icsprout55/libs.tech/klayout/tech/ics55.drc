@@ -180,6 +180,14 @@ def no_singular(errs)
   errs.with_distance(0.0005, nil)
 end
 
+# Drop space results measured through the layer itself. KLayout's euclidian
+# space check can report two corners of the same polygon across its interior
+# (e.g. PO in SDFFNQX3H7R); the area spanned by such a pair is entirely inside
+# the layer, which can never be a real space violation.
+def drop_inner(errs, layer)
+  errs.interacting(errs.polygons(0.0005) - layer)
+end
+
 #================================================
 #------------- LAYERS DEFINITIONS ---------------
 #================================================

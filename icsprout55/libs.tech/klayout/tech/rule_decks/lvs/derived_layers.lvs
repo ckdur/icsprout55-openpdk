@@ -150,19 +150,23 @@ rpposab_2t = ((res_poly & pp) & sab) - res3tpoly - hrp
 # TODO: metal resistors (METnres) are not split out yet.
 # Not in Calibre: the PDK layer map (ics55.map) writes LEF/DEF pin shapes on
 # datatype 6 (Calibre: text only), so these polygons are part of the metal too.
-m1 = met1 | met1dm | get_polygons(81, 6)
-m2 = met2 | met2dm | get_polygons(82, 6)
-m3 = met3 | met3dm | get_polygons(83, 6)
-m4 = met4 | met4dm | get_polygons(84, 6)
-m5 = met5 | met5dm | get_polygons(85, 6)
+# The layers are joined with "+" (no merge), not "|": in deep mode a merge with a
+# parent wire that touches a cell pin moves the merged polygon to the parent, the
+# cell label is left without a shape and the cell net loses its name (the pins of
+# the placed standard cells come out unnamed). Connectivity does not need merging.
+m1 = met1 + met1dm + get_polygons(81, 6)
+m2 = met2 + met2dm + get_polygons(82, 6)
+m3 = met3 + met3dm + get_polygons(83, 6)
+m4 = met4 + met4dm + get_polygons(84, 6)
+m5 = met5 + met5dm + get_polygons(85, 6)
 # TOTALMETAL 6 / SINGLE top metal: M6s = T4M2, VA5 = T4V2
-m6 = t4m2 | t4m2dm | get_polygons(103, 6)
-# VAn = VIAn OR VIAnbar
-va1 = via1 | via1bar
-va2 = via2 | via2bar
-va3 = via3 | via3bar
-va4 = via4 | via4bar
-va5 = t4v2 | t4v2bar
+m6 = t4m2 + t4m2dm + get_polygons(103, 6)
+# VAn = VIAn OR VIAnbar (joined, see above)
+va1 = via1 + via1bar
+va2 = via2 + via2bar
+va3 = via3 + via3bar
+va4 = via4 + via4bar
+va5 = t4v2 + t4v2bar
 # PAS = CB OR RV / APs = ALPAD OR RDL
-pas = cb | rv
-aps = alpad | rdl | get_polygons(123, 6)
+pas = cb + rv
+aps = alpad + rdl + get_polygons(123, 6)

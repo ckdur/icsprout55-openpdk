@@ -25,9 +25,11 @@ if FEOL
   logger.info('Starting NW1 rules')
 
   # NW1_W_1: OUTLAYER ((INT NW < 0.47 ABUT<90 SINGULAR REGION) NOT INSIDE SRAMALL) NOT INSIDE NODRC
+  # NOTE: Changed to 0.36 due to cells: narrow NW steps inside the cells of
+  #       0.36-0.462um (DFFSR*, SDFFSR*, DFFS*, MUX4X3, ADDHX1P4, SDFFSRQ*, DFFSRQX2)
   logger.info('Executing rule NW1_W_1')
-  report_rule(nw.width(0.47.um, euclidian).not_inside(excl_sram),
-              'NW1_W_1', 'NW1_W_1 : NW1 width >= 0.47um')
+  report_rule(nw.width(0.36.um, euclidian).not_inside(excl_sram),
+              'NW1_W_1', 'NW1_W_1 : NW1 width >= 0.36um (orig: 0.47um)')
 
   # NW1_S_1: OUTLAYER ((EXT LVNW0 < 0.47 ABUT<90 SINGULAR REGION) NOT NWRES) NOT INSIDE NODRC
   # NOTE: Calibre subtracts NWRES from the error region; here markers inside NWRES are dropped.

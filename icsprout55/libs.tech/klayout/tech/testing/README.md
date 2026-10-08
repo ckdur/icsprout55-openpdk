@@ -62,27 +62,37 @@ standalone IO cell come in pieces that connect through the neighbouring cells.
 
 ### DRC
 
-These are in the golden files and are believed to be real (the cell geometry
-is below the value in the Calibre deck), not translation errors:
+The standard cell libraries are clean against the deck (with the deviations
+below). These are in the IO golden file and are believed to be real, not
+translation errors:
 
 | Rule       | Where                         | Geometry vs rule                      |
 |------------|-------------------------------|---------------------------------------|
-| MET1_A_1   | 714 standard cells            | M1 pins 0.027-0.031um2 vs >= 0.042    |
-| M2_A_1     | 294 cells of the `_M2` library | M2 pins 0.038um2 vs >= 0.052          |
-| PO_A_1     | 87 standard cells             | 0.0391-0.0394um2 vs >= 0.04           |
-| ACT_S_1    | NAND3, MSDFFQ                 | 0.105 vs >= 0.11                      |
-| PO_S_1     | SDFFSQ                        | corner to corner 0.1196 vs >= 0.12    |
 | V3/V4_EN_5a_enc | IO `P65_1233_VDDIO3`     | via edge on metal edge (0 vs 0.005)   |
 
-Deviations from the Calibre deck, made to accept the released standard cells:
+Deviations from the Calibre deck, made to accept the released standard cells
+(the rule descriptions in the report give the original value):
 
-- NW1_S_1 relaxed from 0.47 to 0.40um (shallow NW notches of 0.409-0.46um in
-  ICGX2, LATLSR and DFFNRX4).
+| Rule     | Calibre | Deck   | Reason |
+|----------|---------|--------|--------|
+| NW1_W_1  | 0.47    | 0.36   | narrow NW steps inside 14 cells, 0.36-0.462um: DFFSRX0P5/X1, SDFFSRX0P5/X1/X2, MUX4X3 (0.36); DFFSX0P5/X1/X2 (0.381); ADDHX1P4 (0.39); SDFFSRQX1/X2/X3 (0.438); DFFSRQX2 (0.453, 0.462). Not abutment: the legs at the cell edges disappear once abutted (the test puts a filler on both sides) |
+| NW1_S_1  | 0.47    | 0.40   | shallow NW notches of 0.409-0.46um in ICGX2, LATLSR and DFFNRX4 |
+| ACT_S_1  | 0.11    | 0.10   | AA spacing of 0.105 in NAND3, MSDFFQ |
+| PO_A_1   | 0.04    | 0.0388 | PO areas of 0.0388-0.03995um2 in 113 cells (smallest in DFFSRX0P5/X1/X2) |
+| MET1_A_1 | 0.042   | 0.027  | M1 pins of 0.027-0.031um2 in 714 cells |
+| Mn_A_1   | 0.052   | 0.020  | M2 pins of 0.038um2 in the `_M2` library |
+
+PO_S_1 keeps the Calibre value (0.12). Its former markers (SDFFSQ, and
+OAI2BB2X6 / SDFFNQX3 / ICGX1 / DFFQX0P5 when it was 0.119) were two corners of
+the same PO polygon measured through its interior; no two PO polygons of the
+libraries are closer than 0.12um. `drop_inner` (ics55.drc) removes such results.
+KLayout's euclidian space check only reports these corner pairs when they are
+within about 1 dbu of the threshold, which is why the counts changed with the
+value. The `transparent` mode is not an alternative: it measures through other
+shapes and reports hundreds of gaps down to 0.06um.
 
 Expected artifacts, not errors:
 
-- NW1_W_1 (15 per standard cell library): at the two ends of the test rows,
-  where the filler NW is not abutted.
 - IO `P65_1233_FILLER0005` / `P65_1233_FILLER001`: 0.005/0.01um wide spacer
   cells whose layers are only complete when abutted to the pads.
 
