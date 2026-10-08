@@ -167,8 +167,17 @@ def not_square(layer, w)
 end
 
 # Enclosed (hole) areas smaller than a (Calibre: "AREA ((HOLES layer INNER) NOT layer) < a")
+# Merged with minimum coherence: shapes touching only at a corner stay separate,
+# so a region closed at single points is not a hole (as in Calibre).
 def small_holes(layer, a)
-  (layer.holes - layer).with_area(nil, a)
+  region = layer.data.dup
+  region.min_coherence = true
+  (DRC::DRCLayer.new(self, region.merged).holes - layer).with_area(nil, a)
+end
+
+# Drop zero-distance (corner to corner) results, for Calibre checks without SINGULAR
+def no_singular(errs)
+  errs.with_distance(0.0005, nil)
 end
 
 #================================================

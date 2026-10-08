@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the KLayout DRC layer definitions from the Calibre DRC deck.
+"""Generate KLayout DRC/LVS layer definitions from a Calibre DRC or LVS deck.
 
 Parses the "LAYER MAP <l> DATATYPE|TEXTTYPE <d> <id>" / "LAYER <name> <id>"
 pairs of the Calibre (TVF/SVRF) runset and writes a KLayout DRC include file
@@ -10,6 +10,9 @@ Usage:
   python3 calibre_layers_to_klayout_drc.py \
       ../icsprout55-pdk/pv/DRC/ICsprout_CalDRC_55LLULP1233_REV1_0_OS.drc \
       ../icsprout55/libs.tech/klayout/tech/rule_decks/layers_def.drc
+  python3 calibre_layers_to_klayout_drc.py \
+      ../icsprout55-pdk/pv/LVS/ICsprout_CalLVS_55LLULP1233_REV1_0_OS.lvs \
+      ../icsprout55/libs.tech/klayout/tech/rule_decks/lvs/layers_def.lvs
 """
 
 import re

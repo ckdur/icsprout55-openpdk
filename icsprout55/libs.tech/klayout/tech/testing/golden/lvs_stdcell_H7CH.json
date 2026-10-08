@@ -1,0 +1,23 @@
+{
+ "match": 759,
+ "not_matching": {
+  "ADDFX1P4H7H": "nomatch",
+  "ADDHX1P4H7H": "nomatch",
+  "AND2X0P7H7H": "nomatch",
+  "AND2X12H7H": "nomatch",
+  "AND2X16H7H": "nomatch",
+  "AND2X1P4H7H": "nomatch",
+  "AND2X8H7H": "nomatch",
+  "AND3X0P7H7H": "nomatch",
+  "AND3X1P4H7H": "nomatch",
+  "AND4X0P7H7H": "nomatch",
+  "AND4X1P4H7H": "nomatch",
+  "INVX16H7H": "nomatch",
+  "INVX7H7H": "nomatch",
+  "MUX4X4H7H": "nomatch",
+  "NAND3BBX0P5H7H": "nomatch",
+  "NAND3BBX0P7H7H": "nomatch",
+  "OAI33X0P5H7H": "nomatch",
+  "TBUFX8H7H": "nomatch"
+ }
+}

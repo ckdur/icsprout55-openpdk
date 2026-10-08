@@ -66,6 +66,10 @@ set ::env(KLAYOUT_DEF_LAYER_MAP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout
 set ::env(KLAYOUT_DRC_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.drc"
 set ::env(KLAYOUT_DRC_OPTIONS) [dict create densityRules 0 ]
 set ::env(KLAYOUT_LVS_SCRIPT) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lvs"
+# Run by the ICS55.KLayoutLVS step of the PDK plugin (libs.tech/librelane/librelane_plugin_ics55)
+# No tapless / implicit_nets here: in a placed design FILLTAP ties the wells and
+# substrate, and pins shorted in every instance (split IO rails, cell wells) are
+# joined by the runset itself. Forcing them would hide missing taps.
 set ::env(KLAYOUT_LVS_OPTIONS) [dict create run_mode deep ]
 
 set ::env(NETGEN_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/netgen/ics55.tcl"
@@ -90,7 +94,10 @@ set ::env(SCL_GROUND_PINS) [list "VSS"]
 
 # Standard cells
 set ::env(CELL_LEFS) [list "$scl_dir/lef/$::env(STD_CELL_LIBRARY)_ecos.lef"]
-set ::env(CELL_GDS) [list "$scl_dir/gds/$::env(STD_CELL_LIBRARY).gds"]
+# The _ecos cell LEF has the signal pins on MET2 (+ VIA1); the matching layout
+# is the _M2 GDS. The plain GDS only has MET1 pins, so routing to the MET2 pin
+# shapes would leave every signal pin open (found by KLayout LVS).
+set ::env(CELL_GDS) [list "$scl_dir/gds/$::env(STD_CELL_LIBRARY)_M2.gds"]
 set ::env(CELL_VERILOG_MODELS) [list "$scl_dir/verilog/$::env(STD_CELL_LIBRARY).v"]
 set ::env(CELL_SPICE_MODELS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]
 set ::env(CELL_CDLS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]

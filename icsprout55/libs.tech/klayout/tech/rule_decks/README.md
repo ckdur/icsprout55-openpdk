@@ -30,6 +30,7 @@ python3 calibre_layers_to_klayout_drc.py \
 ```
 
 Regression on the standard cells and IO: see `tech/testing/README.md`.
+The LVS deck (`tech/ics55.lvs`) is described in `rule_decks/lvs/README.md`.
 
 ## Conventions
 

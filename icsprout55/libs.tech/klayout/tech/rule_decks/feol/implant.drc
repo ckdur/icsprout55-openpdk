@@ -25,13 +25,13 @@ if FEOL
   logger.info('Starting NP/PP rules')
 
   # NP_W_1 / PP_W_1: (INT SDx < 0.18 ABUT<90 REGION) NOT INSIDE NODRC
-  # No SINGULAR: single-point interaction is allowed.
+  # No SINGULAR: single-point interaction is allowed (e.g. the NP/PP checkerboard of FILLTAP).
   # NP_S_1 / PP_S_1: (EXT SDx < 0.18 ABUT<90 OPPOSITE REGION) NOT INSIDE NODRC
   # NP_A_1 / PP_A_1: ((AREA SDx < 0.12) NOT INSIDE SRAMALL) NOT INSIDE NODRC
   # NP_A_2 / PP_A_2: (AREA ((HOLES SDx INNER) NOT SDx) < 0.12) NOT INSIDE NODRC
   [[sdn, 'NP'], [sdp, 'PP']].each do |imp, name|
     logger.info("Executing rule #{name}_W_1")
-    report_rule(imp.width(0.18.um, euclidian).not_inside(excl_nodrc),
+    report_rule(no_singular(imp.width(0.18.um, euclidian)).not_inside(excl_nodrc),
                 "#{name}_W_1", "#{name}_W_1 : #{name} width >= 0.18um")
 
     logger.info("Executing rule #{name}_S_1")

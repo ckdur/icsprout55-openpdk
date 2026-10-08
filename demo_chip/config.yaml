@@ -10,9 +10,13 @@ meta:
     #KLayout.DRC: null
     #Checker.KLayoutDRC: null
 
-    # Disable magic DRC (Takes too much time for something that is not accurate)
+    # Magic verifications are disabled (DRC, extraction, LVS, XOR against
+    # the KLayout stream-out). Signoff is done with KLayout.
     Magic.DRC: null
     Checker.MagicDRC: null
+    Magic.SpiceExtraction: null
+    KLayout.XOR: null
+    Checker.XOR: null
 
     # Disable KLayout antenna check
     #KLayout.Antenna: null
@@ -21,11 +25,14 @@ meta:
     # Disable KLayout density check
     #KLayout.Density: null
     #Checker.KLayoutDensity: null
-    
+
     # Save time
     #OpenROAD.IRDropReport: null
-    Magic.SpiceExtraction: null
-    KLayout.XOR: null
+
+    # LVS disabled for the full chip for now (KLayout LVS of the chip with
+    # fill is too slow yet). To enable it, as in demo_counter:
+    #-Netgen.LVS: OpenROAD.WriteCDL
+    #Netgen.LVS: ICS55.KLayoutLVS
     Netgen.LVS: null
     Checker.LVS: null
 
@@ -163,6 +170,15 @@ MACROS:
       i_chip_core.counter_2:
         location: [860, 390]
         orientation: N
+
+# KLayout DRC still reports the known standard cell issues (MET1_A_1/M2_A_1 pin
+# areas, PO_A_1, NW1_W_1 at row ends without endcaps), see
+# icsprout55/libs.tech/klayout/tech/testing/README.md. Report, but do not fail.
+ERROR_ON_KLAYOUT_DRC: false
+
+# Schematic of the counter macro for LVS (used once chip LVS is enabled)
+EXTRA_CDLS:
+- dir::../demo_counter/runs/debug_ics/final/cdl/counter.cdl
 
 # This is an alternative method compared to
 # specifying the power connections in the RTL
