@@ -236,6 +236,13 @@ expose_labeled_pins(netlist, top_name)
 # FILLTAP through abutment and the global substrate) and for supply rails that
 # come in pieces inside an IO cell. A pin left open in any instance stays
 # separate and still shows up as a mismatch.
+#
+# This runs on both netlists. On the layout side it joins the well / substrate
+# pins of the extracted cells; on the schematic side it does the same for
+# libraries whose CDL has the well bias as explicit pins (the private 9-track
+# standard cells have VNW / VPW on every cell, tied to VDD / VSS by the taps in
+# the layout and by the global connections of the placed netlist). Joining one
+# side only would leave those pins without a counterpart and fail every cell.
 def join_shorted_pins(nl, logger)
   nl.each_circuit_top_down do |c|
     refs = c.each_ref.to_a
@@ -273,6 +280,7 @@ def join_shorted_pins(nl, logger)
 end
 
 join_shorted_pins(netlist, logger)
+join_shorted_pins(schematic, logger)
 
 #================================================
 #------------- COMPARISON RESULTS ---------------

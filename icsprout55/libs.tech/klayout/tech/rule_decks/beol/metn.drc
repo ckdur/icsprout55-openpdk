@@ -47,10 +47,9 @@ if BEOL
     report_rule(mn.space(0.10.um, euclidian).not_inside(mn_excl),
                 "#{name}_S_1", "#{name}_S_1 : Space between two #{name}s >= 0.10um")
 
-    # NOTE: Moving area from 0.052 to 0.020
     logger.info("Executing rule #{name}_A_1")
-    report_rule(mn.with_area(nil, 0.020).not_inside(mn_excl),
-                "#{name}_A_1", "#{name}_A_1 : #{name} area >= 0.020um2 (orig: 0.052um2)")
+    report_rule(mn.with_area(nil, 0.052).not_inside(mn_excl),
+                "#{name}_A_1", "#{name}_A_1 : #{name} area >= 0.052um2")
 
     # Mn_A_2: X = (HOLES Mn INNER) NOT Mn
     #         OUTLAYER (AREA X < 0.18) NOT INSIDE NODRC

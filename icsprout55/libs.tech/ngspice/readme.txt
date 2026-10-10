@@ -1,5 +1,10 @@
+*** from the hspice original models adapted to work with ngspice ***
+*** No copyright is hold here. The idea is to make everything available ***
+*** If anything is licenseable, will just use the same Apache 2.0. See LICENSE ***
+*** Ckristian Duran (2026) ***
+
 ***  55nm Logic Salicide 1.2/2.5 SPICE Model ***
-*** for hspice only ***
+*** for ngspice ***
 
 1. update history:
      Rev                   Date                         Who                   Description       
@@ -14,6 +19,8 @@
 					        3. add device info for random parameter of passive mc
 					        4. update all core dio
 					        5. update res
+     v1.1-ngspice          2026-10-07               CKDur                   1. Adapt many syntaxes that hspice handles but ngspice don't.
+                                                                            2. Re-write the limits of detection of the transistor models due to rounding errors.
                                                                                         
 
 2.device list

@@ -29,7 +29,8 @@ python3 calibre_layers_to_klayout_drc.py \
     ../icsprout55/libs.tech/klayout/tech/rule_decks/layers_def.drc
 ```
 
-Regression on the standard cells and IO: see `tech/testing/README.md`.
+Regression on the standard cells and IO: see `tech/testing/README.md`
+(icsprout55-openpdk repository only).
 The LVS deck (`tech/ics55.lvs`) is described in `rule_decks/lvs/README.md`.
 
 ## Conventions

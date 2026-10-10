@@ -36,6 +36,9 @@ or fixing rules, review the differences and then rerun with `--update`.
 | `drc_stdcell_H7CH`    | `ics55_LLSC_H7CH.gds` (high Vt)         | every cell abutted with FILLER4        |
 | `drc_stdcell_H7CL`    | `ics55_LLSC_H7CL.gds` (low Vt)          | every cell abutted with FILLER4        |
 | `drc_stdcell_H7CR_M2` | `ics55_LLSC_H7CR_M2.gds` (M2 variant)   | every cell abutted with FILLER4        |
+| `drc_stdcell_9TSVT`   | `ICsprout55_9TSVT_basic.gds` (9T, std Vt) | vendor top cell as is                |
+| `drc_stdcell_9THVT`   | `ICsprout55_9THVT_basic.gds` (9T, high Vt) | vendor top cell as is               |
+| `drc_stdcell_9TLVT`   | `ICsprout55_9TLVT_basic.gds` (9T, low Vt) | vendor top cell as is                |
 | `drc_io`              | `ICSIOA_N55_3P3_1P6M1TM.gds`            | top cell `P65_1233_1P6M` as is         |
 | `lvs_stdcell_H7CR`    | H7CR GDS + CDL                          | all cells under `ALL`, `tapless=true`  |
 | `lvs_stdcell_H7CH`    | H7CH GDS + CDL                          | all cells under `ALL`, `tapless=true`  |
@@ -43,11 +46,17 @@ or fixing rules, review the differences and then rerun with `--update`.
 | `lvs_stdcell_H7C*_M2` | `_M2` GDS (MET2 pins, used by LibreLane) + CDL | as above                       |
 | `lvs_io`              | IO GDS + `ICSIOA_N55_3P3.cdl`           | one run per cell, implicit supply nets |
 
-DRC: the standard cell libraries have one top cell per standard cell, so
+DRC: the 7-track standard cell libraries have one top cell per standard cell, so
 `wrap_lib.py` places them all under a new top cell `ALL`. Each cell gets a
 filler on both sides (aligned with the 351/12 boundary) because NW, NP and PP
 extend past the cell edge and only become full width when abutted. Without
 fillers there are ~400 false NW1_W_1 markers per library.
+
+The private 9-track libraries (`ICsprout55_9T{S,H,L}VT_basic`) ship a single top
+cell that already holds all 719 cells, spaced so that the well and implant
+overhang does not interact, so they are checked as they are. They are only in
+`libs.ref` when `install.sh` found the vendor directory; their testcases print
+`SKIP` when the GDS is missing.
 
 LVS standard cells: `lvs_wrap.py` places the cells in a grid (not touching)
 under `ALL` and writes a matching schematic `.SUBCKT ALL` with one instance per
@@ -62,25 +71,35 @@ standalone IO cell come in pieces that connect through the neighbouring cells.
 
 ### DRC
 
-The standard cell libraries are clean against the deck (with the deviations
-below). These are in the IO golden file and are believed to be real, not
-translation errors:
+The private 9-track standard cell libraries are clean against the deck (0
+markers). The 7-track libraries are not; see the table below. This IO marker is
+believed to be real, not a translation error:
 
 | Rule       | Where                         | Geometry vs rule                      |
 |------------|-------------------------------|---------------------------------------|
 | V3/V4_EN_5a_enc | IO `P65_1233_VDDIO3`     | via edge on metal edge (0 vs 0.005)   |
 
-Deviations from the Calibre deck, made to accept the released standard cells
-(the rule descriptions in the report give the original value):
+**The deck is at the Calibre values.** Six rules used to be relaxed so that the
+released 7-track standard cells would pass; they were restored, because the
+private 9-track libraries meet the original rules (0 markers in all three Vt
+flavours). The relaxed values are kept here only as a record of what the
+7-track libraries need:
 
-| Rule     | Calibre | Deck   | Reason |
-|----------|---------|--------|--------|
+| Rule     | Calibre | was relaxed to | 7-track library geometry |
+|----------|---------|----------------|--------------------------|
 | NW1_W_1  | 0.47    | 0.36   | narrow NW steps inside 14 cells, 0.36-0.462um: DFFSRX0P5/X1, SDFFSRX0P5/X1/X2, MUX4X3 (0.36); DFFSX0P5/X1/X2 (0.381); ADDHX1P4 (0.39); SDFFSRQX1/X2/X3 (0.438); DFFSRQX2 (0.453, 0.462). Not abutment: the legs at the cell edges disappear once abutted (the test puts a filler on both sides) |
 | NW1_S_1  | 0.47    | 0.40   | shallow NW notches of 0.409-0.46um in ICGX2, LATLSR and DFFNRX4 |
 | ACT_S_1  | 0.11    | 0.10   | AA spacing of 0.105 in NAND3, MSDFFQ |
 | PO_A_1   | 0.04    | 0.0388 | PO areas of 0.0388-0.03995um2 in 113 cells (smallest in DFFSRX0P5/X1/X2) |
 | MET1_A_1 | 0.042   | 0.027  | M1 pins of 0.027-0.031um2 in 714 cells |
 | Mn_A_1   | 0.052   | 0.020  | M2 pins of 0.038um2 in the `_M2` library |
+
+So the 7-track golden files now carry those markers as the baseline
+(per library: 2390 markers = 2227 MET1_A_1, 113 PO_A_1, 30 ACT_S_1, 15 NW1_W_1,
+5 NW1_S_1; 2718 for `_M2`, which adds 328 M2_A_1), and the IO golden grew from
+5 to 131. Most of them disappear in a placed and routed design, where the cell
+pins merge with the routing: `demo_counter` reports 29 KLayout DRC errors with
+the 7-track library and 0 with the 9-track one.
 
 PO_S_1 keeps the Calibre value (0.12). Its former markers (SDFFSQ, and
 OAI2BB2X6 / SDFFNQX3 / ICGX1 / DFFQX0P5 when it was 0.119) were two corners of

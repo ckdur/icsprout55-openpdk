@@ -40,11 +40,9 @@ if FEOL
               'PO_S_1', 'PO_S_1 : Space between two POs >= 0.12um')
   
   # PO_A_1: OUTLAYER ((AREA PO < 0.04) NOT INSIDE SRAMALL) NOT INSIDE NODRC
-  # NOTE: Changed to 0.0388 due to cells being a little smaller sometimes
-  #       (smallest: 0.0388um2 in DFFSRX0P5/X1/X2)
   logger.info('Executing rule PO_A_1')
-  report_rule(po.with_area(nil, 0.0388).not_inside(excl_sram),
-              'PO_A_1', 'PO_A_1 : PO area >= 0.0388um2 (orig: 0.040um2)')
+  report_rule(po.with_area(nil, 0.04).not_inside(excl_sram),
+              'PO_A_1', 'PO_A_1 : PO area >= 0.040um2')
 
   # PO_A_2: OUTLAYER (AREA ((HOLES PO INNER) NOT PO) < 0.09) NOT INSIDE NODRC
   logger.info('Executing rule PO_A_2')

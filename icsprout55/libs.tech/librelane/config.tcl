@@ -89,20 +89,50 @@ set ::env(SCL_POWER_PINS) [list "VDD"]
 set ::env(SCL_GROUND_PINS) [list "VSS"]
 
 # --- Views ------------------------------------------------------------------
-# The bring-up configuration used the "_ecos" cell LEF with the plain
-# (non-ecos) tech LEF; keep that proven combination.
+# Two standard cell families live in this PDK and they ship different view
+# sets, so the cell LEF / GDS pair (and the liberty file names below) are
+# picked per library. The technology LEF above is the same for both.
+#
+#   ics55_LLSC_H7C{R,H,L}  7-track public libraries (icsprout55-pdk submodule)
+#   ICsprout55_9T{S,H,L}VT_basic  9-track private libraries, installed from
+#                          ICsprout_55LLULP1225_STD_0818 by install.sh
+#
+# scl_lef / scl_gds are the cell views and scl_lib_{tt,ss,ff} the liberty file
+# of each STA corner; they are used by LIB further down.
+if { [regexp {^ICsprout55_9T[A-Z]+_basic$} $::env(STD_CELL_LIBRARY)] } {
+    # The private libraries have a single cell LEF / GDS pair with the signal
+    # pins on MET1, so there is no _ecos / _M2 split to worry about here.
+    set scl_lef "$scl_dir/lef/$::env(STD_CELL_LIBRARY).lef"
+    set scl_gds "$scl_dir/gds/$::env(STD_CELL_LIBRARY).gds"
+    # Liberty files are named after the library without the "_basic" suffix,
+    # which comes back after the corner: ICsprout55_9TSVT_tt_v1p2_25c_basic_nldm.lib
+    set lib_base [regsub {_basic$} $::env(STD_CELL_LIBRARY) ""]
+    set scl_lib_tt "$scl_dir/liberty/${lib_base}_tt_v1p2_25c_basic_nldm.lib"
+    set scl_lib_ss "$scl_dir/liberty/${lib_base}_ss_v1p08_125c_basic_nldm.lib"
+    set scl_lib_ff "$scl_dir/liberty/${lib_base}_ff_v1p32_-40c_basic_nldm.lib"
+} else {
+    # The bring-up configuration used the "_ecos" cell LEF with the plain
+    # (non-ecos) tech LEF; keep that proven combination.
+    set scl_lef "$scl_dir/lef/$::env(STD_CELL_LIBRARY)_ecos.lef"
+    # The _ecos cell LEF has the signal pins on MET2 (+ VIA1); the matching
+    # layout is the _M2 GDS. The plain GDS only has MET1 pins, so routing to
+    # the MET2 pin shapes would leave every signal pin open (found by KLayout
+    # LVS).
+    set scl_gds "$scl_dir/gds/$::env(STD_CELL_LIBRARY)_M2.gds"
+    set scl_lib_tt "$scl_dir/liberty/$::env(STD_CELL_LIBRARY)_typ_tt_1p2_25_nldm.lib"
+    set scl_lib_ss "$scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ss_rcworst_1p08_125_nldm.lib"
+    set scl_lib_ff "$scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ff_rcbest_1p32_m40_nldm.lib"
+}
 
 # Standard cells
-set ::env(CELL_LEFS) [list "$scl_dir/lef/$::env(STD_CELL_LIBRARY)_ecos.lef"]
-# The _ecos cell LEF has the signal pins on MET2 (+ VIA1); the matching layout
-# is the _M2 GDS. The plain GDS only has MET1 pins, so routing to the MET2 pin
-# shapes would leave every signal pin open (found by KLayout LVS).
-set ::env(CELL_GDS) [list "$scl_dir/gds/$::env(STD_CELL_LIBRARY)_M2.gds"]
+set ::env(CELL_LEFS) [list "$scl_lef"]
+set ::env(CELL_GDS) [list "$scl_gds"]
 set ::env(CELL_VERILOG_MODELS) [list "$scl_dir/verilog/$::env(STD_CELL_LIBRARY).v"]
 set ::env(CELL_SPICE_MODELS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]
 set ::env(CELL_CDLS) [list "$scl_dir/cdl/$::env(STD_CELL_LIBRARY).cdl"]
 
-set ::env(PAD_LEFS) "$io_dir/lef/ICSIOA_N55_3P3_1P6M1TM_ecos.lef"
+# The _openpdk LEF is the vendor _ecos one with the pad terminals moved to RDL
+set ::env(PAD_LEFS) "$io_dir/lef/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef"
 set ::env(PAD_GDS) "$io_dir/gds/ICSIOA_N55_3P3_1P6M1TM.gds"
 set ::env(PAD_VERILOG_MODELS) "$io_dir/verilog/icsIOA_N55_3P3.v"
 set ::env(PAD_SPICE_MODELS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
@@ -113,20 +143,22 @@ set ::env(PAD_CDLS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
 # Also, we only include one lib file for the standard cells.
 set ::env(LIB) [dict create]
 dict set ::env(LIB) "nom_tt_025C_1v20" "\
-    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_typ_tt_1p2_25_nldm.lib\
+    $scl_lib_tt\
     $io_dir/liberty/ICSIOA_N55_3P3_tt_1p2_3p3_25c.lib\
 "
 dict set ::env(LIB) "nom_ss_125C_1v08" "\
-    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ss_rcworst_1p08_125_nldm.lib\
+    $scl_lib_ss\
     $io_dir/liberty/ICSIOA_N55_3P3_ss_1p08_2p97_125c.lib\
 "
 dict set ::env(LIB) "nom_ff_n40C_1v32" "\
-    $scl_dir/liberty/$::env(STD_CELL_LIBRARY)_ff_rcbest_1p32_m40_nldm.lib\
+    $scl_lib_ff\
     $io_dir/liberty/ICSIOA_N55_3P3_ff_1p32_3p63_m40c.lib\
 "
 
 # --- Excluded cells ------------------------------------------------------------
-# No exclusions. /dev/null satisfies the required-Path check and reads empty.
+# Defaults (no exclusions). /dev/null satisfies the required-Path check and reads empty.
+# The 7-track standard cell configs (ics55_LLSC_H7C_common.tcl) point them to their
+# exclude lists; the 9-track libraries have no exclusions.
 set ::env(SYNTH_EXCLUDED_CELL_FILE) "/dev/null"
 set ::env(PNR_EXCLUDED_CELL_FILE) "/dev/null"
 

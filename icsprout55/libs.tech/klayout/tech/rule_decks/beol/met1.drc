@@ -42,10 +42,9 @@ if BEOL
 
   # MET1_A_1: SETLAYER X = AREA M1 < 0.042
   #           OUTLAYER (X NOT INSIDE SRAMALL) NOT INSIDE NODRC
-  # NOTE: Changed to 0.027 due to cells
   logger.info('Executing rule MET1_A_1')
-  report_rule(m1.with_area(nil, 0.027).not_inside(excl_sram),
-              'MET1_A_1', 'MET1_A_1 : M1 area >= 0.027um2 (orig: 0.042um2)')
+  report_rule(m1.with_area(nil, 0.042).not_inside(excl_sram),
+              'MET1_A_1', 'MET1_A_1 : M1 area >= 0.042um2')
 
   # MET1_A_2: SETLAYER X = (HOLES M1 INNER EMPTY) NOT M1
   #           OUTLAYER (AREA X < 0.18) NOT INSIDE NODRC

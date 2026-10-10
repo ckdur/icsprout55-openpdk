@@ -39,6 +39,9 @@ GOLDEN_DIR = TESTING_DIR / 'golden'
 
 STDCELL_GDS = 'ics55_LLSC_H7C{v}/gds/ics55_LLSC_H7C{v}{suffix}.gds'
 STDCELL_CDL = 'ics55_LLSC_H7C{v}/cdl/ics55_LLSC_H7C{v}.cdl'
+# Private 9-track libraries; only present when install.sh found the vendor
+# directory, so their testcases skip themselves when the GDS is missing.
+STDCELL_9T_GDS = 'ICsprout55_9T{v}VT_basic/gds/ICsprout55_9T{v}VT_basic.gds'
 IO_GDS = 'ICsprout_55LLULP1233_IO_251013/gds/ICSIOA_N55_3P3_1P6M1TM.gds'
 IO_CDL = 'ICsprout_55LLULP1233_IO_251013/cdl/ICSIOA_N55_3P3.cdl'
 
@@ -52,6 +55,11 @@ TESTCASES = {
     'drc_stdcell_H7CH': ('drc', STDCELL_GDS.format(v='H', suffix=''), 'FILLER4H7H', True),
     'drc_stdcell_H7CL': ('drc', STDCELL_GDS.format(v='L', suffix=''), 'FILLER4H7L', True),
     'drc_stdcell_H7CR_M2': ('drc', STDCELL_GDS.format(v='R', suffix='_M2'), 'FILLER4H7R', True),
+    # The 9-track library GDS is one top cell holding all 719 cells already, so
+    # it is checked as it is (no wrapper, no fillers).
+    'drc_stdcell_9TSVT': ('drc', STDCELL_9T_GDS.format(v='S'), None, False),
+    'drc_stdcell_9THVT': ('drc', STDCELL_9T_GDS.format(v='H'), None, False),
+    'drc_stdcell_9TLVT': ('drc', STDCELL_9T_GDS.format(v='L'), None, False),
     'drc_io': ('drc', IO_GDS, None, False),
     'lvs_stdcell_H7CR': ('lvs', STDCELL_GDS.format(v='R', suffix=''), STDCELL_CDL.format(v='R'), 'library'),
     'lvs_stdcell_H7CH': ('lvs', STDCELL_GDS.format(v='H', suffix=''), STDCELL_CDL.format(v='H'), 'library'),
@@ -62,6 +70,13 @@ TESTCASES = {
     'lvs_stdcell_H7CL_M2': ('lvs', STDCELL_GDS.format(v='L', suffix='_M2'), STDCELL_CDL.format(v='L'), 'library'),
     'lvs_io': ('lvs', IO_GDS, IO_CDL, 'per_cell'),
 }
+
+
+def missing_inputs(name):
+    """Input files of a testcase that are not in libs.ref (not installed)."""
+    kind, *rest = TESTCASES[name]
+    rels = rest[:2] if kind == 'lvs' else rest[:1]
+    return [r for r in rels if not (LIBS_REF / r).exists()]
 
 
 def run_klayout(cmd):
@@ -185,6 +200,10 @@ def main():
     for name in args.tests.split(','):
         if name not in TESTCASES:
             sys.exit(f'Unknown testcase {name}. Available: {", ".join(TESTCASES)}')
+        missing = missing_inputs(name)
+        if missing:
+            print(f'[{name}] SKIP ({", ".join(missing)} not installed)')
+            continue
         if TESTCASES[name][0] == 'drc':
             result = run_drc(name, run_dir)
             compare, total = compare_drc, drc_total

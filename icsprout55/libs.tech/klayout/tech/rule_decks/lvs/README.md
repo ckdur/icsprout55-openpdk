@@ -31,7 +31,8 @@ python3 calibre_layers_to_klayout_drc.py \
     ../icsprout55/libs.tech/klayout/tech/rule_decks/lvs/layers_def.lvs
 ```
 
-Regression on the standard cells and IO: see `tech/testing/README.md`.
+Regression on the standard cells and IO: see `tech/testing/README.md`
+(icsprout55-openpdk repository only).
 
 ## Devices
 
@@ -86,6 +87,14 @@ varactors, MOM/MIM, metal/diffusion/well/HRP resistors, eFuse, ERC checks.
   the well / substrate pins of the tapless standard cells to VDD / VSS (through
   FILLTAP and the global substrate) and the split supply rails inside IO cells.
   A pin left open in any instance stays separate, so missing taps still show.
+  This runs on **both** netlists. On the layout side it joins the well and
+  substrate pins of the extracted cells; on the schematic side it does the same
+  for libraries whose CDL has the well bias as explicit pins -- every cell of
+  the private 9-track standard cells (`ICsprout55_9T{S,H,L}VT_basic`) has
+  `VNW` / `VPW`, tied to VDD / VSS by the taps in the layout and by the
+  LibreLane global connections (`SCL_POWER_PINS` / `SCL_GROUND_PINS`) in the
+  placed netlist. Joining one side only would leave those pins without a
+  counterpart and every cell would mismatch.
 - **`tapless=true`.** For a standard cell library tested on its own (no
   FILLTAP): in every circuit the substrate is joined to `VSS` and wells without
   a tap to `VDD` (`-rd tapless_power=` / `-rd tapless_ground=` to change the
