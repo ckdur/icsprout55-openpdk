@@ -93,7 +93,7 @@ layer and datatype of every layer. Still missing for a reliable implementation:
 - A complete DRC document, to check the translated rules against.
 - The cross-section of the fabrication (dielectrics, metal thicknesses) for RCX.
 
-## How to use this repository:
+## Repository Setup
 
 First, we download the PDK and organize them into a OpenPDK infrastructure
 
@@ -104,7 +104,15 @@ bash ./install.sh
 Besides copying the vendor libraries, `install.sh` converts their CDL netlists into LVS-ready ones
 (`hacking/cdl_convert.py`) and generates ngspice netlists of the standard cells (`hacking/cdl_to_spice.py`).
 
-Next, you need to set the `PDK_ROOT` and `PDK` environment variables:
+## LibreLane Installation
+
+Please follow the [Nix-based Installation](https://librelane.readthedocs.io/en/stable/installation/nix_installation/index.html) of LibreLane.
+
+To enable a Nix shell with the latest `dev` branch of LibreLane, run: `nix shell github:librelane/librelane/dev`
+
+## Implementing Designs
+
+First, you need to set the `PDK_ROOT` and `PDK` environment variables:
 
 ```bash
 export PDK_ROOT=$(pwd)
@@ -119,21 +127,21 @@ librelane --pdk icsprout55 config.json --run-tag debug_ics --manual-pdk
 ```
 
 The `PYTHONPATH` entry loads the PDK LibreLane plugin. To use KLayout LVS and skip the Magic verifications, the
-design config needs these substitutions (as in `demo_counter/config.json`):
+design config needs these substitutions (as in `demo_counter/config.yaml`):
 
-```json
-"meta": {
-  "substituting_steps": {
-    "Magic.DRC": null,
-    "Checker.MagicDRC": null,
-    "Magic.SpiceExtraction": null,
-    "Checker.IllegalOverlap": null,
-    "KLayout.XOR": null,
-    "Checker.XOR": null,
-    "-Netgen.LVS": "OpenROAD.WriteCDL",
-    "Netgen.LVS": "ICS55.KLayoutLVS"
-  }
-}
+```yaml
+meta:
+  flow: Classic
+  substituting_steps:
+    Magic.DRC: null
+    Checker.MagicDRC: null
+    Magic.SpiceExtraction: null
+    Checker.IllegalOverlap: null
+    KLayout.XOR: null
+    Checker.XOR: null
+    -Netgen.LVS: OpenROAD.WriteCDL
+    Netgen.LVS: ICS55.KLayoutLVS
+
 ```
 
 `Checker.LVS` then checks the KLayout LVS result. KLayout DRC still reports some findings of the standard cells
@@ -147,10 +155,4 @@ The DRC and LVS decks have a regression on the standard cells and the IO library
 ```bash
 cd icsprout55/libs.tech/klayout/tech/testing
 python3 run_regression.py
-```
-
-All the tools are available in the `factory.symbioticeda.com/asic-all:dev` container, e.g.:
-
-```bash
-docker run --rm -v "$PWD":/work -w /work/demo_counter factory.symbioticeda.com/asic-all:dev bash -lc 'bash run.sh'
 ```
