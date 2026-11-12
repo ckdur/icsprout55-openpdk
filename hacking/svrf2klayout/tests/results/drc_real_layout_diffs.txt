@@ -1,0 +1,18 @@
+# H7CR library (all cells), recommended rules ON: rules whose markers differ from Calibre
+CT_EN_4a_4b_4c               cal=35266 kl=34930  cal_matched=34930 kl_matched=34930 DIFF
+LU_S_2_PTAP                  cal=13892 kl=13854  cal_matched=13851 kl_matched=13851 DIFF
+MET1_S_4                     cal= 2869 kl= 2846  cal_matched= 2868 kl_matched= 2840 DIFF
+MET1_S_5                     cal= 1283 kl= 1312  cal_matched= 1283 kl_matched= 1268 DIFF
+PO_L_2_R                     cal=  725 kl=  732  cal_matched=  721 kl_matched=  721 DIFF
+PO_S_1                       cal=    0 kl=    3  cal_matched=    0 kl_matched=    0 DIFF
+PO_S_14                      cal=  378 kl=  376  cal_matched=  377 kl_matched=  376 DIFF
+PO_S_14a_R                   cal=18558 kl=18196  cal_matched=18305 kl_matched=18180 DIFF
+PO_S_15                      cal=  102 kl=  100  cal_matched=  101 kl_matched=  100 DIFF
+PO_S_2                       cal=   68 kl=   72  cal_matched=   68 kl_matched=   70 DIFF
+rules compared: 752, with markers: 60, mismatching: 11
+
+# IO library, recommended rules ON
+RV_EN_1_2                    cal=    0 kl=    2  cal_matched=    0 kl_matched=    0 DIFF
+RV_EN_3_4                    cal=    0 kl=    2  cal_matched=    0 kl_matched=    0 DIFF
+T4M2_D_3                     cal=    1 kl=    2  cal_matched=    1 kl_matched=    1 DIFF
+rules compared: 752, with markers: 71, mismatching: 3
