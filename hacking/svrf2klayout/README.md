@@ -40,7 +40,21 @@ and any deck switch, e.g. `-rd OPEN_RECOMMENDED_ON=YES`.
 
 LVS (`klayout -b -r ics55.lvs -rd ...`): `input`, `schematic`, `report`, `target_netlist`,
 `topcell`, `run_mode=deep|flat`, `hier=1` (keep hierarchy; default flattens like Calibre),
-`no_compare=1`. Prints `INFO : Congratulations! Netlists match.` or `ERROR : Netlists don't match`.
+`no_compare=1`, `schematic_out=<file>` (reduced schematic as compared, for debugging).
+Prints `INFO : Congratulations! Netlists match.` or `ERROR : Netlists don't match`.
+
+* `tapless=true` — library regression of tap-less cells: compares hierarchically (each cell is its
+  own circuit pair) and ties the well nets of every cell to `tapless_power` (VDD) /
+  `tapless_ground` (VSS). Labelled nets of a cell become pins even if the parent leaves them open.
+* `implicit_nets="VDD VSS CELL:LABEL"` — joins nets carrying the same label by name
+  (KLayout `connect_implicit`, the counterpart of Calibre `VIRTUAL CONNECT NAME`), e.g. the supply
+  rails of a standalone IO cell.
+
+## Regression suite
+
+`icsprout55/libs.tech/klayout/tech/testing/run_regression.py` runs the installed decks on the
+standard-cell and IO libraries and compares with `testing/golden/`. It needs `klayout` and its
+python module; `./regress.sh [--tests a,b] [--update]` runs it inside the docker image.
 
 ## Verification status (against Calibre 2012.2)
 

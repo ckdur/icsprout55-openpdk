@@ -27,7 +27,7 @@ export PDK_ROOT=$(pwd) PDK=icsprout55
 # LibreLane with the private 9-track standard cells instead of the default 7-track library
 librelane --pdk icsprout55 --scl ICsprout55_9TSVT_basic --manual-pdk config.json
 
-# KLayout DRC / LVS regression on the std cells and IO (≈1 min, run in the container)
+# KLayout DRC / LVS regression on the std cells and IO (≈1 h, run in the container; hacking/svrf2klayout/regress.sh wraps it)
 cd icsprout55/libs.tech/klayout/tech/testing
 python3 run_regression.py                         # all testcases, exit 1 on any change vs golden/
 python3 run_regression.py --tests drc_stdcell_H7CR,lvs_io   # subset
@@ -80,19 +80,18 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
 - `icsprout55/libs.tech/librelane/librelane_plugin_ics55/` — LibreLane plugin (discovered via `PYTHONPATH`, set in the
   demo `run.sh`). Provides step `ICS55.KLayoutLVS`, because upstream `KLayout.LVS` only runs for IHP PDKs. Designs use
   `"-Netgen.LVS": OpenROAD.WriteCDL` + `Netgen.LVS: ICS55.KLayoutLVS`; Magic DRC/extraction/LVS are disabled.
-- `icsprout55/libs.tech/klayout/tech/` — KLayout DRC (`ics55.drc`) and LVS (`ics55.lvs`) decks, translated by hand from
-  the vendor Calibre runsets in `icsprout55-pdk/pv/{DRC,LVS}/`. Structure follows the IHP sg13g2 KLayout decks:
-  - `rule_decks/layers_def.drc` and `rule_decks/lvs/layers_def.lvs` are GENERATED from the Calibre `LAYER MAP`
-    blocks by `hacking/calibre_layers_to_klayout_drc.py` (variable = Calibre layer name lowercased). Don't hand-edit.
-  - `rule_decks/derived_layers.drc`, `rule_decks/{feol,beol}/*.drc`, `rule_decks/lvs/*.lvs` are hand translations;
-    each rule/derivation keeps the original Calibre statement as a comment and uses the Calibre rule name.
-  - The DRC values are the Calibre ones. Six rules (NW1_W_1, NW1_S_1, ACT_S_1, PO_A_1, MET1_A_1, Mn_A_1) used to be
-    relaxed to accept the released 7-track std cells and were restored, because the private 9-track libraries meet
-    the original rules. The 7-track libraries therefore carry ~2400 markers per library in the regression goldens;
-    `testing/README.md` lists them and the geometry behind each.
+- `icsprout55/libs.tech/klayout/tech/` — KLayout DRC (`ics55.drc`) and LVS (`ics55.lvs`) decks. Both are GENERATED
+  from the vendor Calibre runsets in `icsprout55-pdk/pv/{DRC,LVS}/` by `hacking/svrf2klayout/` (SVRF parser, code
+  generators and the Ruby runtimes that get embedded in the decks). Don't hand-edit the decks: change the translator
+  or runtime and regenerate (`hacking/svrf2klayout/README.md` has the commands, deck options and the verification
+  status against Calibre).
+  - Rule names and values are the Calibre ones, nothing is relaxed. The regression goldens therefore carry what
+    Calibre also reports on the libraries: latch-up (`LU_S_2_*`, the wrapped cells have no taps), density minima and,
+    for the 7-track libraries, the cell-intrinsic contact/poly/metal findings.
   - Metal stack is fixed to the Calibre default: 6 metals, 1 top metal (M1–M5, T4V2, T4M2).
-  - `rule_decks/README.md` and `rule_decks/lvs/README.md` document the SVRF→KLayout mapping and LVS behaviour
-    (global substrate + SUBCKTLVS islands, tapless option, label ports, shorted-pin joining, split gates).
+  - LVS flattens by default like Calibre; `tapless=true` compares per cell and ties the wells to the rails,
+    `implicit_nets=` joins same-named labels (Calibre `VIRTUAL CONNECT NAME`).
+  - `rule_decks/` holds the earlier hand translation; it is no longer included by the decks.
 - `testing/` — regression: `wrap_lib.py`/`lvs_wrap.py` place a whole library under a top cell `ALL` (DRC: each cell
   abutted between fillers; LVS: grid + matching `.SUBCKT ALL`), IO LVS runs per cell. Results are compared against
   `golden/*.json`; known remaining findings are explained in `testing/README.md`.

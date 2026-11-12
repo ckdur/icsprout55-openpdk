@@ -10,6 +10,10 @@ Run-time variables (klayout -rd):
   report                .lvsdb output
   target_netlist        extracted netlist output (SPICE)
   run_mode              deep (default) | flat
+  hier=1                compare hierarchically (default: flat, like Calibre)
+  tapless=true          library regression of tap-less cells: implies hier=1 and ties
+                        the wells to tapless_power (VDD) / tapless_ground (VSS) in each cell
+  implicit_nets="A B CELL:C"   join nets with these labels by name (connect_implicit)
   thr / threads
   no_compare=1          only extract
   <SWITCH>=<value>      override any #DEFINE switch
@@ -95,6 +99,16 @@ end
 threads(($threads || $thr || "4").to_i)
 verbose(false)
 
+# -rd log=<file>: also write the log messages to a file
+if $log
+  $sv_logf = File.open($log, "w")
+  def log(msg, indent = 0)
+    puts msg
+    $sv_logf.puts(msg)
+    $sv_logf.flush
+  end
+end
+
 $sv_verbose = false
 $sv_strict = false
 $sv_select = nil
@@ -162,10 +176,22 @@ $sv_filters.each do |type, model, mode|
   end
 end
 
-# Calibre compares flat (no HCELLs): flatten unless -rd hier=1
-if $hier.to_s != "1"
-  tc = netlist.circuit_by_name($topcell || source.cell_name)
+# Calibre compares flat (no HCELLs): flatten unless -rd hier=1.
+# -rd tapless=true (library regression of tap-less cells) implies hier=1.
+$sv_tapless = sv_bool_opt($tapless)
+$sv_hier = ($hier.to_s == "1") || $sv_tapless
+$sv_top_name = $topcell || source.cell_name
+if !$sv_hier
+  tc = netlist.circuit_by_name($sv_top_name)
   netlist.flatten_circuits(netlist.each_circuit.select { |c| c != tc }) if tc
+else
+  sv_expose_labeled_pins(netlist, $sv_top_name)
+  if $sv_tapless
+    nj = sv_tie_tapless(netlist, $tapless_power || "VDD", $tapless_ground || "VSS")
+    sv_merge_pins_on_same_net(netlist)
+    log("SVRF LVS: tapless mode, #{nj} well nets tied to supplies")
+  end
+  sv_join_shorted_pins(netlist)
 end
 
 # Calibre: LVS REDUCE PARALLEL MOS / RESISTORS ... YES
@@ -183,8 +209,8 @@ if $target_netlist
 end
 
 if $schematic && $no_compare.to_s != "1"
-  if $hier.to_s != "1"
-    stc = schematic.circuit_by_name($topcell || source.cell_name)
+  if !$sv_hier
+    stc = schematic.circuit_by_name($sv_top_name)
     schematic.flatten_circuits(schematic.each_circuit.select { |c| c != stc }) if stc
   end
   schematic.combine_devices
@@ -211,7 +237,7 @@ if $schematic && $no_compare.to_s != "1"
     end
   end
   # LVS CHECK PORT NAMES YES: named top level ports must pair by name
-  tcn = $topcell || source.cell_name
+  tcn = $sv_top_name
   ltc = netlist.circuit_by_name(tcn)
   stc2 = schematic.circuit_by_name(tcn)
   if ltc && stc2
@@ -221,6 +247,18 @@ if $schematic && $no_compare.to_s != "1"
       next if p.name == "" || !snames[p.name]
       same_nets!(tcn, p.name, p.name)
     end
+  end
+  [["layout", netlist], ["schematic", schematic]].each do |what, nl|
+    tcx = nl.circuit_by_name(tcn)
+    next unless tcx
+    cnt = Hash.new(0)
+    tcx.each_device { |d| cnt[d.device_class.name.downcase] += 1 }
+    log("SVRF LVS: #{what} #{tcn}: #{tcx.each_net.count} nets, devices " +
+        cnt.sort.collect { |k, v| "#{k}=#{v}" }.join(" "))
+  end
+  if $schematic_out
+    # reduced schematic netlist as it is compared (debugging aid)
+    schematic.write($schematic_out, RBA::NetlistSpiceWriter::new, "Reduced schematic")
   end
   ok = compare
   if ok

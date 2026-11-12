@@ -10,7 +10,7 @@ operations on top of the KLayout DRC DSL. Rules are executed lazily: derived
 layers are evaluated on first use and cached.
 
 Run-time variables (klayout -rd):
-  input, topcell, report, log     (files)
+  input, topcell, report, log     (files; log is optional)
   thr / threads                   number of threads
   select / unselect               regexp of rule names to run / skip
   flat                            "1" -> flat mode (default deep)
@@ -465,6 +465,16 @@ end
 nthr = ($threads || $thr || "4").to_i
 threads(nthr)
 verbose(false)
+
+# -rd log=<file>: also write the log messages to a file
+if $log
+  $sv_logf = File.open($log, "w")
+  def log(msg, indent = 0)
+    puts msg
+    $sv_logf.puts(msg)
+    $sv_logf.flush
+  end
+end
 
 $sv_verbose = ($sv_verbose_flag.to_s == "1")
 $sv_strict = ($strict.to_s == "1")
