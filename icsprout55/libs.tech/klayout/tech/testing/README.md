@@ -11,7 +11,9 @@ git (it is populated by `install.sh`).
 
 ## Running
 
-Inside the tools container (KLayout 0.30.10), about one minute for everything:
+Inside the tools container (KLayout 0.30), about one hour for everything (the DRC
+deck is the complete Calibre rule set; `hacking/svrf2klayout/regress.sh` is a
+wrapper for the command below):
 
 ```
 docker run --rm -v "$PWD":/work -w /work factory.symbioticeda.com/asic-all:dev \
@@ -61,7 +63,7 @@ overhang does not interact, so they are checked as they are. They are only in
 LVS standard cells: `lvs_wrap.py` places the cells in a grid (not touching)
 under `ALL` and writes a matching schematic `.SUBCKT ALL` with one instance per
 cell, so each cell is compared as its own circuit pair. The cells are tapless,
-hence `-rd tapless=true` (substrate joined to VSS, untapped wells to VDD).
+hence `-rd tapless=true` (the well nets of every cell are tied to VSS / VDD).
 
 LVS IO: each IO cell that has a schematic is run as its own top cell, with
 `-rd implicit_nets="VDDIO VSSIO VDD VSS"` because the supply rails of a
@@ -71,49 +73,49 @@ standalone IO cell come in pieces that connect through the neighbouring cells.
 
 ### DRC
 
-The private 9-track standard cell libraries are clean against the deck (0
-markers). The 7-track libraries are not; see the table below. This IO marker is
-believed to be real, not a translation error:
+`ics55.drc` is generated from the Calibre deck (`hacking/svrf2klayout`) with the
+Calibre values and the complete rule set, so the golden files hold what the
+libraries really violate when they are checked standalone. Nothing is relaxed
+or waived.
 
-| Rule       | Where                         | Geometry vs rule                      |
-|------------|-------------------------------|---------------------------------------|
-| V3/V4_EN_5a_enc | IO `P65_1233_VDDIO3`     | via edge on metal edge (0 vs 0.005)   |
+| Testcase | Markers | Rules | Largest contributors |
+|----------|---------|-------|----------------------|
+| `drc_stdcell_H7C{R,H,L}` | 98843 | 39 | CT_EN_4a_4b_4c 34889, LU_S_2_NTAP 14705, LU_S_2_PTAP 14069, CT_S_4 13969, NP_EN_3 4950, PP_EN_3 4585, MET1_S_4 2846, MET1_A_1 2227, MET1_W_2 1703, MET1_S_5 1304 |
+| `drc_stdcell_H7CR_M2`    | 101371 | 42 | as above plus V1_EN_2a_2b_2c 2198, M2_A_1 328, V1_S_3 2 |
+| `drc_stdcell_9T{S,H,L}VT` | 24862 / 24863 / 24863 | 13 | LU_S_2_NTAP 12611, LU_S_2_PTAP 10828, NW1_R_1 717, density minima |
+| `drc_io`                 | 3701 | 57 | SAB_S_5 720, SAB_S_6 422, CT_EN_4d 408, SAB_R_1 398, SAB_S_4 360, PO_S_11 268, POLYres_S_2 222 |
 
-**The deck is at the Calibre values.** Six rules used to be relaxed so that the
-released 7-track standard cells would pass; they were restored, because the
-private 9-track libraries meet the original rules (0 markers in all three Vt
-flavours). The relaxed values are kept here only as a record of what the
-7-track libraries need:
+What is behind them:
 
-| Rule     | Calibre | was relaxed to | 7-track library geometry |
-|----------|---------|----------------|--------------------------|
-| NW1_W_1  | 0.47    | 0.36   | narrow NW steps inside 14 cells, 0.36-0.462um: DFFSRX0P5/X1, SDFFSRX0P5/X1/X2, MUX4X3 (0.36); DFFSX0P5/X1/X2 (0.381); ADDHX1P4 (0.39); SDFFSRQX1/X2/X3 (0.438); DFFSRQX2 (0.453, 0.462). Not abutment: the legs at the cell edges disappear once abutted (the test puts a filler on both sides) |
-| NW1_S_1  | 0.47    | 0.40   | shallow NW notches of 0.409-0.46um in ICGX2, LATLSR and DFFNRX4 |
-| ACT_S_1  | 0.11    | 0.10   | AA spacing of 0.105 in NAND3, MSDFFQ |
-| PO_A_1   | 0.04    | 0.0388 | PO areas of 0.0388-0.03995um2 in 113 cells (smallest in DFFSRX0P5/X1/X2) |
-| MET1_A_1 | 0.042   | 0.027  | M1 pins of 0.027-0.031um2 in 714 cells |
-| Mn_A_1   | 0.052   | 0.020  | M2 pins of 0.038um2 in the `_M2` library |
+- `LU_S_2_NTAP` / `LU_S_2_PTAP` (latch-up, distance to the next well tap): the
+  cells have no taps and the test layouts contain no tap cells. Expected for a
+  library check; a placed design with tap cells clears them.
+- `*_D_*_min` (minimum density): the test layout is not a filled chip.
+- `NW1_R_1`: one marker per cell, also a consequence of the untapped wells.
+- 7-track libraries only: contact enclosure / spacing (`CT_EN_*`, `CT_S_*`),
+  implant enclosure (`NP_EN_3`, `PP_EN_3`), MET1 spacing / width / area and the
+  poly rules. Calibre reports the same rules on these cells; the 9-track
+  libraries have none of them.
+- IO: mostly the SAB / poly resistor / RDL rules of the ESD and pad structures,
+  plus the 0.005/0.01um spacer cells `P65_1233_FILLER0005` / `FILLER001`, whose
+  layers are only complete when abutted to the pads.
 
-So the 7-track golden files now carry those markers as the baseline
-(per library: 2390 markers = 2227 MET1_A_1, 113 PO_A_1, 30 ACT_S_1, 15 NW1_W_1,
-5 NW1_S_1; 2718 for `_M2`, which adds 328 M2_A_1), and the IO golden grew from
-5 to 131. Most of them disappear in a placed and routed design, where the cell
-pins merge with the routing: `demo_counter` reports 29 KLayout DRC errors with
-the 7-track library and 0 with the 9-track one.
+Agreement with Calibre 2012.2 (details in `hacking/svrf2klayout/README.md` and
+`hacking/svrf2klayout/tests/results/`): on the H7CR library 49 of the 60 firing
+rules have identical markers and on the IO library 68 of 71; the others differ
+by a few markers. Known ones in the goldens: `PO_S_1` (3 markers on SDFFSQX1/2/3
+that Calibre does not report: two corners of the same PO polygon measured
+through its interior), `CT_EN_4a_4b_4c`, `PO_S_14`, `PO_S_15`, `PO_S_2`,
+`MET1_S_4`, `MET1_S_5`, `LU_S_2_PTAP` (std cells) and `RV_EN_1_2`, `RV_EN_3_4`,
+`T4M2_D_3` (IO). The 9-track libraries were not run through Calibre.
 
-PO_S_1 keeps the Calibre value (0.12). Its former markers (SDFFSQ, and
-OAI2BB2X6 / SDFFNQX3 / ICGX1 / DFFQX0P5 when it was 0.119) were two corners of
-the same PO polygon measured through its interior; no two PO polygons of the
-libraries are closer than 0.12um. `drop_inner` (ics55.drc) removes such results.
-KLayout's euclidian space check only reports these corner pairs when they are
-within about 1 dbu of the threshold, which is why the counts changed with the
-value. The `transparent` mode is not an alternative: it measures through other
-shapes and reports hundreds of gaps down to 0.06um.
-
-Expected artifacts, not errors:
-
-- IO `P65_1233_FILLER0005` / `P65_1233_FILLER001`: 0.005/0.01um wide spacer
-  cells whose layers are only complete when abutted to the pads.
+Six rules (NW1_W_1, NW1_S_1, ACT_S_1, PO_A_1, MET1_A_1, Mn_A_1) were relaxed
+in an earlier hand-written deck to let the 7-track cells pass. They are at the
+Calibre values now; for the record, the 7-track geometry behind them is: NW
+steps of 0.36-0.462um in 14 flip-flop / mux / adder cells, NW notches of
+0.409-0.46um, AA spacing of 0.105um, PO areas of 0.0388-0.03995um2 in 113
+cells, M1 pins of 0.027-0.031um2 in 714 cells and M2 pins of 0.038um2 in the
+`_M2` library.
 
 ### LVS
 

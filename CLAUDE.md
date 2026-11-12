@@ -113,9 +113,9 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
 - `demo_chip` reaches `final/` but exits non-zero on a deferred `Checker.PowerGridViolations`: PSM reports
   `PSM-0025 VDD/VSS does not contain any terminals` because `VSRC_LOC_FILES` is unset (the grid itself passes,
   `PSM-0040 All shapes on net VDD are connected`). Set `VSRC_LOC_FILES` to clear it.
-- KLayout DRC on the demos still reports library-intrinsic findings with the 7-track libraries (29 in
-  `demo_counter`), so the demo configs set `ERROR_ON_KLAYOUT_DRC: false`; LVS errors still fail the flow. With the
-  9-track libraries `demo_counter` is DRC and LVS clean.
+- KLayout DRC on the demos reports library-intrinsic findings with the 7-track libraries, so the demo configs set
+  `ERROR_ON_KLAYOUT_DRC: false`; LVS errors still fail the flow. The demos have not been re-run through LibreLane
+  since the decks became the generated ones (full rule set), so earlier marker counts no longer apply.
 - 18 std cells per Vt library differ between vendor CDL and layout (listed in `testing/README.md`).
 - The standard cell library has no endcap cells; OpenROAD `tapcell` inserts no taps in rows shorter than
   `FP_TAPCELL_DIST` (15 µm), so tiny dies need absolute sizing.

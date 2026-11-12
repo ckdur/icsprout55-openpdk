@@ -68,14 +68,17 @@ So, I offer this repository to implement the same RTL-to-GDS, but using the regu
 
 This is a list of known features that ECOS offer, and their state in this repository:
 
-- DRC. KLayout DRC (`icsprout55/libs.tech/klayout/tech/ics55.drc`) is a partial translation of the vendor Calibre
-  runset (`icsprout55-pdk/pv/DRC`): widths, spaces, areas and the basic via enclosures of the main FEOL layers,
-  M1-M5, the vias and the top metal. Density, connectivity-based rules, antenna and dummy fill are not translated yet.
-  A few values are relaxed so the released standard cells pass; each one is marked in the deck and listed in
-  `icsprout55/libs.tech/klayout/tech/testing/README.md`. Magic DRC is a placeholder and is not used.
-- LVS. KLayout LVS (`icsprout55/libs.tech/klayout/tech/ics55.lvs`) is translated from the vendor Calibre runset
-  (`icsprout55-pdk/pv/LVS`). It extracts the devices used by the standard cells and the IO library (core svt/hvt/lvt
-  and 3.3V MOS, diodes, poly resistors). LibreLane only runs KLayout LVS for the IHP PDKs, so this PDK ships a
+- DRC. KLayout DRC (`icsprout55/libs.tech/klayout/tech/ics55.drc`) is generated from the vendor Calibre runset
+  (`icsprout55-pdk/pv/DRC`) by `hacking/svrf2klayout`: the complete rule set with the Calibre values, including the
+  connectivity-based rules and density. It was checked against Calibre with pass/fail critical shapes per rule and
+  on the standard cell and IO libraries (`hacking/svrf2klayout/README.md`). Approximations: density windows
+  (BACKUP/GRADIENT), `DRAWN ACUTE/OFFGRID`, enclosure against 45-degree edges. The separate antenna runset (`.ant`)
+  and dummy fill are not translated. Magic DRC is a placeholder and is not used.
+- LVS. KLayout LVS (`icsprout55/libs.tech/klayout/tech/ics55.lvs`) is generated the same way from the vendor Calibre
+  runset (`icsprout55-pdk/pv/LVS`), with all its devices. Verified against Calibre on the standard cells and the IO
+  library (core svt/hvt/lvt and 3.3V MOS, diodes, poly resistors); BJT, MOM, varactors, the other resistors and the
+  native/2.5V/SRAM MOS are translated but untested, ERC and WPE/LOD parameters are not translated.
+  LibreLane only runs KLayout LVS for the IHP PDKs, so this PDK ships a
   LibreLane plugin with the step `ICS55.KLayoutLVS` (see below). Magic/Netgen LVS is not supported.
   Full-chip LVS (`demo_chip`) is disabled for now, it is too slow on a chip with fill.
 - RCX true translation. This repository used the `FasterCap` offered from `OpenROAD`, but this repository contains
