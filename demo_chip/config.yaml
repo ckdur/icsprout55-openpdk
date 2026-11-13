@@ -10,11 +10,9 @@ meta:
     #KLayout.DRC: null
     #Checker.KLayoutDRC: null
 
-    # Magic verifications are disabled (DRC, extraction, LVS, XOR against
-    # the KLayout stream-out). Signoff is done with KLayout.
-    Magic.DRC: null
-    Checker.MagicDRC: null
-    Magic.SpiceExtraction: null
+    # Magic DRC (translated subset of the Calibre deck, on the routing over the
+    # cell abstracts, MAGIC_DRC_USE_GDS below) and Magic extraction + Netgen LVS
+    # run; signoff is KLayout. No XOR against the Magic stream-out.
     KLayout.XOR: null
     Checker.XOR: null
 
@@ -29,12 +27,10 @@ meta:
     # Save time
     #OpenROAD.IRDropReport: null
 
-    # LVS disabled for the full chip for now (KLayout LVS of the chip with
-    # fill is too slow yet). To enable it, as in demo_counter:
+    # LVS: Magic extraction (cells and pads as abstracts) + Netgen. The KLayout
+    # LVS of the full chip with fill is too slow yet; to add it as in demo_counter:
     #-Netgen.LVS: OpenROAD.WriteCDL
-    #Netgen.LVS: ICS55.KLayoutLVS
-    Netgen.LVS: null
-    Checker.LVS: null
+    #+Netgen.LVS: ICS55.KLayoutLVS
 
     # Use Magic.Filler instead of KLayout.Filler
     # This can help in some cases where the target
@@ -175,6 +171,13 @@ MACROS:
 # areas, PO_A_1, NW1_W_1 at row ends without endcaps), see
 # icsprout55/libs.tech/klayout/tech/testing/README.md. Report, but do not fail.
 ERROR_ON_KLAYOUT_DRC: false
+
+# Magic DRC: the translated subset of the Calibre deck (hacking/magic/README.md).
+# Checked on the routing over the cell / pad / macro abstracts: the vendor cells
+# carry the same library-intrinsic findings as with KLayout, and the full chip
+# GDS (pads, fill) is too large for Magic's derived-layer rules.
+MAGIC_DRC_USE_GDS: false
+ERROR_ON_MAGIC_DRC: false
 
 # Schematic of the counter macro for LVS (used once chip LVS is enabled)
 EXTRA_CDLS:

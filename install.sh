@@ -18,11 +18,17 @@ for lib in ics55_LLSC_H7CH ics55_LLSC_H7CL ics55_LLSC_H7CR; do
   python3 hacking/cdl_convert.py $STD_SRC/$lib/cdl/$lib.cdl icsprout55/libs.ref/$lib/cdl/$lib.cdl
   mkdir -p icsprout55/libs.ref/$lib/spice
   python3 hacking/cdl_to_spice.py $STD_SRC/$lib/cdl/$lib.cdl icsprout55/libs.ref/$lib/spice/$lib.spice
+  # netgen reference netlist (helper subcircuits inlined, split gates reduced, see hacking/magic/lvs_netlist.py)
+  python3 hacking/magic/lvs_netlist.py icsprout55/libs.ref/$lib/spice/$lib.spice icsprout55/libs.ref/$lib/spice/${lib}_lvs.spice
 done
 IO_SRC=icsprout55-pdk/IP/IO/ICsprout_55LLULP1233_IO_251013
+IO_DST=icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013
 # --lef: empty subcircuits for the corner / spacer cells, needed by OpenROAD write_cdl
-python3 hacking/cdl_convert.py $IO_SRC/cdl/ICSIOA_N55_3P3.cdl icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013/cdl/ICSIOA_N55_3P3.cdl \
+python3 hacking/cdl_convert.py $IO_SRC/cdl/ICSIOA_N55_3P3.cdl $IO_DST/cdl/ICSIOA_N55_3P3.cdl \
   --lef hacking/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef
+mkdir -p $IO_DST/spice
+python3 hacking/cdl_to_spice.py $IO_SRC/cdl/ICSIOA_N55_3P3.cdl $IO_DST/spice/ICSIOA_N55_3P3.spice
+python3 hacking/magic/lvs_netlist.py $IO_DST/spice/ICSIOA_N55_3P3.spice $IO_DST/spice/ICSIOA_N55_3P3_lvs.spice
 
 # The vendor _ecos.lef has the pad terminals on the top metal; this one moves them to
 # RDL, where they belong. PAD_LEFS (libs.tech/librelane/config.tcl) uses this file.
@@ -87,6 +93,7 @@ if [ -n "${PRIVATE_STD_ROOT:-}" ] && [ -d "$PRIVATE_STD_ROOT" ]; then
     # Same treatment as the public standard cells (see hacking/cdl_convert.py)
     python3 hacking/cdl_convert.py "$src/cdl/$lib.cdl" "$dst/cdl/$lib.cdl"
     python3 hacking/cdl_to_spice.py "$src/cdl/$lib.cdl" "$dst/spice/$lib.spice"
+    python3 hacking/magic/lvs_netlist.py "$dst/spice/$lib.spice" "$dst/spice/${lib}_lvs.spice"
   done
 else
   echo "Private standard cells not found, skipping (set PRIVATE_STD_ROOT to install them)"

@@ -1,0 +1,744 @@
+Calibre rules: 711   translated fully: 142   partly: 20   skipped: 455   never apply: 94
+native Magic rules: 74   CIF rules: 122   CIF layers used: 249 / 255
+
+skipped by reason:
+    85  edge operation
+    66  rectangle
+    62  check
+    42  CIF layer budget (255 per style)
+    35  density
+    31  selection with a count
+    19  angle
+    18  expand_edge
+    13  with_width
+    12  extent
+    11  selection touch
+    10  enclose_rect
+     7  EXT option connected
+     7  int with 2 operands
+     7  ENC option angled
+     6  edge_or
+     4  area
+     4  EXT option corner_to_edge
+     3  EXT between layers derived from the same drawn layer
+     3  EXT option angled
+     2  boolean XOR
+     2  INT option angled
+     1  EXT option inside_also
+     1  length
+     1  dfm_property
+     1  net_area_ratio
+     1  donut
+     1  with_text
+
+DGR_3                        skipped  edge operation
+skew_edge_check              skipped  angle
+DNW_W_1                      ok       
+DNW_S_1                      ok       
+DNW_S_2a                     skipped  EXT option connected
+DNW_S_3                      skipped  extent
+DNW_S_4                      skipped  extent
+DNW_S_5                      skipped  CIF layer budget (255 per style)
+DNW_EN_1                     partial  edge operation
+DNW_EN_2                     skipped  CIF layer budget (255 per style)
+DNW_O_1                      skipped  int with 2 operands
+DNW_R_1                      skipped  edge operation
+DNW_R_3                      skipped  extent
+ACT_W_1                      ok       
+ACT_W_2                      skipped  angle
+ACT_W_3a                     skipped  expand_edge
+ACT_W_3b                     skipped  expand_edge
+ACT_L_1                      skipped  edge operation
+ACT_L_2                      skipped  edge operation
+ACT_S_1                      ok       
+ACT_S_1a                     skipped  EXT between layers derived from the same drawn layer
+ACT_S_2                      skipped  enclose_rect
+ACT_S_3                      skipped  angle
+ACT_S_4                      skipped  edge operation
+ACT_S_5                      skipped  check
+ACT_S_6                      skipped  check
+ACT_S_7                      skipped  check
+ACT_S_8                      skipped  check
+ACT_EN_1                     skipped  check
+ACT_EN_2                     skipped  check
+ACT_EN_2a                    skipped  check
+ACT_A_1                      skipped  area
+ACT_A_2                      ok       
+ACT_D_1_min                  skipped  density
+ACT_D_1_max                  skipped  density
+ACT_D_2                      skipped  density
+ACT_D_3                      skipped  density
+ACT_D_4_min                  skipped  density
+ACT_D_4_max                  skipped  density
+ACT_R_1                      ok       
+NW1_W_1                      ok       
+NW1_S_1                      skipped  check
+NW1_S_2                      skipped  check
+NW1_S_3                      skipped  edge operation
+NW1_S_4                      skipped  EXT option connected
+NW1_S_5                      skipped  edge operation
+NW1_A_1                      ok       
+NW1_A_2                      ok       
+NW1_R_1                      skipped  CIF layer budget (255 per style)
+PSUB_W_1                     ok       
+PSUB_W_2                     skipped  expand_edge
+PSUB_W_3a                    skipped  expand_edge
+PSUB_W_3b                    skipped  expand_edge
+PSUB_W_3d                    skipped  edge operation
+PSUB_S_1                     ok       
+PSUB_S_2                     skipped  selection touch
+PSUB_S_3                     ok       
+PSUB_EN_1                    skipped  boolean XOR
+PSUB_EX_1                    ok       
+PSUB_R_1                     partial  edge operation
+PSUB_R_2                     skipped  selection with a count
+PSUB_R_3                     skipped  selection with a count
+PSUB_A_1                     ok       
+PSUB_A_2                     ok       
+NVT3_W_1                     ok       
+NVT3_S_1                     ok       
+NVT3_S_2                     skipped  edge operation
+NVT3_S_3                     skipped  edge_or
+NVT3_S_4                     ok       
+NVT3_EX_1                    skipped  expand_edge
+NVT3_EX_2                    skipped  check
+NVT3_A_1                     ok       
+NVT3_A_2                     ok       
+NVT3_R_1                     partial  CIF layer budget (255 per style)
+PVT3_W_1                     ok       
+PVT3_S_1                     ok       
+PVT3_S_2                     skipped  edge operation
+PVT3_S_3                     skipped  edge_or
+PVT3_S_4                     ok       
+PVT3_EX_1                    skipped  expand_edge
+PVT3_EX_2                    skipped  check
+PVT3_A_1                     ok       
+PVT3_A_2                     ok       
+PVT3_R_1                     partial  CIF layer budget (255 per style)
+NVT1_W_1                     ok       
+NVT1_S_1                     ok       
+NVT1_S_2                     skipped  edge_or
+NVT1_S_3                     skipped  edge_or
+NVT1_S_4                     ok       
+NVT1_EX_1                    skipped  expand_edge
+NVT1_EX_2                    skipped  edge operation
+NVT1_A_1                     ok       
+NVT1_A_2                     ok       
+NVT1_R_1                     partial  CIF layer budget (255 per style)
+PVT1_W_1                     ok       
+PVT1_S_1                     ok       
+PVT1_S_2                     skipped  edge_or
+PVT1_S_3                     skipped  edge_or
+PVT1_EX_1                    skipped  expand_edge
+PVT1_EX_2                    skipped  edge operation
+PVT1_A_1                     ok       
+PVT1_A_2                     ok       
+PVT1_R_1                     ok       
+ULLD_W_1                     ok       
+ULLD_S_1                     ok       
+ULLD_S_2                     ok       
+ULLD_S_4                     ok       
+ULLD_S_5                     skipped  edge operation
+ULLD_S_6                     skipped  edge operation
+ULLD_EX_1                    ok       
+ULLD_EX_2                    skipped  edge operation
+ULLD_EX_3a                   skipped  edge operation
+ULLD_EX_3b                   skipped  edge operation
+ULLD_A_1                     ok       
+ULLD_A_2                     ok       
+ULLD_R_1                     ok       
+ULLD_R_2                     ok       
+DG_W_1                       ok       
+DG_S_1                       ok       
+DG_S_2                       skipped  selection touch
+DG_S_3                       skipped  selection with a count
+DG_S_4                       ok       
+DG_S_5                       ok       
+DG_EN_1                      skipped  CIF layer budget (255 per style)
+DG_EN_2                      skipped  edge operation
+DG_EN_3                      skipped  edge operation
+DG_EX_1                      ok       
+DG_EX_2                      ok       
+DG_EX_3                      ok       
+DG_O_1                       skipped  int with 2 operands
+DG_O_2                       skipped  int with 2 operands
+TG_W_1                       ok       
+TG_S_1                       ok       
+TG_S_2                       skipped  selection touch
+TG_S_3                       skipped  selection with a count
+TG_S_4                       ok       
+TG_S_5                       ok       
+TG_S_6                       skipped  EXT option inside_also
+TG_EN_1                      skipped  selection touch
+TG_EN_2                      skipped  edge operation
+TG_EN_3                      skipped  edge operation
+TG_EX_1                      ok       
+TG_EX_2                      ok       
+TG_EX_3                      ok       
+TG_O_1                       skipped  int with 2 operands
+TG_O_2                       skipped  int with 2 operands
+PO_W_1                       ok       
+PO_W_2a                      skipped  edge operation
+PO_W_2b                      skipped  check
+PO_W_2d                      skipped  check
+PO_W_3                       skipped  angle
+PO_S_1                       skipped  check
+PO_S_2                       skipped  edge operation
+PO_S_3                       skipped  check
+PO_S_5                       skipped  check
+PO_S_6                       skipped  edge operation
+PO_S_7                       skipped  check
+PO_S_9                       skipped  length
+PO_S_11                      skipped  check
+PO_S_12                      ok       
+PO_S_14                      skipped  edge operation
+PO_S_15                      skipped  edge operation
+PO_S_16                      skipped  area
+PO_EX_1                      skipped  check
+PO_EX_2                      skipped  check
+PO_L_1                       skipped  selection with a count
+PO_D_1_min                   skipped  density
+PO_D_1_max                   skipped  density
+PO_D_2_min                   skipped  density
+PO_D_2_max                   skipped  density
+PO_D_3                       skipped  density
+PO_A_1                       ok       
+PO_A_2                       ok       
+PO_R_1                       skipped  edge operation
+PO_R_2                       skipped  CIF layer budget (255 per style)
+NP_W_1                       ok       
+NP_S_1                       ok       
+NP_S_2                       skipped  check
+NP_S_3                       skipped  edge operation
+NP_S_4                       ok       
+NP_S_5                       skipped  check
+NP_S_6                       skipped  edge operation
+NP_EN_1                      skipped  edge operation
+NP_EN_2                      skipped  edge operation
+NP_EN_3                      skipped  CIF layer budget (255 per style)
+NP_EX_1_EX_1a                skipped  check
+NP_O_1                       skipped  int with 2 operands
+NP_A_1                       ok       
+NP_A_2                       ok       
+NP_A_3                       skipped  selection touch
+PP_W_1                       ok       
+PP_S_1                       ok       
+PP_S_2                       skipped  check
+PP_S_3                       skipped  edge operation
+PP_S_4                       ok       
+PP_S_5                       skipped  check
+PP_S_6                       skipped  edge operation
+PP_EN_1                      skipped  edge operation
+PP_EN_2                      skipped  edge operation
+PP_EN_3                      skipped  CIF layer budget (255 per style)
+PP_EX_1_EX_1a                skipped  check
+PP_O_1                       skipped  edge operation
+PP_A_1                       ok       
+PP_A_2                       ok       
+PP_A_3                       skipped  selection touch
+PP_R_1                       ok       
+PP_R_3                       skipped  edge operation
+SAB_W_1                      ok       
+SAB_S_1                      ok       
+SAB_S_2                      skipped  check
+SAB_S_3                      ok       
+SAB_S_4                      skipped  check
+SAB_S_5                      ok       
+SAB_S_6                      ok       
+SAB_EX_1                     ok       
+SAB_EX_2                     ok       
+SAB_EX_3                     ok       
+SAB_A_1                      ok       
+SAB_A_2                      ok       
+SAB_R_1                      skipped  edge operation
+SAB_R_2                      skipped  edge operation
+CT_W_1                       skipped  rectangle
+CT_W_2                       skipped  with_width
+CT_S_1                       skipped  check
+CT_S_1a                      skipped  CIF layer budget (255 per style)
+CT_S_2                       skipped  EXT option connected
+CT_S_3                       ok       
+CT_S_4                       skipped  check
+CT_S_5                       skipped  check
+CT_S_6                       skipped  edge operation
+CT_EN_1                      ok       
+CT_EN_2a                     skipped  check
+CT_EN_2b                     partial  check
+CT_EN_3a_3b_3c               partial  check
+CT_EN_4a_4b_4c               partial  check
+CT_EN_4d                     skipped  with_width
+CT_R_1                       skipped  selection with a count
+CT_R_2                       ok       
+CT_R_3                       skipped  edge operation
+CT_R_5                       skipped  selection touch
+MET1_W_1                     partial  with_width
+MET1_W_2                     skipped  angle
+MET1_W_3                     skipped  enclose_rect
+MET1_S_1                     skipped  check
+MET1_S_2                     skipped  edge operation
+MET1_S_3                     skipped  edge operation
+MET1_S_4                     skipped  angle
+MET1_S_5                     skipped  check
+MET1_A_1                     skipped  area
+MET1_A_2                     ok       
+MET1_D_1_min                 skipped  density
+MET1_D_1_max                 skipped  density
+MET1_D_2                     skipped  density
+MET1_D_3                     skipped  density
+M2_W_1a                      ok       
+M2_W_1b                      skipped  with_width
+M2_W_2                       skipped  angle
+M2_W_3                       skipped  enclose_rect
+M2_S_1                       skipped  check
+M2_S_2                       skipped  edge operation
+M2_S_3                       skipped  edge operation
+M2_S_4                       skipped  EXT option corner_to_edge
+M2_S_5                       skipped  check
+M2_A_1                       skipped  area
+M2_A_2                       ok       
+M2_D_1_min                   skipped  density
+M2_D_1_max                   skipped  density
+M2_D_2                       skipped  density
+M2_D_3                       skipped  density
+M3_W_1a                      ok       
+M3_W_1b                      skipped  with_width
+M3_W_2                       skipped  angle
+M3_W_3                       skipped  enclose_rect
+M3_S_1                       ok       
+M3_S_2                       skipped  edge operation
+M3_S_3                       skipped  edge operation
+M3_S_4                       skipped  EXT option corner_to_edge
+M3_S_5                       skipped  check
+M3_A_1                       ok       
+M3_A_2                       ok       
+M3_D_1_min                   skipped  density
+M3_D_1_max                   skipped  density
+M3_D_2                       skipped  density
+M3_D_3                       skipped  density
+M4_W_1a                      ok       
+M4_W_1b                      skipped  with_width
+M4_W_2                       skipped  angle
+M4_W_3                       skipped  enclose_rect
+M4_S_1                       ok       
+M4_S_2                       skipped  edge operation
+M4_S_3                       skipped  edge operation
+M4_S_4                       skipped  EXT option corner_to_edge
+M4_S_5                       skipped  check
+M4_A_1                       ok       
+M4_A_2                       ok       
+M4_D_1_min                   skipped  density
+M4_D_1_max                   skipped  density
+M4_D_2                       skipped  density
+M4_D_3                       skipped  density
+M5_W_1a                      ok       
+M5_W_1b                      skipped  with_width
+M5_W_2                       skipped  angle
+M5_W_3                       skipped  enclose_rect
+M5_S_1                       ok       
+M5_S_2                       skipped  edge operation
+M5_S_3                       skipped  edge operation
+M5_S_4                       skipped  EXT option corner_to_edge
+M5_S_5                       skipped  check
+M5_A_1                       ok       
+M5_A_2                       ok       
+M5_D_1_min                   skipped  density
+M5_D_1_max                   skipped  density
+M5_D_2                       skipped  density
+M5_D_3                       skipped  density
+V1_W_1                       skipped  rectangle
+V1_W_2                       skipped  with_width
+V1_S_1                       ok       
+V1_S_2                       skipped  CIF layer budget (255 per style)
+V1_S_3                       skipped  EXT option connected
+V1_EN_2a_2b_2c               partial  rect_enc
+V1_EN_5a_5b                  partial  INTERSECTING ONLY
+V1_R_5                       skipped  edge operation
+V2_W_1                       skipped  rectangle
+V2_W_2                       skipped  with_width
+V2_S_1                       ok       
+V2_S_2                       skipped  CIF layer budget (255 per style)
+V2_S_3                       skipped  EXT option connected
+V2_EN_2a_2b_2c               partial  rect_enc
+V2_EN_5a_5b                  partial  INTERSECTING ONLY
+V2_R_5                       skipped  edge operation
+V3_W_1                       skipped  rectangle
+V3_W_2                       skipped  with_width
+V3_S_1                       ok       
+V3_S_2                       skipped  CIF layer budget (255 per style)
+V3_S_3                       skipped  EXT option connected
+V3_EN_2a_2b_2c               partial  rect_enc
+V3_EN_5a_5b                  partial  INTERSECTING ONLY
+V3_R_5                       skipped  edge operation
+V4_W_1                       skipped  rectangle
+V4_W_2                       skipped  with_width
+V4_S_1                       ok       
+V4_S_2                       skipped  CIF layer budget (255 per style)
+V4_S_3                       skipped  EXT option connected
+V4_EN_2a_2b_2c               partial  rect_enc
+V4_EN_5a_5b                  partial  INTERSECTING ONLY
+V4_R_5                       skipped  edge operation
+V1_R_3                       skipped  selection with a count
+V2_R_3                       skipped  selection with a count
+V3_R_3                       skipped  selection with a count
+V4_R_3                       skipped  selection with a count
+T4V2_W_1                     skipped  rectangle
+T4V2_W_2                     skipped  with_width
+T4V2_S_1                     ok       
+T4V2_S_2                     skipped  CIF layer budget (255 per style)
+T4V2_EN_2_EN_3               partial  INTERSECTING ONLY
+T4V2_EN_5_EN_6               ok       
+T4V2_R_3                     skipped  edge operation
+T4M2_W_1                     skipped  with_width
+T4M2_S_1                     skipped  check
+T4M2_S_2                     skipped  edge operation
+T4M2_A_1                     ok       
+T4M2_A_2                     ok       
+T4M2_D_1_min                 skipped  density
+T4M2_D_1_max                 skipped  density
+T4M2_D_2                     skipped  density
+T4M2_D_3                     skipped  density
+CB_W_1                       skipped  check
+CB_S_1                       skipped  check
+CB_EN_1_EN_2                 skipped  check
+RV_W_1                       skipped  rectangle
+RV_S_1                       skipped  selection touch
+RV_S_2                       skipped  check
+RV_EN_1_2                    skipped  check
+RV_EN_3_4                    partial  check
+RV_R_1                       skipped  selection with a count
+RDL_W_1                      skipped  with_width
+RDL_S_1                      skipped  check
+RDL_S_2                      skipped  check
+RDL_S_3                      skipped  check
+RDL_EN_1                     never    uses layers Magic does not read
+RDL_EN_2                     ok       
+COVER_W_1                    skipped  check
+COVER_L_1                    skipped  enclose_rect
+COVER_S_1                    skipped  check
+COVER_S_2                    skipped  check
+COVER_EN_1                   skipped  check
+CHIPEDGE_EN_1                skipped  extent
+CHIPEDGE_EN_2                ok       
+CHIPEDGE_EN_3                never    uses layers Magic does not read
+AAres_W_1                    skipped  edge operation
+AAres_S_1_NP                 ok       
+AAres_S_1_PP                 ok       
+AAres_S_1_NVT3               skipped  CIF layer budget (255 per style)
+AAres_S_1_PVT3               skipped  CIF layer budget (255 per style)
+AAres_S_1_NVT1               skipped  CIF layer budget (255 per style)
+AAres_S_1_PVT1               skipped  CIF layer budget (255 per style)
+AAres_S_1_ESD                skipped  CIF layer budget (255 per style)
+AAres_S_1_HRP                skipped  CIF layer budget (255 per style)
+AAres_S_2                    skipped  selection touch
+AAres_EN_1                   ok       
+AAres_EX_1                   skipped  CIF layer budget (255 per style)
+AAres_R_1                    skipped  CIF layer budget (255 per style)
+AAres_R_2                    skipped  CIF layer budget (255 per style)
+AAres_R_3                    skipped  edge operation
+AAres_R_4                    skipped  edge operation
+NWresAA_W_1                  skipped  edge operation
+NWresAA_S_1                  skipped  CIF layer budget (255 per style)
+NWresAA_S_2                  skipped  edge operation
+NWresAA_S_3                  skipped  EXT between layers derived from the same drawn layer
+NWresAA_S_4                  skipped  edge operation
+NWresAA_EN_1                 skipped  CIF layer budget (255 per style)
+NWresAA_EN_2                 skipped  edge operation
+NWresAA_EN_3                 skipped  CIF layer budget (255 per style)
+NWresAA_EN_4                 skipped  CIF layer budget (255 per style)
+NWresAA_EX_1                 ok       
+NWresAA_O_1                  skipped  CIF layer budget (255 per style)
+NWresAA_R_1                  skipped  CIF layer budget (255 per style)
+NWresAA_R_2                  skipped  rectangle
+NWresAA_R_4                  skipped  selection with a count
+NWresSTI_W_1                 skipped  edge operation
+NWresSTI_S_1                 skipped  CIF layer budget (255 per style)
+NWresSTI_S_2                 skipped  CIF layer budget (255 per style)
+NWresSTI_S_3                 skipped  EXT between layers derived from the same drawn layer
+NWresSTI_EN_1                skipped  edge operation
+NWresSTI_EN_2                skipped  CIF layer budget (255 per style)
+NWresSTI_EN_3                skipped  CIF layer budget (255 per style)
+NWresSTI_EX_1                ok       
+NWresSTI_EX_2                skipped  CIF layer budget (255 per style)
+NWresSTI_R_1                 skipped  CIF layer budget (255 per style)
+NWresSTI_R_2                 partial  CIF layer budget (255 per style)
+NWresSTI_R_3                 skipped  rectangle
+POLYres_W_1                  skipped  dfm_property
+POLYres_S_1a:PP              skipped  CIF layer budget (255 per style)
+POLYres_S_1b:NP              skipped  CIF layer budget (255 per style)
+POLYres_S_1:ESD              skipped  CIF layer budget (255 per style)
+POLYres_S_1:HRP              skipped  CIF layer budget (255 per style)
+POLYres_S_1:NPR              never    uses layers Magic does not read
+POLYres_S_2                  skipped  selection touch
+POLYres_EN_1                 ok       
+POLYres_EX_1                 skipped  edge operation
+POLYres_EX_2                 ok       
+POLYres_R_1                  skipped  CIF layer budget (255 per style)
+POLYres_R_3                  skipped  edge operation
+EFU_1b_G                     never    uses layers Magic does not read
+EFU_1c_G                     never    uses layers Magic does not read
+EFU_2b_G                     never    uses layers Magic does not read
+EFU_2c_G                     never    uses layers Magic does not read
+HRP_W_1                      ok       
+HRP_W_2                      skipped  edge operation
+HRP_S_1                      ok       
+HRP_S_2                      skipped  selection with a count
+HRP_S_3                      skipped  selection touch
+HRP_EN_1                     skipped  CIF layer budget (255 per style)
+HRP_EX_1                     skipped  CIF layer budget (255 per style)
+HRP_O_1                      skipped  edge operation
+HRP_R_1                      skipped  CIF layer budget (255 per style)
+HRP_R_2                      skipped  boolean XOR
+DEUPAD_R_2                   never    uses layers Magic does not read
+DEUPAD_R_3                   never    uses layers Magic does not read
+DEUPAD_R_5                   never    uses layers Magic does not read
+DEUPAD_R_6                   never    uses layers Magic does not read
+DEUPAD_R_7                   never    uses layers Magic does not read
+SRCK_3_M1                    skipped  extent
+SRCK_3_M2                    skipped  extent
+SRCK_3_M3                    skipped  extent
+SRCK_3_M4                    skipped  extent
+SRCK_3_M5                    skipped  extent
+SRCK_3_T4M2                  skipped  extent
+SRCK_4_M1                    skipped  selection with a count
+SRCK_4_M2                    skipped  selection with a count
+SRCK_4_M3                    skipped  selection with a count
+SRCK_4_M4                    skipped  selection with a count
+SRCK_4_M5                    skipped  selection with a count
+SRCK_4_T4M2                  skipped  selection with a count
+SRCK_5_M1                    skipped  selection with a count
+SRCK_5_M2                    skipped  selection with a count
+SRCK_5_M3                    skipped  selection with a count
+SRCK_5_M4                    skipped  selection with a count
+SRCK_5_M5                    skipped  selection with a count
+SRCK_5_T4M2                  skipped  selection with a count
+SRCK_6_M1                    skipped  selection with a count
+SRCK_6_M2                    skipped  selection with a count
+SRCK_6_M3                    skipped  selection with a count
+SRCK_6_M4                    skipped  selection with a count
+SRCK_6_M5                    skipped  selection with a count
+SRCK_6_T4M2                  skipped  selection with a count
+SRCK_7_RDL                   skipped  extent
+SRCK_8_RDL                   skipped  INT option angled
+SRCK_9_RV                    skipped  extent
+SRCK_10_RV                   skipped  INT option angled
+SRCK_11a                     skipped  enclose_rect
+SRCK_11b                     skipped  enclose_rect
+SRCK_11d_12e                 skipped  enclose_rect
+SRCK_13a                     skipped  rectangle
+SRCK_13b_13c                 skipped  rectangle
+SRCK_13e_13f                 skipped  rectangle
+SRCK_14a_CT                  skipped  ENC option angled
+SRCK_14b_14c                 skipped  ENC option angled
+SRCK_14d_14e_14f             skipped  ENC option angled
+SRCK_15a_CT                  skipped  ENC option angled
+SRCK_15b_v1                  skipped  ENC option angled
+SRCK_15b_15c                 skipped  ENC option angled
+SRCK_15d_15e_15f             skipped  ENC option angled
+SRCK_16a                     skipped  EXT option angled
+SRCK_16b_16c                 skipped  EXT option angled
+SRCK_16d_16e_16f             skipped  EXT option angled
+SL_W_1_L_1                   skipped  rectangle
+SL_S_1                       never    uses layers Magic does not read
+SL_R_1                       never    uses layers Magic does not read
+AADUM_W_1                    skipped  rectangle
+AADUM_S_1                    skipped  rectangle
+AADUM_S_2                    skipped  rectangle
+AADUM_S_3                    skipped  rectangle
+AADUM_S_4                    ok       
+AADUM_S_5                    ok       
+AADUM_S_6                    ok       
+AADUM_S_7                    never    uses layers Magic does not read
+AADUM_S_8                    ok       
+AADUM_S_9                    never    uses layers Magic does not read
+AADUM_S_10                   never    uses layers Magic does not read
+AADUM_S_11                   ok       
+AADUM_S_12                   never    uses layers Magic does not read
+AADUM_S_13                   never    uses layers Magic does not read
+AADUM_R_1                    ok       
+PODUM_W_1                    skipped  rectangle
+PODUM_S_1                    skipped  rectangle
+PODUM_S_2                    skipped  rectangle
+PODUM_S_3                    skipped  rectangle
+PODUM_S_4                    ok       
+PODUM_S_5                    ok       
+PODUM_S_6                    ok       
+PODUM_S_7                    ok       
+PODUM_S_8                    never    uses layers Magic does not read
+PODUM_S_9                    never    uses layers Magic does not read
+PODUM_S_10                   ok       
+PODUM_S_11                   never    uses layers Magic does not read
+PODUM_S_12                   never    uses layers Magic does not read
+PODUM_R_1                    ok       
+M1DUM_W_1                    skipped  rectangle
+M1DUM_S_1                    skipped  rectangle
+M1DUM_S_2                    skipped  rectangle
+M1DUM_S_3                    skipped  rectangle
+M1DUM_S_4                    skipped  rectangle
+M1DUM_S_5                    skipped  rectangle
+M1DUM_S_6                    skipped  rectangle
+M1DUM_S_7                    skipped  expand_edge
+M1DUM_S_8                    skipped  angle
+M1DUM_S_9                    never    uses layers Magic does not read
+M1DUM_S_10                   never    uses layers Magic does not read
+M1DUM_S_11                   never    uses layers Magic does not read
+M1DUM_S_12                   never    uses layers Magic does not read
+M1DUM_S_13                   ok       
+M1DUM_S_14                   never    uses layers Magic does not read
+M1DUM_S_15                   never    uses layers Magic does not read
+M2DUM_W_1                    skipped  rectangle
+M2DUM_S_1                    skipped  rectangle
+M2DUM_S_2                    skipped  rectangle
+M2DUM_S_3                    skipped  rectangle
+M2DUM_S_4                    skipped  rectangle
+M2DUM_S_5                    skipped  rectangle
+M2DUM_S_6                    skipped  rectangle
+M2DUM_S_7                    skipped  expand_edge
+M2DUM_S_8                    skipped  angle
+M2DUM_S_9                    never    uses layers Magic does not read
+M2DUM_S_10                   never    uses layers Magic does not read
+M2DUM_S_11                   never    uses layers Magic does not read
+M2DUM_S_12                   never    uses layers Magic does not read
+M2DUM_S_13                   ok       
+M2DUM_S_14                   never    uses layers Magic does not read
+M2DUM_S_15                   never    uses layers Magic does not read
+M3DUM_W_1                    skipped  rectangle
+M3DUM_S_1                    skipped  rectangle
+M3DUM_S_2                    skipped  rectangle
+M3DUM_S_3                    skipped  rectangle
+M3DUM_S_4                    skipped  rectangle
+M3DUM_S_5                    skipped  rectangle
+M3DUM_S_6                    skipped  rectangle
+M3DUM_S_7                    skipped  expand_edge
+M3DUM_S_8                    skipped  angle
+M3DUM_S_9                    never    uses layers Magic does not read
+M3DUM_S_10                   never    uses layers Magic does not read
+M3DUM_S_11                   never    uses layers Magic does not read
+M3DUM_S_12                   never    uses layers Magic does not read
+M3DUM_S_13                   ok       
+M3DUM_S_14                   never    uses layers Magic does not read
+M3DUM_S_15                   never    uses layers Magic does not read
+M4DUM_W_1                    skipped  rectangle
+M4DUM_S_1                    skipped  rectangle
+M4DUM_S_2                    skipped  rectangle
+M4DUM_S_3                    skipped  rectangle
+M4DUM_S_4                    skipped  rectangle
+M4DUM_S_5                    skipped  rectangle
+M4DUM_S_6                    skipped  rectangle
+M4DUM_S_7                    skipped  expand_edge
+M4DUM_S_8                    skipped  angle
+M4DUM_S_9                    never    uses layers Magic does not read
+M4DUM_S_10                   never    uses layers Magic does not read
+M4DUM_S_11                   never    uses layers Magic does not read
+M4DUM_S_12                   never    uses layers Magic does not read
+M4DUM_S_13                   ok       
+M4DUM_S_14                   never    uses layers Magic does not read
+M4DUM_S_15                   never    uses layers Magic does not read
+M5DUM_W_1                    skipped  rectangle
+M5DUM_S_1                    skipped  rectangle
+M5DUM_S_2                    skipped  rectangle
+M5DUM_S_3                    skipped  rectangle
+M5DUM_S_4                    skipped  rectangle
+M5DUM_S_5                    skipped  rectangle
+M5DUM_S_6                    skipped  rectangle
+M5DUM_S_7                    skipped  expand_edge
+M5DUM_S_8                    skipped  angle
+M5DUM_S_9                    never    uses layers Magic does not read
+M5DUM_S_10                   never    uses layers Magic does not read
+M5DUM_S_11                   never    uses layers Magic does not read
+M5DUM_S_12                   never    uses layers Magic does not read
+M5DUM_S_13                   ok       
+M5DUM_S_14                   never    uses layers Magic does not read
+M5DUM_S_15                   never    uses layers Magic does not read
+M6DUM_W_1                    never    uses layers Magic does not read
+M6DUM_S_1                    skipped  rectangle
+M6DUM_S_2                    never    uses layers Magic does not read
+M6DUM_S_3                    skipped  rectangle
+M6DUM_S_4                    never    uses layers Magic does not read
+M6DUM_S_5                    skipped  rectangle
+M6DUM_S_6                    never    uses layers Magic does not read
+M6DUM_S_7                    skipped  expand_edge
+M6DUM_S_8                    skipped  angle
+M6DUM_S_9                    never    uses layers Magic does not read
+M6DUM_S_10                   never    uses layers Magic does not read
+M6DUM_S_11                   never    uses layers Magic does not read
+M6DUM_S_12                   never    uses layers Magic does not read
+M6DUM_S_13                   never    uses layers Magic does not read
+M6DUM_S_14                   never    uses layers Magic does not read
+M6DUM_S_15                   never    uses layers Magic does not read
+M7DUM_W_1                    never    uses layers Magic does not read
+M7DUM_S_1                    skipped  rectangle
+M7DUM_S_2                    never    uses layers Magic does not read
+M7DUM_S_3                    skipped  rectangle
+M7DUM_S_4                    never    uses layers Magic does not read
+M7DUM_S_5                    skipped  rectangle
+M7DUM_S_6                    never    uses layers Magic does not read
+M7DUM_S_7                    skipped  expand_edge
+M7DUM_S_8                    skipped  angle
+M7DUM_S_9                    never    uses layers Magic does not read
+M7DUM_S_10                   never    uses layers Magic does not read
+M7DUM_S_11                   never    uses layers Magic does not read
+M7DUM_S_12                   never    uses layers Magic does not read
+M7DUM_S_13                   never    uses layers Magic does not read
+M7DUM_S_14                   never    uses layers Magic does not read
+M7DUM_S_15                   never    uses layers Magic does not read
+M8DUM_W_1                    never    uses layers Magic does not read
+M8DUM_S_1                    skipped  rectangle
+M8DUM_S_2                    never    uses layers Magic does not read
+M8DUM_S_3                    skipped  rectangle
+M8DUM_S_4                    never    uses layers Magic does not read
+M8DUM_S_5                    skipped  rectangle
+M8DUM_S_6                    never    uses layers Magic does not read
+M8DUM_S_7                    skipped  expand_edge
+M8DUM_S_8                    skipped  angle
+M8DUM_S_9                    never    uses layers Magic does not read
+M8DUM_S_10                   never    uses layers Magic does not read
+M8DUM_S_11                   never    uses layers Magic does not read
+M8DUM_S_12                   never    uses layers Magic does not read
+M8DUM_S_13                   never    uses layers Magic does not read
+M8DUM_S_14                   never    uses layers Magic does not read
+M8DUM_S_15                   never    uses layers Magic does not read
+T4M2DUM_W_1                  skipped  rectangle
+T4M2DUM_S_1                  skipped  check
+T4M2DUM_S_2                  skipped  check
+T4M2DUM_S_3                  skipped  check
+T4M2DUM_S_4                  skipped  check
+T4M2DUM_S_5                  skipped  check
+T4M2DUM_S_6                  skipped  check
+T4M2DUM_S_7                  skipped  expand_edge
+T4M2DUM_S_8                  skipped  angle
+T4M2DUM_S_9                  never    uses layers Magic does not read
+T4M2DUM_S_10                 never    uses layers Magic does not read
+T4M2DUM_S_11                 never    uses layers Magic does not read
+T4M2DUM_S_12                 never    uses layers Magic does not read
+T4M2DUM_S_13                 ok       
+T4M2DUM_S_14                 never    uses layers Magic does not read
+T4M2DUM_S_15                 never    uses layers Magic does not read
+ESDN_1_SEDP_1                skipped  edge operation
+ESDN_2_ESDP_2                skipped  edge operation
+ESDN_4_ESDP_4                skipped  int with 2 operands
+ESDN_5_ESDP_5                skipped  edge operation
+ESDN_6_ESDP_6                skipped  edge operation
+ESDN_7_ESDP_7                skipped  edge operation
+ESDN_8_ESDP_8                skipped  edge operation
+ESDN_9                       skipped  edge operation
+ESDN_10                      skipped  edge operation
+ESDN_11                      skipped  edge operation
+ESDN_12                      skipped  edge operation
+ESDP_9                       skipped  edge operation
+ESDN_3                       skipped  edge operation
+ESDP_3                       skipped  edge operation
+ESD_W_1                      ok       
+ESD_S_1                      ok       
+ESD_A_1                      ok       
+ESD_A_2                      ok       
+LU_R_2                       skipped  net_area_ratio
+LU_W_1                       skipped  donut
+LU_S_1a                      skipped  check
+LU_S_1b                      skipped  check
+LU_S_1c                      skipped  check
+LU_S_1d                      skipped  check
+LU_S_2_NTAP                  skipped  edge operation
+LU_S_2_PTAP                  skipped  edge operation
+MOM_R_1                      never    uses layers Magic does not read
+MOM_S_1                      never    uses layers Magic does not read
+MOM_R_2                      skipped  with_text
