@@ -43,6 +43,9 @@ klayout -b -r icsprout55/libs.tech/klayout/tech/ics55.lvs -rd input=<gds> -rd sc
 cd demo_counter && bash run.sh
 cd demo_chip && bash run.sh
 
+# Antenna check / repair (OpenROAD vs KLayout): bash run.sh [norepair]
+cd demo_antenna && bash run.sh
+
 # ngspice model demos
 cd demo_sim && ./run.sh
 ```
@@ -62,7 +65,8 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
 
 - `icsprout55/libs.tech/librelane/config.tcl` — LibreLane PDK config (std cell lib `ics55_LLSC_H7C{R,H,L}`, IO lib
   `ICsprout_55LLULP1233_IO_251013`). Important pairing: `CELL_LEFS` uses the `_ecos` cell LEF whose signal pins are on
-  MET2, so `CELL_GDS` must be the matching `*_M2.gds` (the plain GDS only has MET1 pins → every routed pin is open).
+  MET2 (installed as `_ecos_openpdk.lef`: plus the per-pin antenna data from Magic, `hacking/magic/lef_antenna.py`
+  and `libs.tech/librelane/<lib>/antenna.pins`), so `CELL_GDS` must be the matching `*_M2.gds` (the plain GDS only has MET1 pins → every routed pin is open).
   The cell LEF/GDS pair and the liberty file names are picked per standard cell family (`regexp` on
   `STD_CELL_LIBRARY`); the technology LEF (`N551P6M_ecos.lef`) is the same for both families.
 - Two standard cell families are supported:
@@ -108,6 +112,9 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
   - Metal stack is fixed to the Calibre default: 6 metals, 1 top metal (M1–M5, T4V2, T4M2).
   - LVS flattens by default like Calibre; `tapless=true` compares per cell and ties the wells to the rails,
     `implicit_nets=` joins same-named labels (Calibre `VIRTUAL CONNECT NAME`).
+  - Antenna (WP2): the tech LEFs carry the runset's antenna rules (`hacking/svrf2klayout/ant2lef.py`, re-run after
+    `itf2lef.py`); 7-track `DIODE_CELL` = `ANT2H7*` with a generated liberty (`hacking/antenna_liberty.py`,
+    `<lib>_antenna.lib` added to LIB); `demo_antenna` checks OpenROAD vs KLayout with and without repair.
   - `ics55_antenna.drc`: the vendor antenna runset (`pv/DRC/*.ant`) through the same generator (incremental
     connectivity, per gate `ACCUMULATE`, diode allowance; runs flat). LibreLane `KLAYOUT_ANTENNA_RUNSET`.
     Semantics settled on `hacking/svrf2klayout/tests/antenna` (identical to Calibre on all 23 firing rules).

@@ -20,6 +20,13 @@ for lib in ics55_LLSC_H7CH ics55_LLSC_H7CL ics55_LLSC_H7CR; do
   python3 hacking/cdl_to_spice.py $STD_SRC/$lib/cdl/$lib.cdl icsprout55/libs.ref/$lib/spice/$lib.spice
   # netgen reference netlist (helper subcircuits inlined, split gates reduced, see hacking/magic/lvs_netlist.py)
   python3 hacking/magic/lvs_netlist.py icsprout55/libs.ref/$lib/spice/$lib.spice icsprout55/libs.ref/$lib/spice/${lib}_lvs.spice
+  # cell LEF with the per-pin antenna data (gate / diffusion area from Magic's LEF writer,
+  # libs.tech/librelane/<lib>/antenna.pins, see hacking/magic/lef_antenna.py)
+  python3 hacking/magic/lef_antenna.py merge icsprout55/libs.ref/$lib/lef/${lib}_ecos.lef \
+    icsprout55/libs.tech/librelane/$lib/antenna.pins icsprout55/libs.ref/$lib/lef/${lib}_ecos_openpdk.lef
+  # liberty of the antenna diode cells ANT2/ANT4, which the vendor liberty lacks (DIODE_CELL)
+  python3 hacking/antenna_liberty.py icsprout55/libs.ref/$lib/cdl/$lib.cdl icsprout55/libs.ref/$lib/lef/${lib}_ecos.lef \
+    icsprout55/libs.tech/ngspice/dio/dio_core.mdl $lib icsprout55/libs.ref/$lib/liberty/${lib}_antenna.lib
 done
 IO_SRC=icsprout55-pdk/IP/IO/ICsprout_55LLULP1233_IO_251013
 IO_DST=icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013

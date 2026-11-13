@@ -1,0 +1,45 @@
+{
+  "DESIGN_NAME": "antenna",
+  "VERILOG_FILES": ["dir::antenna.v"],
+  "CLOCK_PORT": null,
+  "CLOCK_PERIOD": 25,
+  "FP_PIN_ORDER_CFG": "dir::pin_order.cfg",
+  "FP_SIZING": "absolute",
+  "DIE_AREA": [0, 0, 3000, 200],
+  "CORE_AREA": [10, 10, 2990, 190],
+  "IO_PIN_H_LENGTH": 1.0,
+  "IO_PIN_V_LENGTH": 1.0,
+
+  "//": "No buffers and no resizer repairs: the inputs go straight to INVX0P5 gates, so the long wires have no diffusion. RUN_ANTENNA_REPAIR=0 (run.sh) shows the violations, the default repairs them with the DIODE_CELL.",
+  "DESIGN_REPAIR_BUFFER_INPUT_PORTS": false,
+  "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": false,
+  "SYNTH_BUFFERING": false,
+  "SYNTH_SIZING": false,
+  "RUN_POST_GPL_DESIGN_REPAIR": false,
+  "RUN_POST_GRT_DESIGN_REPAIR": false,
+  "RUN_POST_CTS_RESIZER_TIMING": false,
+  "RUN_POST_GRT_RESIZER_TIMING": false,
+  "//fill": "Fillers keep the wells continuous (an isolated diode cell has a floating n-well); no decaps, so KLayout LVS stays fast",
+  "DECAP_CELLS": [],
+  "//diodes": "Only the antenna repair adds diodes (not Odb.DiodesOnPorts), so run.sh norepair keeps the violations",
+  "DIODE_ON_PORTS": "none",
+  "ERROR_ON_KLAYOUT_DRC": false,
+  "ERROR_ON_MAGIC_DRC": false,
+
+  "meta": {
+    "flow": "Classic",
+    "substituting_steps": {
+      "Checker.IllegalOverlap": null,
+      "KLayout.XOR": null,
+      "Checker.XOR": null,
+      "KLayout.DRC": null,
+      "Checker.KLayoutDRC": null,
+      "Magic.DRC": null,
+      "Checker.MagicDRC": null,
+      "-Netgen.LVS": "OpenROAD.WriteCDL",
+      "+Netgen.LVS": "ICS55.KLayoutLVS",
+      "+Checker.LVS": "KLayout.Antenna",
+      "+KLayout.Antenna": "Checker.KLayoutAntenna"
+    }
+  }
+}

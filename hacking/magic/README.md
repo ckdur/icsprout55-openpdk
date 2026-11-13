@@ -145,6 +145,26 @@ Open: NP_W_1 / NP_S_1 / PP_W_1 / PP_S_1 (~290 tiles each) where FILLTAPH7R abuts
 KLayout does not report; the implant strips there are >= 0.18 um, so probably a Magic hierarchy
 interaction artefact (not yet confirmed).
 
+## Cell antenna data (`lef_antenna.py`)
+
+The vendor 7-track cell LEFs have no ANTENNAGATEAREA / ANTENNADIFFAREA. Magic's `lef write`
+computes them from the extracted devices (gate) and the `tiedown` diffusion types:
+
+```bash
+# in the container: Magic on every cell of the _M2 GDS (the layout of the _ecos LEF)
+python3 hacking/magic/lef_antenna.py extract icsprout55/libs.ref/ics55_LLSC_H7CR/gds/ics55_LLSC_H7CR_M2.gds \
+    icsprout55/libs.tech/librelane/ics55_LLSC_H7CR/antenna.pins
+# install.sh: vendor _ecos LEF + table -> <lib>_ecos_openpdk.lef (CELL_LEFS)
+python3 hacking/magic/lef_antenna.py merge <lib>_ecos.lef antenna.pins <lib>_ecos_openpdk.lef
+```
+
+On the 9-track library, whose vendor LEF has antenna data, the Magic values agree within 1 % on
+4480 of 4508 signal pins; the 28 others are in the G* ECO cells, where the vendor counts more gate
+area than the transistors Magic extracts. The 7-track tables are committed
+(`libs.tech/librelane/ics55_LLSC_H7C*/antenna.pins`, 3499 signal pins each), so install needs no
+Magic. The antenna diode cells ANT2 / ANT4 get a liberty from `hacking/antenna_liberty.py`
+(input capacitance = zero-bias junction capacitance of their diodes).
+
 ## DRC translation
 
 `svrf2magic_drc.py` (coverage per rule in `drc_coverage.txt`):

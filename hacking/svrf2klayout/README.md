@@ -16,6 +16,10 @@ calibre -E ICsprout_CalANT_expanded.svrf -drc ../../icsprout55-pdk/pv/DRC/ICspro
 python3 svrf2klayout.py     ICsprout_CalDRC_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55.drc
 python3 svrf2klayout_lvs.py ICsprout_CalLVS_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55.lvs
 python3 svrf2klayout.py     ICsprout_CalANT_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55_antenna.drc --name ICS55_ANTENNA
+
+# antenna rules into the LibreLane tech LEFs (after generate_rcx_rules/itf2lef.py rewrote them)
+L=../../icsprout55/libs.tech/librelane
+python3 ant2lef.py ICsprout_CalANT_expanded.svrf $L/N551P6M_ecos.lef $L/N551P6M_ecos_max.lef $L/N551P6M_ecos_min.lef
 ```
 
 The same files are copied to `../icsprout55-pdk/klayout/tech/` (the PDK fork).
@@ -81,6 +85,15 @@ M1-T4M2 with / without diode, cumulative M2, per gate accumulation, single and c
 1.8 V gates, RV and RDL) report the same cases as Calibre; `demo_counter` and the H7CR
 library have no findings in either tool. The regression (`testing/run_regression.py
 --tests ant_vehicle,ant_stdcell_H7CR_M2`) checks the vehicle against the Calibre result.
+
+### LEF antenna rules (`ant2lef.py`)
+
+The same checks as LEF statements for OpenROAD (check_antennas / repair_antennas), per layer
+and gate oxide (GATE -> OXIDE1, GATE18 -> OXIDE2): a check `> v` with the diode allowance
+`a*A + b` becomes `ANTENNA[CUM]AREARATIO v` and `ANTENNA[CUM]DIFFAREARATIO PWL ((0 v+b) (100
+v+b+100a))`; accumulated metal and via checks are the CUM forms, single via / CT / RV the plain
+ones, the RDL perimeter check `ANTENNASIDEAREARATIO` with the runset's RDL thickness. POLY (a
+masterslice layer) and the GATE1825 check of RV are left to the KLayout deck.
 
 ## Verification status (against Calibre 2012.2)
 
