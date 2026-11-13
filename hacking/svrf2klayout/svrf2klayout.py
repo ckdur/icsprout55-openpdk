@@ -53,6 +53,8 @@ class Gen:
         self.out = []
         self.rule_names = []
         self.warnings = []
+        self.incremental = False   # DRC INCREMENTAL CONNECT YES seen
+        self.nconnect = 0          # CONNECT statements emitted so far (connectivity stage)
         self.text_layers = set()
         self._collect_layers(deck.stmts)
         self._collect_text_usage(deck.stmts)
@@ -83,7 +85,7 @@ class Gen:
         if n.op == 'stamp':
             return self.net_base(n.args[1], depth + 1)
         if n.op in ('bool', 'nary', 'sel', 'copy', 'bracket', 'size', 'with_width', 'area', 'rectangle',
-                    'holes', 'enclose_rect', 'net_area_ratio', 'esel'):
+                    'holes', 'enclose_rect', 'net_area_ratio', 'net_area', 'esel'):
             return self.net_base(n.args[0], depth + 1) if n.args else None
         return None
 
@@ -339,7 +341,81 @@ class Gen:
         props = '[' + ', '.join('[%s, %s]' % (rb_str(e), rb_cons(c)) for e, c in n.kw.get('props')) + ']'
         return 'sv_dfm_property([%s], %s)' % (', '.join(self.expr(a, sc) for a in n.args), props)
 
+    @staticmethod
+    def nar_lambda(expr, names):
+        """Calibre NET AREA RATIO expression -> Ruby lambda { |a, p| ... } over the per net
+        areas a[name] (um2) and perimeters p[name] (um). !!X is 1 if X is not zero."""
+        toks = expr.split() if expr else None
+        if not toks:
+            # default: AREA(first) / AREA(last)
+            return 'lambda { |a, p| a[%s] / a[%s] }' % (rb_str(names[0]), rb_str(names[-1]))
+        out = []
+        i = 0
+
+        def atom(i):
+            t = toks[i].upper()
+            if t in ('AREA', 'PERIMETER') and toks[i + 1] == '(' and toks[i + 3] == ')':
+                ln = toks[i + 2].upper()
+                if ln not in names:
+                    raise NotImplementedError('NET AREA RATIO expression layer %s' % ln)
+                return '%s[%s]' % ('a' if t == 'AREA' else 'p', rb_str(ln)), i + 4
+            if t == '(':
+                depth, j = 1, i + 1
+                while depth:
+                    depth += {'(': 1, ')': -1}.get(toks[j], 0)
+                    j += 1
+                inner, _ = conv(toks[i + 1:j - 1])
+                return '(%s)' % inner, j
+            if t == '!':
+                k = i
+                while toks[k] == '!':
+                    k += 1
+                x, j = atom(k)
+                odd = (k - i) % 2 == 1
+                return '((%s) %s 0 ? 1.0 : 0.0)' % (x, '==' if odd else '!='), j
+            float(toks[i])
+            return toks[i] if '.' in toks[i] or 'e' in toks[i].lower() else toks[i] + '.0', i + 1
+
+        def conv(tl):
+            nonlocal toks
+            save = toks
+            toks = tl
+            res, j = [], 0
+            while j < len(toks):
+                if toks[j] in '+-*/':
+                    res.append(toks[j])
+                    j += 1
+                    continue
+                x, j = atom(j)
+                res.append(x)
+            toks = save
+            return ' '.join(res), j
+        body, _ = conv(toks)
+        return 'lambda { |a, p| %s }' % body
+
+    def x_net_area(self, n, sc):
+        return 'sv_net_area(%s, %s, %d)' % (self.expr(n.args[0], sc), rb_cons(n.kw['cons']), self.nconnect)
+
     def x_net_area_ratio(self, n, sc):
+        if self.incremental:
+            names = [a.kw['name'].upper() if a.op == 'name' else None for a in n.args]
+            if None in names:
+                raise NotImplementedError('NET AREA RATIO on an expression')
+            acc = n.kw.get('accumulate')
+            if acc is None:
+                accs = 'nil'
+            elif acc is True:
+                accs = 'true'
+            else:
+                accs = self.expr(acc, sc)
+            bases = []
+            for a in n.args:
+                b = self.net_base(a)
+                bases.append(('%s[%s]' % (sc, rb_str(b))) if b and b.upper() != a.kw['name'].upper() else 'nil')
+            return 'sv_nar([%s], [%s], %s, %s, %d, %s, [%s])' % (
+                ', '.join(self.expr(a, sc) for a in n.args), ', '.join(rb_str(x) for x in names),
+                self.nar_lambda(n.kw.get('expr'), names), rb_cons(n.kw['cons']), self.nconnect, accs,
+                ', '.join(bases))
         kw = dict(n.kw)
         cons = kw.pop('cons')
         expr = kw.pop('expr')
@@ -387,6 +463,12 @@ class Gen:
                 specs = self.layer_specs(name)
                 self.emit('%s.define(%s) { sv_input(%s) }' % (sc, rb_str(name), repr([list(x) for x in specs])),
                           ind)
+            elif k == 'directive' and ' '.join(s[1].upper().split()) == 'DRC INCREMENTAL CONNECT YES':
+                self.incremental = True
+                self.emit('$sv_incremental = true', ind)
+                # the per stage re-extraction (clear_connections) only works in flat mode
+                self.emit('flat', ind)
+                self.emit('$sv_flat = true', ind)
             elif k in ('layermap', 'layermap_range', 'variable', 'directive', 'error'):
                 if k == 'error':
                     self.warnings.append(s)
@@ -404,6 +486,7 @@ class Gen:
                 _, soft, layers, via = s
                 self.emit('sv_connect(%s, %s)' % ('[' + ', '.join(rb_str(x) for x in layers) + ']',
                                                   rb_str(via) if via else 'nil'), ind)
+                self.nconnect += 1
             elif k == 'rule':
                 _, name, comments, body, ln = s
                 desc = ' '.join(comments)

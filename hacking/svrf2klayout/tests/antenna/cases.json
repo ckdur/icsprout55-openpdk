@@ -1,0 +1,67 @@
+[
+ {
+  "name": "m1_6000",
+  "x": 300000,
+  "expect": "AR_5_10_M1"
+ },
+ {
+  "name": "m1_4000",
+  "x": 600000,
+  "expect": null
+ },
+ {
+  "name": "m1_6000_diode",
+  "x": 900000,
+  "expect": null
+ },
+ {
+  "name": "m1_50000_diode",
+  "x": 1200000,
+  "expect": "AR_5_10_M1"
+ },
+ {
+  "name": "acc_m1_3000_m2_3000",
+  "x": 1500000,
+  "expect": "AR_5_10_M2 if accumulated"
+ },
+ {
+  "name": "acc_per_gate",
+  "x": 1800000,
+  "expect": "gate A only if per gate"
+ },
+ {
+  "name": "po_300",
+  "x": 2100000,
+  "expect": "AR_1"
+ },
+ {
+  "name": "m1_1500_dgox",
+  "x": 2400000,
+  "expect": "AR18_5_10_M1"
+ },
+ {
+  "name": "po_perim",
+  "x": 2700000,
+  "expect": "AR_2"
+ },
+ {
+  "name": "ct_49",
+  "x": 3000000,
+  "expect": "AR_3"
+ },
+ {
+  "name": "via1_9x9",
+  "x": 3300000,
+  "expect": "AR_4_VIA1"
+ },
+ {
+  "name": "via1_15x15",
+  "x": 3600000,
+  "expect": "AR_4_VIA1"
+ },
+ {
+  "name": "stack_rdl",
+  "x": 3900000,
+  "expect": "AR_7_11_core AR_8_12"
+ }
+]

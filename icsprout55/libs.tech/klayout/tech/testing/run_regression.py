@@ -2,7 +2,9 @@
 """ICS55 KLayout DRC and LVS regression on the PDK standard cells and IO library.
 
 DRC testcases run tech/ics55.drc and compare the markers per rule and per
-cell against golden/<testcase>.json.
+cell against golden/<testcase>.json; antenna testcases (ant_*) do the same with
+tech/ics55_antenna.drc. ant_vehicle is the test layout antenna/ant_test.gds
+(hacking/svrf2klayout/tests/antenna), whose golden is what Calibre reports on it.
 LVS testcases run tech/ics55.lvs and compare the match status per cell.
 
 Usage:
@@ -33,6 +35,7 @@ import klayout.db as db
 TESTING_DIR = Path(__file__).resolve().parent
 TECH_DIR = TESTING_DIR.parent
 DRC_DECK = TECH_DIR / 'ics55.drc'
+ANT_DECK = TECH_DIR / 'ics55_antenna.drc'
 LVS_DECK = TECH_DIR / 'ics55.lvs'
 LIBS_REF = TESTING_DIR.parents[3] / 'libs.ref'
 GOLDEN_DIR = TESTING_DIR / 'golden'
@@ -69,6 +72,8 @@ TESTCASES = {
     'lvs_stdcell_H7CH_M2': ('lvs', STDCELL_GDS.format(v='H', suffix='_M2'), STDCELL_CDL.format(v='H'), 'library'),
     'lvs_stdcell_H7CL_M2': ('lvs', STDCELL_GDS.format(v='L', suffix='_M2'), STDCELL_CDL.format(v='L'), 'library'),
     'lvs_io': ('lvs', IO_GDS, IO_CDL, 'per_cell'),
+    'ant_vehicle': ('ant', str(TESTING_DIR / 'antenna' / 'ant_test.gds'), None, False),
+    'ant_stdcell_H7CR_M2': ('ant', STDCELL_GDS.format(v='R', suffix='_M2'), 'FILLER4H7R', True),
 }
 
 
@@ -86,9 +91,9 @@ def run_klayout(cmd):
 #---------------- DRC ----------------
 
 def run_drc(name, run_dir):
-    _, gds_rel, filler, wrapped = TESTCASES[name]
+    kind, gds_rel, filler, wrapped = TESTCASES[name]
     gds = LIBS_REF / gds_rel
-    cmd = ['-r', str(DRC_DECK)]
+    cmd = ['-r', str(ANT_DECK if kind == 'ant' else DRC_DECK)]
     if wrapped:
         wrapper = run_dir / f'{name}.gds'
         wrap(str(gds), str(wrapper), filler)
@@ -97,7 +102,7 @@ def run_drc(name, run_dir):
         cmd += ['-rd', f'input={gds}']
     report = run_dir / f'{name}.lyrdb'
     cmd += ['-rd', f'report={report}', '-rd', f'log={run_dir / f"{name}.log"}']
-    print(f'[{name}] running DRC')
+    print(f'[{name}] running {"antenna check" if kind == "ant" else "DRC"}')
     run_klayout(cmd)
     return {rule: {'count': sum(cells.values()), 'cells': dict(sorted(cells.items()))}
             for rule, cells in sorted(summarize(str(report)).items())}
@@ -204,7 +209,7 @@ def main():
         if missing:
             print(f'[{name}] SKIP ({", ".join(missing)} not installed)')
             continue
-        if TESTCASES[name][0] == 'drc':
+        if TESTCASES[name][0] in ('drc', 'ant'):
             result = run_drc(name, run_dir)
             compare, total = compare_drc, drc_total
         else:

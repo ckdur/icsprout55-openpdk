@@ -881,6 +881,12 @@ class ExprParser:
                     props.append((' '.join(toks), cons))
                 return Node('dfm_property', layers, props=props)
             self.error('unsupported DFM operation')
+        if u == 'NET' and self.pu(1) == 'AREA' and self.pu(2) != 'RATIO':
+            # NET AREA X constraint: polygons of X on nets whose X area meets it
+            self.i += 2
+            a = operand()
+            cons = self.parse_constraint(optional=False)
+            return Node('net_area', [a], cons=cons)
         if u == 'NET' and self.pu(1) == 'AREA' and self.pu(2) == 'RATIO':
             self.i += 3
             a = operand()
@@ -904,6 +910,21 @@ class ExprParser:
                 expr = ' '.join(toks)
             cons = self.parse_constraint(optional=False)
             kw = {}
+
+            def bracket():
+                self.next()
+                depth = 1
+                toks = []
+                while True:
+                    t = self.next()
+                    if t.v == '[':
+                        depth += 1
+                    elif t.v == ']':
+                        depth -= 1
+                        if depth == 0:
+                            break
+                    toks.append(t.v)
+                return ' '.join(toks)
             while not self.at_end() and self.peek().v not in (')',):
                 if self.accept('RDB'):
                     if self.accept('ONLY'):
@@ -913,6 +934,11 @@ class ExprParser:
                         self.next()
                 elif self.accept('ACCUMULATE'):
                     kw['accumulate'] = True
+                    # ACCUMULATE <layer of a previous NET AREA RATIO ... ACCUMULATE>
+                    if not self.at_end() and self.peek().t == 'word' and self.pu() not in OPTION_WORDS:
+                        kw['accumulate'] = self.parse_operand()
+                elif self.peek().v == '[' and expr is None:
+                    expr = bracket()
                 elif self.accept('INSIDE', 'OF', 'LAYER'):
                     kw['inside_of_layer'] = self.parse_operand()
                 else:
@@ -1089,6 +1115,10 @@ def logical_lines(text):
             continue
         is_cont = (cur is not None and depth == 0 and toks[0].t == 'word' and toks[0].u in CONT_START
                    and len(toks) > 1 and (toks[1].t == 'num' or toks[1].v == '-'))
+        # NET AREA RATIO ... > c  followed by the ratio expression "[ ... ]" on its own line
+        if cur is not None and depth == 0 and toks[0].v == '[' and \
+                any(t.t == 'word' and t.u == 'RATIO' for t in cur[1][:4]):
+            is_cont = True
         if cur is not None and (depth > 0 or is_cont):
             cur[1].extend(toks)
         else:
@@ -1400,6 +1430,13 @@ class DeckParser:
                 pass
             else:
                 return ('directive', ' '.join(t.v for t in toks))
+        if u0 == 'RDB':
+            # RDB <file> <layers>: per-net value report of a NET AREA RATIO check
+            return ('directive', ' '.join(t.v for t in toks))
+        if u0 == 'NET' and len(toks) > 3 and toks[1].u == 'AREA' and toks[2].u == 'RATIO' \
+                and toks[3].u == 'PRINT':
+            # NET AREA RATIO PRINT <layer> <file>: writes the values of a layer to a file
+            return ('directive', ' '.join(t.v for t in toks))
         if toks[0].t == 'word' and len(toks) >= 2 and toks[1].v == '=':
             name = toks[0].v
             p = ExprParser(toks[2:], self.variables)

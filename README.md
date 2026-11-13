@@ -72,14 +72,19 @@ This is a list of known features that ECOS offer, and their state in this reposi
   (`icsprout55-pdk/pv/DRC`) by `hacking/svrf2klayout`: the complete rule set with the Calibre values, including the
   connectivity-based rules and density. It was checked against Calibre with pass/fail critical shapes per rule and
   on the standard cell and IO libraries (`hacking/svrf2klayout/README.md`). Approximations: density windows
-  (BACKUP/GRADIENT), `DRAWN ACUTE/OFFGRID`, enclosure against 45-degree edges. The separate antenna runset (`.ant`)
-  and dummy fill are not translated. Magic DRC is a placeholder and is not used.
+  (BACKUP/GRADIENT), `DRAWN ACUTE/OFFGRID`, enclosure against 45-degree edges. The separate antenna runset (`.ant`) is
+  translated too (`ics55_antenna.drc`, LibreLane `KLayout.Antenna`), with the same results as Calibre on an antenna
+  test layout; dummy fill is not translated. Magic DRC carries the part of the deck Magic's rule language can express
+  (~160 of 711 rules, `hacking/magic/README.md`); KLayout is the signoff DRC.
 - LVS. KLayout LVS (`icsprout55/libs.tech/klayout/tech/ics55.lvs`) is generated the same way from the vendor Calibre
   runset (`icsprout55-pdk/pv/LVS`), with all its devices. Verified against Calibre on the standard cells and the IO
   library (core svt/hvt/lvt and 3.3V MOS, diodes, poly resistors); BJT, MOM, varactors, the other resistors and the
   native/2.5V/SRAM MOS are translated but untested, ERC and WPE/LOD parameters are not translated.
   LibreLane only runs KLayout LVS for the IHP PDKs, so this PDK ships a
-  LibreLane plugin with the step `ICS55.KLayoutLVS` (see below). Magic/Netgen LVS is not supported.
+  LibreLane plugin with the step `ICS55.KLayoutLVS` (see below).
+  Magic extraction + Netgen LVS work too: the Magic tech file and the netgen setup are generated from the same
+  Calibre runset (`hacking/magic/gen_magic_tech.py`), with the core / 3.3V MOS, diodes and poly resistors; per cell
+  they give the same verdicts as KLayout on the standard cell and IO libraries (`hacking/magic/README.md`).
   Full-chip LVS (`demo_chip`) is disabled for now, it is too slow on a chip with fill.
 - RCX. The OpenRCX rules (`icsprout55/libs.tech/librelane/rcx/`) are field solved from the vendor StarRC ITF
   files (`ICsprout_55LLULP1225_1P6M_5Ic_1T4Mc_RDL1_v1p11/StarRC/ITF`, the full cross-section: dielectric
@@ -109,7 +114,8 @@ bash ./install.sh
 ```
 
 Besides copying the vendor libraries, `install.sh` converts their CDL netlists into LVS-ready ones
-(`hacking/cdl_convert.py`) and generates ngspice netlists of the standard cells (`hacking/cdl_to_spice.py`).
+(`hacking/cdl_convert.py`), generates ngspice netlists (`hacking/cdl_to_spice.py`) and from those the netgen
+reference netlists `spice/<lib>_lvs.spice` (`hacking/magic/lvs_netlist.py`).
 
 Next, you need to set the `PDK_ROOT` and `PDK` environment variables:
 
@@ -125,27 +131,26 @@ export PYTHONPATH=$PDK_ROOT/$PDK/libs.tech/librelane${PYTHONPATH:+:$PYTHONPATH}
 librelane --pdk icsprout55 config.json --run-tag debug_ics --manual-pdk
 ```
 
-The `PYTHONPATH` entry loads the PDK LibreLane plugin. To use KLayout LVS and skip the Magic verifications, the
-design config needs these substitutions (as in `demo_counter/config.json`):
+The `PYTHONPATH` entry loads the PDK LibreLane plugin. `demo_counter/config.json` runs Magic DRC, Magic extraction +
+Netgen LVS and, after it, KLayout LVS of the stream-out:
 
 ```json
 "meta": {
   "substituting_steps": {
-    "Magic.DRC": null,
-    "Checker.MagicDRC": null,
-    "Magic.SpiceExtraction": null,
     "Checker.IllegalOverlap": null,
     "KLayout.XOR": null,
     "Checker.XOR": null,
     "-Netgen.LVS": "OpenROAD.WriteCDL",
-    "Netgen.LVS": "ICS55.KLayoutLVS"
+    "+Netgen.LVS": "ICS55.KLayoutLVS"
   }
 }
 ```
 
-`Checker.LVS` then checks the KLayout LVS result. KLayout DRC still reports some findings of the standard cells
-themselves (see `icsprout55/libs.tech/klayout/tech/testing/README.md`), so the demos set
-`ERROR_ON_KLAYOUT_DRC: false`.
+`ICS55.KLayoutLVS` adds its error count to Netgen's, so `Checker.LVS` fails if either LVS fails. To use KLayout LVS
+alone, replace Netgen with it: `"Netgen.LVS": "ICS55.KLayoutLVS"` instead of the `+Netgen.LVS` entry.
+
+KLayout DRC (and Magic DRC) still report some findings of the standard cells themselves (see `icsprout55/libs.tech/klayout/tech/testing/README.md`), so the demos set
+`ERROR_ON_KLAYOUT_DRC: false` and `ERROR_ON_MAGIC_DRC: false`.
 
 `demo_chip` is a full chip with a pad ring that uses the `counter` as a macro, so run `demo_counter` first.
 

@@ -10,13 +10,15 @@ Do not edit them by hand; change the translator or runtime here and regenerate.
 . 616cad                                   # Calibre on PATH (only needed to re-expand the TVF decks)
 calibre -E ICsprout_CalDRC_expanded.svrf -drc ../../icsprout55-pdk/pv/DRC/ICsprout_CalDRC_55LLULP1233_REV1_0_OS.drc
 calibre -E ICsprout_CalLVS_expanded.svrf -lvs ../../icsprout55-pdk/pv/LVS/ICsprout_CalLVS_55LLULP1233_REV1_0_OS.lvs
-# (both stop with "cannot open *.gds" after writing the expanded file - that is fine)
+calibre -E ICsprout_CalANT_expanded.svrf -drc ../../icsprout55-pdk/pv/DRC/ICsprout_CalDRC_55LLULP1233_REV1_0_OS.ant
+# (they stop with "cannot open *.gds" after writing the expanded file - that is fine)
 
 python3 svrf2klayout.py     ICsprout_CalDRC_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55.drc
 python3 svrf2klayout_lvs.py ICsprout_CalLVS_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55.lvs
+python3 svrf2klayout.py     ICsprout_CalANT_expanded.svrf ../../icsprout55/libs.tech/klayout/tech/ics55_antenna.drc --name ICS55_ANTENNA
 ```
 
-The same two files are copied to `../icsprout55-pdk/klayout/tech/` (the PDK fork).
+The same files are copied to `../icsprout55-pdk/klayout/tech/` (the PDK fork).
 
 ## Pieces
 
@@ -55,6 +57,30 @@ Prints `INFO : Congratulations! Netlists match.` or `ERROR : Netlists don't matc
 `icsprout55/libs.tech/klayout/tech/testing/run_regression.py` runs the installed decks on the
 standard-cell and IO libraries and compares with `testing/golden/`. It needs `klayout` and its
 python module; `./regress.sh [--tests a,b] [--update]` runs it inside the docker image.
+
+## Antenna deck (`ics55_antenna.drc`)
+
+The vendor antenna runset (`.ant`, 6 metals / 1 top metal / RDL 1.595 um) uses
+`DRC INCREMENTAL CONNECT YES` and `NET AREA RATIO ... [expression] ACCUMULATE <layer>`.
+The runtime (`sv_nar`, `sv_net_area`, `sv_stage`) implements it as Calibre does, settled by
+running both tools on the test vehicle `tests/antenna/` (`mk_antenna_test.py` builds it,
+`run_calibre.py` runs Calibre, `compare.py` compares with the KLayout report):
+
+* every check sees only the CONNECT statements above it (the connectivity of its stage is
+  set up with `clear_connections`; the deck therefore runs flat);
+* the bracketed expression is evaluated per net on the areas (um2) / perimeters (um) of the
+  listed layers; `!!AREA(X)` is 1 when the net has X. Nets without gate area are skipped;
+* plain checks report the merged polygons of the first layer on the failing nets;
+* `ACCUMULATE` works per gate (last layer): the value of a gate is the value of its net at
+  this level plus its value in the `ACCUMULATE` layer (the raw ratios of the lower levels,
+  `AC<n>`), so lower metal keeps counting, while the diode allowance of the expression is
+  applied once; the failing gates are reported.
+
+All 23 rules that fire on the 15 cases of the test vehicle (poly area and perimeter, contacts,
+M1-T4M2 with / without diode, cumulative M2, per gate accumulation, single and cumulative vias,
+1.8 V gates, RV and RDL) report the same cases as Calibre; `demo_counter` and the H7CR
+library have no findings in either tool. The regression (`testing/run_regression.py
+--tests ant_vehicle,ant_stdcell_H7CR_M2`) checks the vehicle against the Calibre result.
 
 ## Verification status (against Calibre 2012.2)
 

@@ -8,20 +8,28 @@
   "DIE_AREA": [0, 0, 100, 100],
   "CORE_AREA": [10, 10, 90, 90],
 
+  "//pins": "Explicit IO pin lengths: with LibreLane 3.0.16 the default (from the layer min area) makes Odb.CustomIOPlacement draw pins ~10^6 too long, which shorts them to the PDN (IRDropReport PSM-0069) and breaks KLayout.Render",
+  "IO_PIN_H_LENGTH": 1.0,
+  "IO_PIN_V_LENGTH": 1.0,
+
   "//": "KLayout DRC still reports the known standard cell issues (MET1_A_1/M2_A_1 pin areas, PO_A_1, NW1_W_1 at row ends without endcaps), see icsprout55/libs.tech/klayout/tech/testing/README.md",
   "ERROR_ON_KLAYOUT_DRC": false,
+  "//magic": "Magic DRC runs the translated subset of the Calibre deck and reports the same library-intrinsic findings (PO_A_1, NW1_W_1), see hacking/magic/README.md",
+  "ERROR_ON_MAGIC_DRC": false,
+
+  "//antenna": "KLayout.Antenna (not in the Classic flow) runs the translated Calibre antenna runset, libs.tech/klayout/tech/ics55_antenna.drc",
+  "//lvs": "Magic extraction + Netgen LVS, then KLayout LVS of the stream-out (ICS55.KLayoutLVS); Checker.LVS fails if either fails",
 
   "meta": {
     "flow": "Classic",
     "substituting_steps": {
-      "Magic.DRC": null,
-      "Checker.MagicDRC": null,
-      "Magic.SpiceExtraction": null,
       "Checker.IllegalOverlap": null,
       "KLayout.XOR": null,
       "Checker.XOR": null,
       "-Netgen.LVS": "OpenROAD.WriteCDL",
-      "Netgen.LVS": "ICS55.KLayoutLVS"
+      "+Netgen.LVS": "ICS55.KLayoutLVS",
+      "+Checker.KLayoutDRC": "KLayout.Antenna",
+      "+KLayout.Antenna": "Checker.KLayoutAntenna"
     }
   }
 }

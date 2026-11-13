@@ -47,6 +47,11 @@ or fixing rules, review the differences and then rerun with `--update`.
 | `lvs_stdcell_H7CL`    | H7CL GDS + CDL                          | all cells under `ALL`, `tapless=true`  |
 | `lvs_stdcell_H7C*_M2` | `_M2` GDS (MET2 pins, used by LibreLane) + CDL | as above                       |
 | `lvs_io`              | IO GDS + `ICSIOA_N55_3P3.cdl`           | one run per cell, implicit supply nets |
+| `ant_vehicle`         | `antenna/ant_test.gds` (15 antenna cases) | `ics55_antenna.drc`; golden = what Calibre reports |
+| `ant_stdcell_H7CR_M2` | `ics55_LLSC_H7CR_M2.gds`                | `ics55_antenna.drc`, cells abutted with FILLER4 (no findings) |
+
+The antenna test layout is made by `hacking/svrf2klayout/tests/antenna/mk_antenna_test.py`
+(also `run_calibre.py` / `compare.py` there to re-check it against Calibre).
 
 DRC: the 7-track standard cell libraries have one top cell per standard cell, so
 `wrap_lib.py` places them all under a new top cell `ALL`. Each cell gets a
