@@ -58,9 +58,105 @@ class SvScope
     return @p[n] if @p
     raise "SVRF: undefined layer #{n}"
   end
+  # true if n is evaluated already (here or in a parent scope)
+  def cached?(n)
+    k = n.upcase
+    return @cache.has_key?(k) if @defs.has_key?(k)
+    @p ? @p.cached?(n) : false
+  end
   def forget
     @cache.clear
   end
+end
+
+# ---------------------------------------------------------------------------
+# Lazy operands. The generator passes the operands of the operations below as
+# SvLazy, so that an operand which makes the result empty when it is empty is
+# looked at first and the other one is not computed at all (e.g. M1DUM_S_7:
+# an expensive spacing on all of M1, only used next to wide M1 that the
+# standard cells do not have). An operand that is a plain layer name and is
+# already computed is "ready" and gets probed first.
+# ---------------------------------------------------------------------------
+
+class SvLazy
+  def initialize(scope = nil, name = nil, &blk)
+    @s = scope
+    @n = name
+    @b = blk
+    @done = false
+  end
+  def ready?
+    @done || (!@s.nil? && @s.cached?(@n))
+  end
+  def value
+    unless @done
+      @v = @s ? @s[@n] : @b.call
+      @done = true
+    end
+    @v
+  end
+end
+
+def sv_lz(&blk)
+  SvLazy.new(&blk)
+end
+
+def sv_lzn(scope, name)
+  SvLazy.new(scope, name)
+end
+
+def sv_is_empty(l)
+  l.data.is_empty?
+end
+
+# NOT / AND are empty if the first operand is
+def sv_bool_lz(op, a, b)
+  av = a.value
+  if (op == "NOT" || op == "AND") && sv_is_empty(av)
+    return sv_bool(op, av, sv_empty_poly)
+  end
+  sv_bool(op, av, b.value)
+end
+
+# Which operand to probe first: one that is computed already, else b if the
+# generator estimated it to be the cheaper one (bfirst).
+def sv_lz_bfirst(a, b, bfirst)
+  return true if b.ready? && !a.ready?
+  return false if a.ready?
+  bfirst
+end
+
+# Edge selections are empty if the edges selected from are; and, when not
+# negated and without a count (OUTSIDE EDGE selects everything on an empty
+# second layer), if the selecting layer is empty.
+def sv_esel_lz(kind, a, b, cons, neg, bfirst = false)
+  b_cuts = !neg && kind != "outside_edge" && (cons.nil? || cons.empty?)
+  if b_cuts && sv_lz_bfirst(a, b, bfirst)
+    if sv_is_empty(b.value)
+      return kind == "with_edge" ? sv_empty_poly : sv_empty_poly.edges
+    end
+  end
+  av = a.value
+  return sv_esel(kind, av, sv_empty_poly, cons, neg) if sv_is_empty(av)
+  sv_esel(kind, av, b.value, cons, neg)
+end
+
+# Two layer EXT / INT / ENC give no pairs if either layer is empty (the result
+# type depends on the options only). Not for ENC OUTSIDE ALSO (an empty second
+# layer flags all of the first) and not for CONNECTED checks.
+def sv_check_lz(kind, a, b, cons, opts = {}, bfirst = false)
+  return sv_check(kind, a.value, nil, cons, opts) if b.nil?
+  cuts = %w[ext int enc].include?(kind) && !opts[:outside_also] && opts[:connected].nil?
+  if cuts
+    first, other = sv_lz_bfirst(a, b, bfirst) ? [b, a] : [a, b]
+    if sv_is_empty(first.value)
+      av = first.equal?(a) ? a.value : sv_empty_poly
+      bv = first.equal?(b) ? b.value : sv_empty_poly
+      return sv_check(kind, av, bv, cons, opts)
+    end
+    other.value
+  end
+  sv_check(kind, a.value, b.value, cons, opts)
 end
 
 $sv_rules = []

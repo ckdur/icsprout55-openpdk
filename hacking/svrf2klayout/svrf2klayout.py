@@ -148,6 +148,63 @@ class Gen:
     def x_bracket(self, n, sc):
         return self.expr(n.args[0], sc)
 
+    # Rough cost of proving a layer empty, used to order the operands of the
+    # lazy operations (svrf_runtime.rb SvLazy): through a lazy operation it is
+    # the cost of its cheapest short-circuiting operand, otherwise the sum of
+    # the inputs plus the operation. Checks and other measurements are
+    # expensive; global layers are shared and count as free.
+    HEAVY_OPS = ('check', 'density', 'dfm_space', 'dfm_property', 'net_area', 'net_area_ratio',
+                 'rect_enc', 'area_ratio')
+
+    def cost(self, n, seen=None):
+        seen = set() if seen is None else seen
+        while n.op == 'bracket':
+            n = n.args[0]
+        if n.op == 'name':
+            k = n.kw['name'].upper()
+            d = getattr(self, 'local_defs', {}).get(k)
+            if d is None or k in seen:
+                return 0
+            memo = self.__dict__.setdefault('_cost_memo', {})
+            key = (id(self.local_defs), k)
+            if key not in memo:
+                memo[key] = self.cost(d, seen | {k})
+            return memo[key]
+        args = n.args
+        if n.op == 'bool' and len(args) == 2 and n.kw.get('op_') in ('NOT', 'AND'):
+            return 1 + self.cost(args[0], seen)
+        if n.op == 'esel':
+            c = self.cost(args[0], seen)
+            if self._esel_b_cuts(n):
+                c = min(c, self.cost(args[1], seen))
+            return 1 + c
+        if n.op == 'check' and len(args) > 1 and self._check_cuts(n):
+            return 10 + min(self.cost(args[0], seen), self.cost(args[1], seen))
+        sub = list(args) + [v for v in n.kw.values() if isinstance(v, P.Node)]
+        return (10 if n.op in self.HEAVY_OPS else 1) + sum(self.cost(a, seen) for a in sub)
+
+    @staticmethod
+    def _esel_b_cuts(n):
+        return not n.kw.get('neg') and n.kw['kind'] != 'outside_edge' and not n.kw.get('cons')
+
+    @staticmethod
+    def _check_cuts(n):
+        return n.kw['kind'] in ('ext', 'int', 'enc') and not n.kw.get('outside_also') \
+            and 'connected' not in n.kw
+
+    def lazy_order(self, a, b):
+        """'true' if operand b is the cheaper one to probe first."""
+        return 'true' if self.cost(b) < self.cost(a) else 'false'
+
+    def lazy(self, n, sc):
+        """Operand as an SvLazy (svrf_runtime.rb): plain layer names can tell whether
+        they are computed already, anything else is wrapped in a block."""
+        while n.op == 'bracket':
+            n = n.args[0]
+        if n.op == 'name':
+            return 'sv_lzn(%s, %s)' % (sc, rb_str(n.kw['name']))
+        return 'sv_lz { %s }' % self.expr(n, sc)
+
     def x_str(self, n, sc):
         return rb_str(n.kw['value'])
 
@@ -158,6 +215,8 @@ class Gen:
         op = n.kw['op_']
         if len(n.args) > 2:
             return 'sv_nary(%s, %s)' % (rb_str(op), ', '.join(self.expr(a, sc) for a in n.args))
+        if op in ('NOT', 'AND'):
+            return 'sv_bool_lz(%s, %s, %s)' % (rb_str(op), self.lazy(n.args[0], sc), self.lazy(n.args[1], sc))
         return 'sv_bool(%s, %s, %s)' % (rb_str(op), self.expr(n.args[0], sc), self.expr(n.args[1], sc))
 
     def x_nary(self, n, sc):
@@ -198,9 +257,10 @@ class Gen:
             rb_cons(n.kw.get('cons')), 'true' if n.kw.get('neg') else 'false', self._opts(kw))
 
     def x_esel(self, n, sc):
-        return 'sv_esel(%s, %s, %s, %s, %s)' % (
-            rb_str(n.kw['kind']), self.expr(n.args[0], sc), self.expr(n.args[1], sc),
-            rb_cons(n.kw.get('cons')), 'true' if n.kw.get('neg') else 'false')
+        return 'sv_esel_lz(%s, %s, %s, %s, %s, %s)' % (
+            rb_str(n.kw['kind']), self.lazy(n.args[0], sc), self.lazy(n.args[1], sc),
+            rb_cons(n.kw.get('cons')), 'true' if n.kw.get('neg') else 'false',
+            self.lazy_order(n.args[0], n.args[1]))
 
     def x_size(self, n, sc):
         kw = dict(n.kw)
@@ -231,9 +291,12 @@ class Gen:
             if bb:
                 kw['netbase_b'] = P.Name(bb)
         self._sc = sc
+        if len(args) > 1:
+            a, b = self.lazy(args[0], sc), self.lazy(args[1], sc)
+            return 'sv_check_lz(%s, %s, %s, %s, %s, %s)' % (rb_str(kind), a, b, rb_cons(cons), self._opts(kw),
+                                                         self.lazy_order(args[0], args[1]))
         a = self.expr(args[0], sc)
-        b = self.expr(args[1], sc) if len(args) > 1 else 'nil'
-        return 'sv_check(%s, %s, %s, %s, %s)' % (rb_str(kind), a, b, rb_cons(cons), self._opts(kw))
+        return 'sv_check(%s, %s, nil, %s, %s)' % (rb_str(kind), a, rb_cons(cons), self._opts(kw))
 
     def x_area(self, n, sc):
         return 'sv_area(%s, %s, %s)' % (self.expr(n.args[0], sc), rb_cons(n.kw['cons']),

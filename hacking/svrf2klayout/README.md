@@ -38,6 +38,26 @@ The same files are copied to `../icsprout55-pdk/klayout/tech/` (the PDK fork).
 
 KLayout is run through docker (`kl.sh`); set `KLAYOUT_BIN` for a native binary in `klayout_run.py`.
 
+### Lazy operands
+
+Derived layers inside a rule are lazy (`SvScope`), but the operands of one operation were
+evaluated eagerly. For operations that are empty when one operand is empty, the generator passes
+the operands as `SvLazy` (`sv_bool_lz`, `sv_esel_lz`, `sv_check_lz`), and the runtime looks at
+one operand first and skips the other when the first is empty:
+
+- `NOT` / `AND`: the first operand.
+- Edge selections (`COIN`, `TOUCH`, `INSIDE`, `WITH EDGE` ...): either operand. The second one only
+  without `NOT`, without a count and not for `OUTSIDE EDGE`.
+- Two layer `EXT` / `INT` / `ENC`: either operand, not with `OUTSIDE ALSO` or `CONNECTED`.
+
+The operand to look at first is one that is computed already. If neither is, the generator
+decides with a static cost estimate (`Gen.cost`): checks are expensive, and through a lazy
+operation the cost is that of its cheapest short-circuiting operand. Example: `M1DUM_S_7` (all
+metals) computes a 0.6 um spacing on all of M1 but only uses it next to M1 >= 1.5 um wide,
+which the standard cells do not have. It took 131 of 177 s on 100 abutted 7-track cells and now
+takes nothing. The results are identical marker by marker (abutted and grid std cells, IO
+library, antenna vehicle).
+
 ## Running the decks
 
 DRC (`klayout -b -r ics55.drc -rd ...`): `input`, `topcell`, `report`, `thr`/`threads`,
