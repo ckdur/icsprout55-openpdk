@@ -81,11 +81,14 @@ This is a list of known features that ECOS offer, and their state in this reposi
   LibreLane only runs KLayout LVS for the IHP PDKs, so this PDK ships a
   LibreLane plugin with the step `ICS55.KLayoutLVS` (see below). Magic/Netgen LVS is not supported.
   Full-chip LVS (`demo_chip`) is disabled for now, it is too slow on a chip with fill.
-- RCX true translation. This repository used the `FasterCap` offered from `OpenROAD`, but this repository contains
-  the hacked-out StarRC files. the idea is to translate the files found in `hacking/decrypted_output/` into
-  OpenRCX format. For now, the RCX will be VERY imprecise for two reasons:
-  - Dielectric epsilons, distances, and metal thicknesses are not specified anywhere. Put some arbritary values.
-  - The FasterCap implementation has the precision of their solver into 10% instead of 1% for faster convergence.
+- RCX. The OpenRCX rules (`icsprout55/libs.tech/librelane/rcx/`) are field solved from the vendor StarRC ITF
+  files (`ICsprout_55LLULP1225_1P6M_5Ic_1T4Mc_RDL1_v1p11/StarRC/ITF`, the full cross-section: dielectric
+  thicknesses and permittivities, metal heights and thicknesses, sheet and via resistances, per RC corner) with
+  FasterCap 2D by `generate_rcx_rules/itf2rcx.py`, including the 0.9 half node shrink of the ITF. They agree with
+  the vendor Innovus cap tables to within a few percent (`generate_rcx_rules/README.md`). The ITF files are the
+  same data as `hacking/decrypted_output/kItf*.txt` recovered from the ECOS binary. Corners: `nom_*` TYP,
+  `max_*` RCworst, `min_*` RCbest; the wire and via resistance of each corner is in its tech LEF
+  (`N551P6M_ecos{,_max,_min}.lef`), since LibreLane extracts with `-lef_res`.
 
 ## Missing PDK features
 
@@ -94,7 +97,8 @@ The vendor PDK (`icsprout55-pdk`) now includes the SPICE models (HSPICE, adapted
 layer and datatype of every layer. Still missing for a reliable implementation:
 
 - A complete DRC document, to check the translated rules against.
-- The cross-section of the fabrication (dielectrics, metal thicknesses) for RCX.
+
+The cross-section for RCX is not missing: it is in the StarRC ITF files of the full vendor kit (see RCX above).
 
 ## How to use this repository:
 

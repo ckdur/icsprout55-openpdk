@@ -105,11 +105,22 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
   - `cdl_to_spice.py` makes the ngspice netlists; `layermap*_to_*.py` generate `.lyp`/magic tech from `hacking/layermap`.
   - `NOTES.md` documents how RCX parameters were recovered from the ECOS binaries.
 - `icsprout55/libs.tech/ngspice` / `hspice` — device models (ngspice copies adapted from hspice).
-- `generate_rcx_rules/` — OpenRCX rule generation (Makefile driven, needs `openroad`); current `rcx.rules` are placeholders.
+- `generate_rcx_rules/` — OpenRCX rules from the vendor StarRC ITF (`../pdk/.../StarRC/ITF`, same data as
+  `hacking/decrypted_output/kItf*`): `itf2rcx.py` field solves every OpenRCX context with FasterCap 2D
+  (drawn dimensions × the ITF 0.9 half node shrink) into `libs.tech/librelane/rcx/ics55_{typ,rcworst,rcbest}.rules`
+  (`nom_*` / `max_*` / `min_*`) and `rcx/layers_rc.tcl`; `itf2lef.py` writes the per corner tech LEFs
+  `N551P6M_ecos{,_max,_min}.lef` (resistance, since LibreLane extracts with `-lef_res`). Solutions are kept in
+  `solutions/*.csv` (`--from-csv` regenerates without solving, a full solve is ~4 h per corner).
+  Method and validation in `generate_rcx_rules/README.md`. The old `Makefile` flow is superseded.
 
 ## Known gaps
 
 - Full-chip KLayout LVS (`demo_chip`) is disabled: layer derivation is far too slow on the filled chip.
+- With the container's LibreLane 3.0.16, `Odb.CustomIOPlacement` makes the IO pins span the whole die (default pin
+  length from the layer min AREA comes out ~10^6 too long when `IO_PIN_H_LENGTH` / `IO_PIN_V_LENGTH` are unset), so
+  `OpenROAD.IRDropReport` fails `demo_counter` with `PSM-0069` (pins shorted to the VDD stripes). RCX and post-route
+  STA run before it and pass.
+- RCX: Cbest / Cworst ITF corners are not generated (no STA corner uses them).
 - `demo_chip` reaches `final/` but exits non-zero on a deferred `Checker.PowerGridViolations`: PSM reports
   `PSM-0025 VDD/VSS does not contain any terminals` because `VSRC_LOC_FILES` is unset (the grid itself passes,
   `PSM-0040 All shapes on net VDD are connected`). Set `VSRC_LOC_FILES` to clear it.

@@ -19,19 +19,29 @@ set ::env(VDD_PIN) "VDD"
 set ::env(GND_PIN) "VSS"
 
 # Technology LEF, as a map of corner patterns to files.
-# NOTE: the bring-up config used the plain N551P6M.lef (not the _ecos variant).
-# NOTE2: The resistance in VIAs is not defined. Using a modified version here
+# The vendor N551P6M_ecos.lef with the wire and via resistances of the StarRC ITF
+# of the RC corner (generate_rcx_rules/itf2lef.py): OpenRCX runs with -lef_res, so
+# the SPEF resistance of an extraction corner comes from its tech LEF.
+#   nom_*  TYP      at   25 C
+#   max_*  RCworst  at  125 C
+#   min_*  RCbest   at  -40 C
 set ::env(TECH_LEFS) [list \
     "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/N551P6M_ecos.lef" \
+    "max_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/N551P6M_ecos_max.lef" \
+    "min_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/N551P6M_ecos_min.lef" \
 ]
 
-# Timing corners (IPVT). Corner names match the bring-up configuration exactly.
+# Timing corners (IPVT). The nom_* corners are the bring-up ones; max_ss (setup)
+# and min_ff (hold) pair the slow/fast liberty with the RCworst/RCbest
+# extraction, the RC corners the 7-track liberty is characterised with.
 set ::env(DEFAULT_CORNER) "nom_tt_025C_1v20"
 set ::env(TIMING_VIOLATION_CORNERS) "*"
 set ::env(STA_CORNERS) [list \
     "nom_tt_025C_1v20" \
     "nom_ss_125C_1v08" \
     "nom_ff_n40C_1v32" \
+    "max_ss_125C_1v08" \
+    "min_ff_n40C_1v32" \
 ]
 
 # Routing layers
@@ -64,7 +74,7 @@ set ::env(KLAYOUT_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics
 set ::env(KLAYOUT_PROPERTIES) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyp"
 set ::env(KLAYOUT_DEF_LAYER_MAP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.map"
 set ::env(KLAYOUT_DRC_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.drc"
-set ::env(KLAYOUT_DRC_OPTIONS) [dict create densityRules 0 ]
+set ::env(KLAYOUT_DRC_DEFINES) [dict create densityRules 0 ]
 set ::env(KLAYOUT_LVS_SCRIPT) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lvs"
 # Run by the ICS55.KLayoutLVS step of the PDK plugin (libs.tech/librelane/librelane_plugin_ics55)
 # No tapless / implicit_nets here: in a placed design FILLTAP ties the wells and
@@ -74,11 +84,13 @@ set ::env(KLAYOUT_LVS_OPTIONS) [dict create run_mode deep ]
 
 set ::env(NETGEN_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/netgen/ics55.tcl"
     
-# TODO: This is the only file that is left to implement for RCX
-# the one put here is just a copy of IHP. Obviously it won't work.
-# REPLACE ME REPLACE ME REPLACE ME
+# OpenRCX rules, field solved (FasterCap 2D) from the vendor StarRC ITF of each RC
+# corner by generate_rcx_rules/itf2rcx.py. They only depend on the metal stack,
+# so all standard cell libraries share them.
 set ::env(RCX_RULESETS) [list \
-    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/$::env(STD_CELL_LIBRARY)/rcx.rules" \
+    "nom_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rcx/ics55_typ.rules" \
+    "max_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rcx/ics55_rcworst.rules" \
+    "min_*" "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rcx/ics55_rcbest.rules" \
 ]
 
 set scl_dir "$::env(PDK_ROOT)/$::env(PDK)/libs.ref/$::env(STD_CELL_LIBRARY)"
@@ -139,18 +151,19 @@ set ::env(PAD_SPICE_MODELS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
 set ::env(PAD_CDLS) "$io_dir/cdl/ICSIOA_N55_3P3.cdl"
 
 # --- Timing libraries (tech.yml: sta.libs) ------------------------------------
-# Exactly one entry must match DEFAULT_CORNER (nom_tt_025C_1v20).
+# Exactly one entry must match DEFAULT_CORNER (nom_tt_025C_1v20). The RC corner
+# prefix (nom/min/max) only selects the extraction, so the keys are wildcards.
 # Also, we only include one lib file for the standard cells.
 set ::env(LIB) [dict create]
-dict set ::env(LIB) "nom_tt_025C_1v20" "\
+dict set ::env(LIB) "*_tt_025C_1v20" "\
     $scl_lib_tt\
     $io_dir/liberty/ICSIOA_N55_3P3_tt_1p2_3p3_25c.lib\
 "
-dict set ::env(LIB) "nom_ss_125C_1v08" "\
+dict set ::env(LIB) "*_ss_125C_1v08" "\
     $scl_lib_ss\
     $io_dir/liberty/ICSIOA_N55_3P3_ss_1p08_2p97_125c.lib\
 "
-dict set ::env(LIB) "nom_ff_n40C_1v32" "\
+dict set ::env(LIB) "*_ff_n40C_1v32" "\
     $scl_lib_ff\
     $io_dir/liberty/ICSIOA_N55_3P3_ff_1p32_3p63_m40c.lib\
 "
@@ -197,4 +210,8 @@ set ::env(PDN_CORE_RING_HOFFSET) 12.45
 # PDN Macro blockages list
 set ::env(MACRO_BLOCKAGES_LAYER) "MET1 MET2 MET3 MET4 MET5"
 
-# TODO: LAYERS_RC and VIAS_R are not defined!
+# Wire and via RC for placement / global routing estimates, per RC corner, from
+# the same field solutions as the RCX rules (generate_rcx_rules/itf2rcx.py --tcl).
+set ::env(LAYERS_RC) [dict create]
+set ::env(VIAS_R) [dict create]
+source "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rcx/layers_rc.tcl"

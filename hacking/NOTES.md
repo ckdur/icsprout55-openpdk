@@ -60,7 +60,7 @@ read_lef -library /Users/ckdur/Documents/SymbioticEDA/icsprout55-openpdk/demo_co
 read_lef -library /Users/ckdur/Documents/SymbioticEDA/icsprout55-openpdk/icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013/lef/ICSIOA_N55_3P3_1P6M1TM_ecos.lef
 read_def /Users/ckdur/Documents/SymbioticEDA/icsprout55-openpdk/demo_chip/runs/debug_ics/52-odb-cellfrequencytables/chip_top.def
 define_process_corner -ext_model_index 0 CURRENT_CORNER
-extract_parasitics  -ext_model_file /Users/ckdur/Documents/SymbioticEDA/icsprout55-openpdk/icsprout55/libs.tech/librelane/ics55_LLSC_H7CR/rcx.rules -lef_res
+extract_parasitics  -ext_model_file /Users/ckdur/Documents/SymbioticEDA/icsprout55-openpdk/icsprout55/libs.tech/librelane/rcx/ics55_typ.rules -lef_res
 ```
 
 Also, comment to OpenROAD: Please specify the syntax of OpenRCX! My god!
