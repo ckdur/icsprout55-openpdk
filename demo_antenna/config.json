@@ -29,6 +29,7 @@
   "meta": {
     "flow": "Classic",
     "substituting_steps": {
+      "OpenROAD.TapEndcapInsertion": "ICS55.TapEndcapInsertion",
       "Checker.IllegalOverlap": null,
       "KLayout.XOR": null,
       "Checker.XOR": null,

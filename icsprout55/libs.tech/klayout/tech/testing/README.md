@@ -132,6 +132,11 @@ What is behind them:
   history (before the std cell fix commit).
 - Neighbour dependent markers (keys `A|B`) only cover the arrangement of the
   wrapper; `abut_check.py` checks every left / right side pair of a library.
+- The wrapper never leaves a cell without a neighbour; `rowend_check.py` checks the
+  cells at a row end and in the outer rows. The 602 usable non-filler 7-track cells
+  are clean between two `FILLER1` with a filler row above and below; with nothing
+  around them they have 12410 markers (`NP_EN_3` / `PP_EN_3` on ~500 cells from the
+  open top / bottom, `NP/PP_EX_1_EX_1a` on ~240 cells from the open sides).
 - IO: mostly the SAB / poly resistor / RDL rules of the ESD and pad structures,
   plus the 0.005/0.01um spacer cells `P65_1233_FILLER0005` / `FILLER001`, whose
   layers are only complete when abutted to the pads.
@@ -183,6 +188,10 @@ the Calibre tolerance of 0.1% on W/L, so Calibre should flag them as well:
 - `abut_check.py <lib.gds> [--tests half,nw,cross,verify]` every left / right side
   pair of a library (profiles of the shapes near each side, the real deck on
   the pairs, confirmed by placing real cells)
+- `rowend_check.py <lib.gds> [cells|all] [--endcap CELL|none] [--cover both|above|below|none]
+  [--exclude unusable.cells]` every cell alone at the edge of a row block: between two
+  endcaps (default `FILLER1`) and with a filler row above / below, as the PDK closes the
+  rows (LibreLane `ENDCAP_CELL`, `ENDCAP_HORIZONTAL_CELLS`); exit 1 on markers
 - `summary.py <report.lyrdb>` DRC markers per rule and the cells they fall in
 - `items.py <report.lyrdb> RULE1,RULE2 [n]` print DRC marker geometries of some rules
 - `lvs_wrap.py <lib.gds> <lib.cdl> <out.gds> <out.cdl>` build the LVS wrapper layout + schematic

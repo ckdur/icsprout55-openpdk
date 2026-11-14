@@ -144,11 +144,17 @@ usable):
 - every left / right side pair (`testing/abut_check.py`): only `ACT_S_2` is confirmed in real cells,
   111 sides (the vendor layout of the same 609 cells: `ACT_S_2` 127 sides, `MET1_S_4` 819,
   `NW1_W_1` 317). The first tap fix (islands 0.24 wide in one site) conflicted with ~240 cell sides
-  here, hence the two site tap.
+  here, hence the two site tap;
+- every cell alone at the edge of a row block (`testing/rowend_check.py`): clean between two
+  `FILLER1` endcaps with a filler row above and below, which is how the LibreLane config closes the
+  rows (`ENDCAP_CELL`, `ENDCAP_HORIZONTAL_CELLS`, plugin step `ICS55.TapEndcapInsertion`); without
+  them 12410 markers (`NP_EN_3` / `PP_EN_3` from the open top / bottom on ~500 cells,
+  `NP/PP_EX_1_EX_1a` from the open sides on ~240).
 
-LibreLane `demo_counter` with the fixed libraries (2026-11-14): Netgen and KLayout LVS clean, antenna
-clean, no routing DRC, timing met. KLayout DRC: density minima, latch-up and `CHIPEDGE` (small unfilled
-die), `NP/PP_EX_1_EX_1a` / `NP_EN_3` on cells at the row ends (no neighbour, no endcap: the cell side
-is the vendor one) and one `PO_S_9` between poly ends of vertically adjacent rows (poly ends 60 nm from
-the cell top / bottom, as in the vendor cells; neither `abut_check.py` nor the regression covers
-rows above / below with real cells).
+LibreLane `demo_counter` with the fixed libraries (2026-11-15, with `ICS55.TapEndcapInsertion`): Netgen
+and KLayout LVS clean, antenna clean, no routing DRC, timing met. KLayout DRC: only density minima,
+latch-up inside `BUFX10` / `BUFX16` and `CHIPEDGE` / `V4_S_2` at the die corner (small unfilled die).
+Before the endcaps the cells at the row ends had `NP/PP_EX_1_EX_1a` (8) and the top row `NP_EN_3` (2).
+Poly ends of vertically adjacent rows (60 nm from the cell top / bottom, as in the vendor cells) can
+still meet `PO_S_9` in other placements; neither `abut_check.py` nor the regression covers rows above /
+below with real cells.

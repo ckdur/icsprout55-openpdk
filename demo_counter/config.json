@@ -12,7 +12,8 @@
   "IO_PIN_H_LENGTH": 1.0,
   "IO_PIN_V_LENGTH": 1.0,
 
-  "//": "KLayout DRC still reports the known standard cell issues (MET1_A_1/M2_A_1 pin areas, PO_A_1, NW1_W_1 at row ends without endcaps), see icsprout55/libs.tech/klayout/tech/testing/README.md",
+  "//": "KLayout DRC still reports the density minima and latch-up of a small unfilled die, see icsprout55/libs.tech/klayout/tech/testing/README.md",
+  "//endcaps": "ICS55.TapEndcapInsertion closes the rows: FILLER1 at the row ends (ENDCAP_CELL) and the top / bottom row filled with fillers (ENDCAP_HORIZONTAL_CELLS)",
   "ERROR_ON_KLAYOUT_DRC": false,
   "//magic": "Magic DRC runs the translated subset of the Calibre deck and reports the same library-intrinsic findings (PO_A_1, NW1_W_1), see hacking/magic/README.md",
   "ERROR_ON_MAGIC_DRC": false,
@@ -23,6 +24,7 @@
   "meta": {
     "flow": "Classic",
     "substituting_steps": {
+      "OpenROAD.TapEndcapInsertion": "ICS55.TapEndcapInsertion",
       "Checker.IllegalOverlap": null,
       "KLayout.XOR": null,
       "Checker.XOR": null,

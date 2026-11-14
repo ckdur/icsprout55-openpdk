@@ -3,6 +3,10 @@ meta:
   flow: Chip
   substituting_steps:
 
+    # Endcaps (FILLER1) at the row ends and the top / bottom row of every row
+    # block filled with fillers (7-track cells, see librelane_plugin_ics55)
+    OpenROAD.TapEndcapInsertion: ICS55.TapEndcapInsertion
+
     # Magic reports some overlaps which can be ignored
     Checker.IllegalOverlap: null
 
