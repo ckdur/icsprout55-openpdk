@@ -72,8 +72,13 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
 - Two standard cell families are supported:
   - `ics55_LLSC_H7C{R,H,L}` — 7-track, public, from the `icsprout55-pdk` submodule. Default (`H7CR`). Shared
     configuration in `libs.tech/librelane/ics55_LLSC_H7C_common.tcl`, sourced by each library's `config.tcl`;
-    the three Vt flavours differ only in the cell name suffix (`H7R`/`H7H`/`H7L`). Each has
-    `synth_exclude.cells` / `pnr_exclude.cells`, the 18 cells whose layout does not match their CDL.
+    the three Vt flavours differ only in the cell name suffix (`H7R`/`H7H`/`H7L`). The installed GDS and cell
+    LEFs are the DRC fixed ones from `stdcell_fixed/` (made by `hacking/stdcell_fix/make_fixed.py`, see its
+    README; liberty and CDL stay the vendor ones): 609 of 785 cells per library are DRC clean, the other 176 keep
+    the vendor layout. `synth_exclude.cells` / `pnr_exclude.cells` (192) are those 176 plus the cells whose
+    layout does not match their CDL. Async reset flops map to the set flops with `QN` (no `DFFR*` is usable),
+    `latch_map.v` builds the negative enable reset latches from `LATHR*` / `LATHSR*`, `DECAP_CELLS` is
+    `FILLCAP4` only.
   - `ICsprout55_9T{S,H,L}VT_basic` — 9-track, **private**, installed by `install.sh` from
     `../pdk/ICsprout_55LLULP1225_STD_0818` when that directory exists (`PRIVATE_STD_ROOT=` to point elsewhere,
     `PRIVATE_STD_LIBERTY=all` for every NLDM corner instead of the three in `STA_CORNERS`; the vendor `lib/` is
@@ -119,8 +124,9 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
     connectivity, per gate `ACCUMULATE`, diode allowance; runs flat). LibreLane `KLAYOUT_ANTENNA_RUNSET`.
     Semantics settled on `hacking/svrf2klayout/tests/antenna` (identical to Calibre on all 23 firing rules).
   - `rule_decks/` holds the earlier hand translation; it is no longer included by the decks.
-- `testing/` — regression: `wrap_lib.py`/`lvs_wrap.py` place a whole library under a top cell `ALL` (DRC: each cell
-  abutted between fillers; LVS: grid + matching `.SUBCKT ALL`), IO LVS runs per cell. Results are compared against
+- `testing/` — regression: `wrap_lib.py`/`lvs_wrap.py` place a whole library under a top cell `ALL` (DRC: abutted,
+  alternately mirrored rows like a placed design, FILLER4 at the row ends and a filler row below / above; LVS: grid +
+  matching `.SUBCKT ALL`); `check_cells.py` runs the same DRC (+ LVS with `--cdl`) on a few cells in seconds, IO LVS runs per cell. Results are compared against
   `golden/*.json`; known remaining findings are explained in `testing/README.md`.
 - `hacking/` — reverse-engineering and generator scripts that feed the PDK:
   - `ICSIOA_N55_3P3_1P6M1TM_openpdk.lef` is the vendor IO `_ecos` LEF with the pad terminals moved to RDL;
@@ -131,6 +137,11 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
     OpenROAD `write_cdl`). `install.sh` runs it instead of copying.
   - `cdl_to_spice.py` makes the ngspice netlists; `layermap*_to_lyp.py` generate the `.lyp` from `hacking/layermap`.
   - `NOTES.md` documents how RCX parameters were recovered from the ECOS binaries.
+  - `stdcell_fix/` fixes the DRC violations of the 7-track cells: polygon legalization per layer against the
+    Calibre rules (`legalize.py`, up to three sites of growth), NP/PP boundary solver (`implant.py`), DRC/LVS
+    feedback rounds and the Vt variants (`make_fixed.py`, ~1.5 h with 16 jobs; outputs are GBs, use `/opt/ext` or
+    the home folder, not `/tmp`). The result is committed gzipped in `stdcell_fixed/<lib>/{gds,lef}` with
+    `unusable.cells` and `report.json`; `install.sh` unpacks it over libs.ref. Liberty files are not regenerated.
 - `icsprout55/libs.tech/ngspice` / `hspice` — device models (ngspice copies adapted from hspice).
 - `generate_rcx_rules/` — OpenRCX rules from the vendor StarRC ITF (`../pdk/.../StarRC/ITF`, same data as
   `hacking/decrypted_output/kItf*`): `itf2rcx.py` field solves every OpenRCX context with FasterCap 2D
@@ -141,6 +152,9 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
   Method and validation in `generate_rcx_rules/README.md`. The old `Makefile` flow is superseded.
 
 ## Known gaps
+
+Open work is tracked in the SymbioticEDA Plane tracker (bugs.ckdur.dev, workspace `symbioticeda`, label
+`icsprout55`, titles `[ICS55] ...`; SYMBI-47 is the umbrella ticket). Keep it in sync with this list.
 
 - Full-chip KLayout LVS (`demo_chip`) is disabled: layer derivation is far too slow on the filled chip.
 - With the container's LibreLane 3.0.16, `Odb.CustomIOPlacement` makes the IO pins span the whole die (default pin
@@ -165,5 +179,10 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
 - No decap insertion for the 9-track libraries (`DECAP_CELLS` empty). OpenROAD fill insertion runs after detailed
   routing and is not routing aware, and the `FILLCAP*` / `GFILL*` cells have their internal nodes on MET1, so they
   short to whatever MET1 the router already put in the gap. The plain `FILL*` cells have no devices and no MET1
-  outside the rails. The same hazard exists for `FILLCAP*H7R` in the 7-track libraries, it just does not trigger on
+  outside the rails. The same hazard exists for `FILLCAP4H7R` in the 7-track libraries, it just does not trigger on
   the demos.
+- 7-track DRC fix (`stdcell_fixed/`): 176 cells per library still fail DRC and are excluded, among them every
+  asynchronous reset / set+reset flop, the scan flops, most XOR / XNOR and `FILLCAP8/16/32`. Only left / right
+  abutment is checked (`testing/abut_check.py`); poly ends of vertically adjacent rows can still meet `PO_S_9`
+  (one marker on `demo_counter`), and cells at the row ends see `NP/PP_EX_1_EX_1a` (no endcaps). The per pin
+  antenna areas (`antenna.pins`) were extracted from the vendor layout.

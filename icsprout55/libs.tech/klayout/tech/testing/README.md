@@ -34,10 +34,10 @@ or fixing rules, review the differences and then rerun with `--update`.
 
 | Name                  | Input                                   | How                                    |
 |-----------------------|-----------------------------------------|----------------------------------------|
-| `drc_stdcell_H7CR`    | `ics55_LLSC_H7CR.gds` (regular Vt)      | every cell abutted with FILLER4        |
-| `drc_stdcell_H7CH`    | `ics55_LLSC_H7CH.gds` (high Vt)         | every cell abutted with FILLER4        |
-| `drc_stdcell_H7CL`    | `ics55_LLSC_H7CL.gds` (low Vt)          | every cell abutted with FILLER4        |
-| `drc_stdcell_H7CR_M2` | `ics55_LLSC_H7CR_M2.gds` (M2 variant)   | every cell abutted with FILLER4        |
+| `drc_stdcell_H7CR`    | `ics55_LLSC_H7CR.gds` (regular Vt)      | abutted rows, mirrored, FILLER4        |
+| `drc_stdcell_H7CH`    | `ics55_LLSC_H7CH.gds` (high Vt)         | abutted rows, mirrored, FILLER4        |
+| `drc_stdcell_H7CL`    | `ics55_LLSC_H7CL.gds` (low Vt)          | abutted rows, mirrored, FILLER4        |
+| `drc_stdcell_H7CR_M2` | `ics55_LLSC_H7CR_M2.gds` (M2 variant)   | abutted rows, mirrored, FILLER4        |
 | `drc_stdcell_9TSVT`   | `ICsprout55_9TSVT_basic.gds` (9T, std Vt) | vendor top cell as is                |
 | `drc_stdcell_9THVT`   | `ICsprout55_9THVT_basic.gds` (9T, high Vt) | vendor top cell as is               |
 | `drc_stdcell_9TLVT`   | `ICsprout55_9TLVT_basic.gds` (9T, low Vt) | vendor top cell as is                |
@@ -54,10 +54,27 @@ The antenna test layout is made by `hacking/svrf2klayout/tests/antenna/mk_antenn
 (also `run_calibre.py` / `compare.py` there to re-check it against Calibre).
 
 DRC: the 7-track standard cell libraries have one top cell per standard cell, so
-`wrap_lib.py` places them all under a new top cell `ALL`. Each cell gets a
-filler on both sides (aligned with the 351/12 boundary) because NW, NP and PP
-extend past the cell edge and only become full width when abutted. Without
-fillers there are ~400 false NW1_W_1 markers per library.
+`wrap_lib.py` places them all under a new top cell `ALL`, laid out like a
+placed design: the cells are packed into rows and abut each other directly
+(351/12 boundary), every other row is mirrored so that neighbouring rows share
+their rail and implant edge, each row starts and ends with `FILLER4`, and a
+filler row is added below and above. Every other cell of a row is mirrored
+left / right, as a placer does, so cells also meet with their edges reversed.
+NW, NP and PP extend past the cell edge and are only complete when abutted on
+all four sides: placing cells on their own gives ~400 false NW1_W_1 markers per
+library, and unmirrored rows give ~9500 false `NP_EN_3` / `PP_EN_3` markers at
+the row edges.
+
+KLayout reports a marker in `ALL` when it depends on geometry outside one cell
+(a neighbour, or the implant of the row across the rail). `summary.py`, given
+the wrapper GDS, assigns those to the cell whose boundary they overlap, or to
+the neighbour pair `A|B` (names sorted) when they overlap two; only markers
+over no cell or more than two (density windows, some floating wells) stay in
+`ALL`. The golden files use these keys. `wrap_lib.py --order reverse|shuffle=N`
+and `--no-flip` change which cells become neighbours. The plain
+`FILLER<n>` cells are only used as fillers; `FILLCAP*` and `FILLTAP*` are
+checked like the other cells. `wrap_lib.py --grid` gives the former layout
+(cells apart, each between two fillers, all `FILL*` skipped).
 
 The private 9-track libraries (`ICsprout55_9T{S,H,L}VT_basic`) ship a single top
 cell that already holds all 719 cells, spaced so that the well and implant
@@ -85,8 +102,8 @@ or waived.
 
 | Testcase | Markers | Rules | Largest contributors |
 |----------|---------|-------|----------------------|
-| `drc_stdcell_H7C{R,H,L}` | 98843 | 39 | CT_EN_4a_4b_4c 34889, LU_S_2_NTAP 14705, LU_S_2_PTAP 14069, CT_S_4 13969, NP_EN_3 4950, PP_EN_3 4585, MET1_S_4 2846, MET1_A_1 2227, MET1_W_2 1703, MET1_S_5 1304 |
-| `drc_stdcell_H7CR_M2`    | 101371 | 42 | as above plus V1_EN_2a_2b_2c 2198, M2_A_1 328, V1_S_3 2 |
+| `drc_stdcell_H7C{R,H,L}` | 52714 | 35 | LU_S_2_NTAP 14250, CT_EN_4a_4b_4c 13658, LU_S_2_PTAP 13548, CT_S_4 3752, MET1_S_4 1862, MET1_W_2 1145, NW1_R_1 909, MET1_S_5 905, MET1_A_1 487, PO_EX_1 394 |
+| `drc_stdcell_H7CR_M2`    | 53377 | 38 | as above plus V1_EN_2a_2b_2c 553, ... |
 | `drc_stdcell_9T{S,H,L}VT` | 24862 / 24863 / 24863 | 13 | LU_S_2_NTAP 12611, LU_S_2_PTAP 10828, NW1_R_1 717, density minima |
 | `drc_io`                 | 3701 | 57 | SAB_S_5 720, SAB_S_6 422, CT_EN_4d 408, SAB_R_1 398, SAB_S_4 360, PO_S_11 268, POLYres_S_2 222 |
 
@@ -97,10 +114,24 @@ What is behind them:
   library check; a placed design with tap cells clears them.
 - `*_D_*_min` (minimum density): the test layout is not a filled chip.
 - `NW1_R_1`: one marker per cell, also a consequence of the untapped wells.
-- 7-track libraries only: contact enclosure / spacing (`CT_EN_*`, `CT_S_*`),
-  implant enclosure (`NP_EN_3`, `PP_EN_3`), MET1 spacing / width / area and the
-  poly rules. Calibre reports the same rules on these cells; the 9-track
-  libraries have none of them.
+- 7-track libraries: the installed layouts are the DRC fixed ones
+  (`stdcell_fixed/`, `hacking/stdcell_fix/README.md`). 609 of the 785 cells
+  are clean; the other 176 keep the vendor layout and are excluded from
+  synthesis / PnR (`stdcell_fixed/<lib>/unusable.cells`). Besides the context
+  rules above, all but 5 markers (3 `MET1_S_5`, 2 `PO_S_9`, between usable
+  neighbours) are in or next to those 176 cells: contact enclosure / spacing
+  (`CT_EN_*`, `CT_S_*`), MET1 spacing / width / area, the poly rules and, in
+  the `_M2` view, `V1_*`. Calibre reports the same rules on the vendor cells;
+  the 9-track libraries have none of them. H7CH / H7CL have the same markers
+  as H7CR (cell suffix aside).
+- The vendor libraries, for comparison: 88879 markers (`_M2` 91636), among
+  them `CT_EN_4a_4b_4c` 34925, `CT_S_4` 13985, `NP_EN_3` / `PP_EN_3` (PO near
+  the rail edge against the implant of the row across), `NW1_W_1` between
+  neighbours of different NW heights and, in `_M2`, `V1_S_3` 231 (vias
+  0.055um from the cell side on 475 sides). The old golden files are in git
+  history (before the std cell fix commit).
+- Neighbour dependent markers (keys `A|B`) only cover the arrangement of the
+  wrapper; `abut_check.py` checks every left / right side pair of a library.
 - IO: mostly the SAB / poly resistor / RDL rules of the ESD and pad structures,
   plus the 0.005/0.01um spacer cells `P65_1233_FILLER0005` / `FILLER001`, whose
   layers are only complete when abutted to the pads.
@@ -145,7 +176,13 @@ the Calibre tolerance of 0.1% on W/L, so Calibre should flag them as well:
 ## Tools
 
 - `run_regression.py` the regression runner
-- `wrap_lib.py <lib.gds> <out.gds> [FILLER]` build the DRC wrapper layout
+- `wrap_lib.py <lib.gds> <out.gds> [FILLER] [--grid]` build the DRC wrapper layout
+- `check_cells.py <lib.gds> CELL1,CELL2|all [--cdl lib.cdl] [--items N]` DRC (and LVS
+  with `--cdl`) of a few cells in seconds, same abutted wrapper as the
+  regression; for iterating on cell fixes
+- `abut_check.py <lib.gds> [--tests half,nw,cross,verify]` every left / right side
+  pair of a library (profiles of the shapes near each side, the real deck on
+  the pairs, confirmed by placing real cells)
 - `summary.py <report.lyrdb>` DRC markers per rule and the cells they fall in
 - `items.py <report.lyrdb> RULE1,RULE2 [n]` print DRC marker geometries of some rules
 - `lvs_wrap.py <lib.gds> <lib.cdl> <out.gds> <out.cdl>` build the LVS wrapper layout + schematic

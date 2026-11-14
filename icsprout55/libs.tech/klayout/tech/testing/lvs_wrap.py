@@ -40,7 +40,7 @@ def subckt_pins(cdl_path):
 
 
 def main(gds, cdl, out_gds, out_cdl, shared=('VSS',)):
-    wrap(gds, out_gds)
+    wrap(gds, out_gds, grid=True)
     layout = db.Layout()
     layout.read(out_gds)
     cells = sorted(layout.cell(ci).name for ci in layout.cell('ALL').each_child_cell())

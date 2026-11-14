@@ -21,3 +21,4 @@ hacking/__pycache__
 .DS_Store
 generate_rcx_rules/__pycache__
 generate_rcx_rules/solutions/*.cache
+__pycache__/

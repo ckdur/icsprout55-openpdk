@@ -104,8 +104,10 @@ def run_drc(name, run_dir):
     cmd += ['-rd', f'report={report}', '-rd', f'log={run_dir / f"{name}.log"}']
     print(f'[{name}] running {"antenna check" if kind == "ant" else "DRC"}')
     run_klayout(cmd)
+    # markers of the wrapper top cell go to the cell / neighbour pair they are in
+    res = summarize(str(report), str(wrapper) if wrapped else None)
     return {rule: {'count': sum(cells.values()), 'cells': dict(sorted(cells.items()))}
-            for rule, cells in sorted(summarize(str(report)).items())}
+            for rule, cells in sorted(res.items())}
 
 
 def compare_drc(name, result, golden):

@@ -11,6 +11,16 @@ cp -r icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL icspro
 cp -r icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR icsprout55/libs.ref
 cp -r icsprout55-pdk/prtech icsprout55/libs.ref
 
+# 7-track cells with the DRC violations fixed (GDS and cell LEFs; liberty, CDL and the
+# cells listed in stdcell_fixed/<lib>/unusable.cells are the vendor ones), made by
+# hacking/stdcell_fix/make_fixed.py
+for lib in ics55_LLSC_H7CH ics55_LLSC_H7CL ics55_LLSC_H7CR; do
+  for f in stdcell_fixed/$lib/gds/*.gz stdcell_fixed/$lib/lef/*.gz; do
+    view=$(basename $(dirname $f))
+    gunzip -c $f > icsprout55/libs.ref/$lib/$view/$(basename $f .gz)
+  done
+done
+
 # The installed CDLs are converted from the vendor ones (LVS-ready, see hacking/cdl_convert.py)
 # and the ngspice-compatible copies are generated from the vendor CDLs too
 STD_SRC=icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100

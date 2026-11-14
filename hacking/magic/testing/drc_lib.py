@@ -4,8 +4,9 @@
 Usage (repo root, inside the asic-all container):
   python3 hacking/magic/testing/drc_lib.py <lib> [--out DIR] [--style "drc(full)"]
 
-The library is wrapped exactly like the KLayout regression (testing/wrap_lib.py: every cell
-abutted between fillers under a top cell ALL), converted to the Magic layer numbering
+The library is wrapped exactly like the KLayout regression (testing/wrap_lib.py: the 7-track
+cells in abutted, alternately mirrored rows under a top cell ALL; the 9-track and IO
+libraries with --grid), converted to the Magic layer numbering
 (magic_gds.py) and checked with Magic. The error boxes of every rule are merged into
 markers and compared with icsprout55/libs.tech/klayout/tech/testing/golden/drc_<lib>.json.
 Rules the Magic tech file does not translate are not listed (see hacking/magic/drc_coverage.txt).
@@ -30,11 +31,14 @@ KTEST = os.path.join(PDK, 'libs.tech', 'klayout', 'tech', 'testing')
 REF = os.path.join(PDK, 'libs.ref')
 
 LIBS = {
-    'stdcell_H7CR_M2': ('ics55_LLSC_H7CR/gds/ics55_LLSC_H7CR_M2.gds', 'FILLER1H7R'),
-    'stdcell_H7CR': ('ics55_LLSC_H7CR/gds/ics55_LLSC_H7CR.gds', 'FILLER1H7R'),
+    'stdcell_H7CR_M2': ('ics55_LLSC_H7CR/gds/ics55_LLSC_H7CR_M2.gds', 'FILLER4H7R'),
+    'stdcell_H7CR': ('ics55_LLSC_H7CR/gds/ics55_LLSC_H7CR.gds', 'FILLER4H7R'),
     'stdcell_9TSVT': ('ICsprout55_9TSVT_basic/gds/ICsprout55_9TSVT_basic.gds', 'FILL1_9TSVT'),
     'io': ('ICsprout_55LLULP1233_IO_251013/gds/ICSIOA_N55_3P3_1P6M1TM.gds', None),
 }
+# Libraries with one top cell per standard cell are wrapped in abutted rows like
+# the KLayout regression; the others (one library top cell) keep the grid layout.
+ABUTTED = {'stdcell_H7CR_M2', 'stdcell_H7CR'}
 
 
 def magic_run(gds, top, style, out):
@@ -65,16 +69,6 @@ quit -noprompt
     return res
 
 
-def cell_boxes(gds, top):
-    ly = db.Layout()
-    ly.read(gds)
-    t = ly.cell(top)
-    out = []
-    for inst in t.each_inst():
-        out.append((inst.cell.name, inst.bbox()))
-    return out, ly.dbu
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('lib', choices=sorted(LIBS))
@@ -89,6 +83,8 @@ def main():
     cmd = [sys.executable, os.path.join(KTEST, 'wrap_lib.py'), os.path.join(REF, src), wrapped]
     if filler:
         cmd.append(filler)
+    if a.lib not in ABUTTED:
+        cmd.append('--grid')
     subprocess.run(cmd, check=True)
     mgds = os.path.join(out, 'wrapped_magic.gds')
     subprocess.run([sys.executable, os.path.join(HERE, '..', 'magic_gds.py'), wrapped, mgds], check=True)
@@ -96,7 +92,11 @@ def main():
     if not (a.reuse and os.path.exists(res)):
         res = magic_run(mgds, 'ALL', a.style, out)
 
-    insts, dbu = cell_boxes(wrapped, 'ALL')
+    # same attribution as the KLayout regression (testing/summary.py): the cell or
+    # neighbour pair "A|B" whose boundary the marker overlaps
+    sys.path.insert(0, KTEST)
+    from summary import Attributor
+    attr = Attributor(wrapped, 'ALL')
     per = {}
     for line in open(res):
         why, coords = line.rstrip('\n').split('\t')
@@ -112,12 +112,7 @@ def main():
         r.merge()
         cells = {}
         for p in r.each():
-            c = p.bbox().center()
-            name = 'ALL'
-            for cn, bb in insts:
-                if bb.contains(c):
-                    name = cn
-                    break
+            name = attr(p.bbox().to_dtype(0.001))
             cells[name] = cells.get(name, 0) + 1
         result[rule] = {'count': r.count(), 'cells': cells}
     json.dump(result, open(os.path.join(out, a.lib + '_magic_drc.json'), 'w'), indent=1, sort_keys=True)
