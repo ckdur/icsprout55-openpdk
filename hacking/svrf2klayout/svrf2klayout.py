@@ -166,6 +166,9 @@ class Gen:
             if d is None or k in seen:
                 return 0
             memo = self.__dict__.setdefault('_cost_memo', {})
+            # keep the dict alive: a freed one's id is reused by the next rule's (stale costs,
+            # output that changed from run to run)
+            self.__dict__.setdefault('_cost_keep', {})[id(self.local_defs)] = self.local_defs
             key = (id(self.local_defs), k)
             if key not in memo:
                 memo[key] = self.cost(d, seen | {k})

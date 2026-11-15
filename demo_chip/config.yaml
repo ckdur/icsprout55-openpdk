@@ -20,6 +20,11 @@ meta:
     KLayout.XOR: null
     Checker.XOR: null
 
+    # No Magic stream-out: it takes the macro size from the PR boundary of its
+    # GDS, which is on layer 351/12 (DIEAREA), and Magic reads no GDS layer
+    # above 255. The GDS is the KLayout one (PRIMARY_GDSII_STREAMOUT_TOOL).
+    Magic.StreamOut: null
+
     # Disable KLayout antenna check
     #KLayout.Antenna: null
     #Checker.KLayoutAntenna: null

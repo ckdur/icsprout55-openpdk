@@ -20,6 +20,8 @@ python3 svrf2klayout.py     ICsprout_CalANT_expanded.svrf ../../icsprout55/libs.
 # antenna rules into the LibreLane tech LEFs (after generate_rcx_rules/itf2lef.py rewrote them)
 L=../../icsprout55/libs.tech/librelane
 python3 ant2lef.py ICsprout_CalANT_expanded.svrf $L/N551P6M_ecos.lef $L/N551P6M_ecos_max.lef $L/N551P6M_ecos_min.lef
+# via array spacing (V1_S_2 .. V4_S_2, CT_S_1a) as cut layer ADJACENTCUTS spacing, same files
+python3 cutspacing2lef.py ICsprout_CalDRC_expanded.svrf $L/N551P6M_ecos.lef $L/N551P6M_ecos_max.lef $L/N551P6M_ecos_min.lef
 ```
 
 The same files are copied to `../icsprout55-pdk/klayout/tech/` (the PDK fork).
@@ -99,6 +101,12 @@ running both tools on the test vehicle `tests/antenna/` (`mk_antenna_test.py` bu
   this level plus its value in the `ACCUMULATE` layer (the raw ratios of the lower levels,
   `AC<n>`), so lower metal keeps counting, while the diode allowance of the expression is
   applied once; the failing gates are reported.
+* the connectivity layers are broken into pieces of <= 512 points first (`sv_break_big`, flat
+  runs; `-rd break_points=<n>`): an abutted IO pad ring merges its guard rings into one ACT /
+  SD polygon of ~43000 points and ~10000 holes, and the net extraction against ~500000
+  contacts did not finish in hours (5 s broken). Per-net areas do not change; perimeters
+  (only PO and RDL are used) would, but those polygons stay far below the limit. The notched
+  test vehicle gives identical markers with `break_points=32` and without breaking.
 
 All 23 rules that fire on the 15 cases of the test vehicle (poly area and perimeter, contacts,
 M1-T4M2 with / without diode, cumulative M2, per gate accumulation, single and cumulative vias,
@@ -114,6 +122,16 @@ and gate oxide (GATE -> OXIDE1, GATE18 -> OXIDE2): a check `> v` with the diode 
 v+b+100a))`; accumulated metal and via checks are the CUM forms, single via / CT / RV the plain
 ones, the RDL perimeter check `ANTENNASIDEAREARATIO` with the runset's RDL thickness. POLY (a
 masterslice layer) and the GATE1825 check of RV are left to the KLayout deck.
+
+### LEF via array spacing (`cutspacing2lef.py`)
+
+The DRC deck checks cuts in an array with a larger spacing than single cuts (`V1_S_2` ..
+`V4_S_2`: 0.13 between vias closer than 0.14 to each other; `CT_S_1a`: 0.14 / 0.15). The
+`SIZE BY a OVERUNDER` / `SIZE BY b UNDEROVER` / `INSIDE` / `EXT < s` form of these rules becomes
+`SPACING s ADJACENTCUTS 3 WITHIN 2a` on the cut layer. Without it pdngen builds the PDN via
+arrays with the single cut spacing 0.11 (it ignores the VIARULE GENERATE pitch), and every
+array of 3 x 3 cuts or more fails `V*_S_2` (50 markers on `demo_counter`, 0 with the rule).
+Recommended rules (`T4V2_S_2`) are not written.
 
 ## Verification status (against Calibre 2012.2)
 

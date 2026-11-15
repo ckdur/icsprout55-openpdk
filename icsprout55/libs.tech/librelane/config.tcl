@@ -81,6 +81,10 @@ set ::env(KLAYOUT_DRC_DEFINES) [dict create densityRules 0 flat 1 ]
 # Antenna: the vendor Calibre antenna runset (.ant), translated by the same generator
 # (incremental connectivity, per gate accumulation, diode allowance); KLayout.Antenna
 set ::env(KLAYOUT_ANTENNA_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55_antenna.drc"
+# flat: deep and flat agree on the antenna test layout, but deep did not finish on a
+# full chip (pad ring guard rings) in hours; flat breaks the huge polygons (pad ring
+# of demo_chip alone ~27 min)
+set ::env(KLAYOUT_ANTENNA_DEFINES) [dict create flat 1 ]
 set ::env(KLAYOUT_LVS_SCRIPT) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lvs"
 # Run by the ICS55.KLayoutLVS step of the PDK plugin (libs.tech/librelane/librelane_plugin_ics55)
 # No tapless / implicit_nets here: in a placed design FILLTAP ties the wells and
