@@ -105,8 +105,12 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
   gives only netlist ports (`IOVDD`, `IOVSS`) a bond pad terminal; without one PSM has no source on VDD / VSS
   (`PSM-0025`, counted by `Checker.PowerGridViolations`). No `VSRC_LOC_FILES` needed.
 - KLayout DRC in LibreLane runs the deck flat (`KLAYOUT_DRC_DEFINES flat 1`), the mode it is verified in against
-  Calibre (`compare.py` forces `flat=1`). The deck's default deep mode reports `LU_S_2_*` inside placed cells
-  (`BUFX10/16H7R`) that Calibre and the flat run do not. The antenna deck runs flat as well
+  Calibre (`compare.py` forces `flat=1`). Flat is single threaded (KLayout only uses `threads` when tiled):
+  3 h 34 min on `demo_chip`. Deep mode used to report `LU_S_2_*` inside placed cells (`BUFX10/16H7R`) and lose
+  some enclosure / spacing markers: KLayout 0.30 `Edges#inside_part` / `#outside_part` drop child cell edges that
+  are covered by a parent cell polygon only (`hacking/svrf2klayout/tests/deep_edge_parts.rb`). The runtime uses
+  the equivalent boolean operators in deep mode (`sv_ein` / `sv_eout`); deep and flat now agree on
+  `demo_counter` and the library goldens are deep results that match flat. The antenna deck runs flat as well
   (`KLAYOUT_ANTENNA_DEFINES flat 1`): the guard rings of the abutted pad ring merge into one polygon of ~43000
   points, which made the net extraction of the first stage take hours (deep too); the runtime breaks polygons over
   512 points before the connectivity (`sv_break_big`, flat only; results identical, checked on the antenna test

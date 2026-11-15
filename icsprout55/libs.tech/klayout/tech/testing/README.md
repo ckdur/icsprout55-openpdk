@@ -102,10 +102,10 @@ or waived.
 
 | Testcase | Markers | Rules | Largest contributors |
 |----------|---------|-------|----------------------|
-| `drc_stdcell_H7C{R,H,L}` | 52714 | 35 | LU_S_2_NTAP 14250, CT_EN_4a_4b_4c 13658, LU_S_2_PTAP 13548, CT_S_4 3752, MET1_S_4 1862, MET1_W_2 1145, NW1_R_1 909, MET1_S_5 905, MET1_A_1 487, PO_EX_1 394 |
-| `drc_stdcell_H7CR_M2`    | 53377 | 38 | as above plus V1_EN_2a_2b_2c 553, ... |
-| `drc_stdcell_9T{S,H,L}VT` | 24862 / 24863 / 24863 | 13 | LU_S_2_NTAP 12611, LU_S_2_PTAP 10828, NW1_R_1 717, density minima |
-| `drc_io`                 | 3701 | 57 | SAB_S_5 720, SAB_S_6 422, CT_EN_4d 408, SAB_R_1 398, SAB_S_4 360, PO_S_11 268, POLYres_S_2 222 |
+| `drc_stdcell_H7C{R,H,L}` | 52717 | 35 | LU_S_2_NTAP 14250, CT_EN_4a_4b_4c 13660, LU_S_2_PTAP 13548, CT_S_4 3752, MET1_S_4 1862, MET1_W_2 1145, NW1_R_1 909, MET1_S_5 906, MET1_A_1 487, PO_EX_1 394 |
+| `drc_stdcell_H7CR_M2`    | 53380 | 38 | as above plus V1_EN_2a_2b_2c 553, ... |
+| `drc_stdcell_9T{S,H,L}VT` | 24854 / 24855 / 24855 | 13 | LU_S_2_NTAP 12611, LU_S_2_PTAP 10820, NW1_R_1 717, density minima |
+| `drc_io`                 | 3685 | 56 | SAB_S_5 720, SAB_S_6 422, CT_EN_4d 408, SAB_R_1 398, SAB_S_4 360, PO_S_11 268, POLYres_S_2 222 |
 
 What is behind them:
 

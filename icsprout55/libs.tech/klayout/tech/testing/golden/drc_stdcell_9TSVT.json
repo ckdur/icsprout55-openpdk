@@ -727,7 +727,7 @@
   }
  },
  "LU_S_2_PTAP": {
-  "count": 10828,
+  "count": 10820,
   "cells": {
    "ADDFCINX0P5_9TSVT": 42,
    "ADDFCINX1_9TSVT": 42,
@@ -1347,8 +1347,6 @@
    "OR4X2_9TSVT": 4,
    "OR4X3_9TSVT": 4,
    "OR4X4_9TSVT": 4,
-   "OR4X6_9TSVT": 4,
-   "OR4X8_9TSVT": 4,
    "SDFFKRNQX2_9TSVT": 30,
    "SDFFKRNQX4_9TSVT": 32,
    "SDFFKRSNQX0P5_9TSVT": 50,

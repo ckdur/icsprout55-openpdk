@@ -94,7 +94,7 @@
   }
  },
  "CT_EN_4a_4b_4c": {
-  "count": 13658,
+  "count": 13660,
   "cells": {
    "ADDHX1P4H7H": 64,
    "AO211X2H7H": 30,
@@ -202,8 +202,8 @@
    "SDFFNSX0P5H7H": 106,
    "SDFFNSX1H7H": 103,
    "SDFFNSX2H7H": 105,
-   "SDFFNX2H7H": 94,
-   "SDFFNX3H7H": 99,
+   "SDFFNX2H7H": 95,
+   "SDFFNX3H7H": 100,
    "SDFFQX0P5H7H": 92,
    "SDFFQX1H7H": 86,
    "SDFFQX2H7H": 91,
@@ -2416,9 +2416,10 @@
   }
  },
  "MET1_S_5": {
-  "count": 905,
+  "count": 906,
   "cells": {
    "ADDHX1P4H7H": 5,
+   "AO211X2H7H": 1,
    "AO21X2H7H": 1,
    "AO222X0P5H7H": 1,
    "AO222X0P7H7H": 1,
