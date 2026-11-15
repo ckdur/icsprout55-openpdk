@@ -52,6 +52,38 @@ python3 hacking/magic/lvs_netlist.py $IO_DST/spice/ICSIOA_N55_3P3.spice $IO_DST/
 cp hacking/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013/lef/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef
 
 # ----------------------------------------------------------------------------
+# Generated standard cells (stdcell-gen, stdcell_gen/README.md): ics55t9, ics55t7
+# ----------------------------------------------------------------------------
+# The views are used as delivered (CDL already LVS-ready); added here: the netgen
+# reference netlist, the cell LEF with the per-pin antenna areas
+# (libs.tech/librelane/<lib>/antenna.pins) and the liberty of the antenna diode.
+for lib in ics55t9 ics55t7; do
+  dst=icsprout55/libs.ref/$lib
+  rm -rf "$dst"
+  mkdir -p "$dst"
+  for view in gds lef liberty verilog cdl spice doc cell_list README.md; do
+    cp -r "stdcell_gen/$lib/$view" "$dst/"
+  done
+  # GDS and liberty are committed gzipped
+  find "$dst/gds" "$dst/liberty" -name '*.gz' -exec gunzip -f {} +
+  # one-line "if (...) x <= y;" in the flop models would be dropped by LibreLane's lint
+  # preprocessing (see hacking/verilog_models.py)
+  python3 hacking/verilog_models.py "$dst/verilog/$lib.v" "$dst/verilog/$lib.v"
+  # max capacitance / transition = the characterized range (CTS needs them, see the script)
+  for f in "$dst"/liberty/${lib}_*.lib; do
+    python3 hacking/liberty_limits.py "$f" "$f"
+  done
+  python3 hacking/magic/lvs_netlist.py "$dst/spice/$lib.spice" "$dst/spice/${lib}_lvs.spice"
+  python3 hacking/magic/lef_antenna.py merge "$dst/lef/$lib.lef" \
+    icsprout55/libs.tech/librelane/$lib/antenna.pins "$dst/lef/${lib}_openpdk.lef"
+  # The cell LEF declares DATABASE MICRONS 2000, more than the tech LEF's 1000, and
+  # OpenROAD then discards it (ODB-0292). Every coordinate is on the 0.001 um grid.
+  sed -i 's/DATABASE MICRONS 2000 ;/DATABASE MICRONS 1000 ;/' "$dst/lef/${lib}_openpdk.lef"
+  python3 hacking/antenna_liberty.py "$dst/cdl/$lib.cdl" "$dst/lef/$lib.lef" \
+    icsprout55/libs.tech/ngspice/dio/dio_core.mdl $lib "$dst/liberty/${lib}_antenna.lib"
+done
+
+# ----------------------------------------------------------------------------
 # Private standard cells (ICsprout_55LLULP1225_STD_0818, "ICsprout55 SC9T")
 # ----------------------------------------------------------------------------
 # Not part of the public release and not in the icsprout55-pdk submodule, so
