@@ -74,7 +74,10 @@ set ::env(KLAYOUT_TECH) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics
 set ::env(KLAYOUT_PROPERTIES) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.lyp"
 set ::env(KLAYOUT_DEF_LAYER_MAP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.map"
 set ::env(KLAYOUT_DRC_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55.drc"
-set ::env(KLAYOUT_DRC_DEFINES) [dict create densityRules 0 ]
+# flat: the mode the translated deck is verified in against Calibre (compare.py);
+# deep mode reports e.g. LU_S_2_* (tap distance) inside placed cells that Calibre
+# and the flat run do not report
+set ::env(KLAYOUT_DRC_DEFINES) [dict create densityRules 0 flat 1 ]
 # Antenna: the vendor Calibre antenna runset (.ant), translated by the same generator
 # (incremental connectivity, per gate accumulation, diode allowance); KLayout.Antenna
 set ::env(KLAYOUT_ANTENNA_RUNSET) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/klayout/tech/ics55_antenna.drc"

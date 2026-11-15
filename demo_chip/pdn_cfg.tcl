@@ -20,6 +20,11 @@ source $::env(SCRIPTS_DIR)/openroad/common/io.tcl
 source $::env(SCRIPTS_DIR)/openroad/common/set_global_connections.tcl
 set_global_connections
 
+# Bond pad terminals for VDD / VSS (no netlist ports in the Chip flow), so that
+# OpenROAD PSM has a source on them (else PSM-0025 in check_power_grid)
+source $::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/librelane_plugin_ics55/scripts/pad_supply_terminals.tcl
+ics55_pad_supply_terminals "$::env(VDD_NETS) $::env(GND_NETS)"
+
 set secondary []
 foreach vdd $::env(VDD_NETS) gnd $::env(GND_NETS) {
     if { $vdd != $::env(VDD_NET)} {
