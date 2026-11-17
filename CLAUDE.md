@@ -195,13 +195,18 @@ Open work is tracked in the SymbioticEDA Plane tracker (bugs.ckdur.dev, workspac
 - RCX: Cbest / Cworst ITF corners are not generated (no STA corner uses them).
 - `demo_chip` with OpenROAD 26Q4: the detailed routing crash (pad MET5 pins), the unconnected VDD pad and
   `PSM-0025` are fixed (`io_lef_openpdk.py`, `pad_supply_terminals.tcl`; PDN checked alone: both nets connected,
-  no unconnected shapes). Run 2026-11-15 up to `OpenROAD.IRDropReport`: route DRC 0, power grid 0, OpenROAD
-  antenna 0, setup / hold WS 12.0 / 0.06 ns, IR drop worst 39 mV; the signoff steps (KLayout antenna / DRC, Magic
-  DRC, Netgen LVS) of the full run are still to be recorded. `Magic.StreamOut` is disabled in `demo_chip`: Magic
+  no unconnected shapes). Full run 2026-11-15 (`runs/debug_ics`): route DRC 0, power grid 0, OpenROAD and KLayout
+  antenna 0, setup / hold WS 12.0 / 0.06 ns, IR drop worst 39 mV, Netgen LVS clean, Magic DRC 21 (one sliver on
+  M2-M4 where the pad ring corner meets the next filler, abstract views), KLayout DRC 8422: 6990 in the IO pads
+  (vendor layout, identical per instance to the `drc_io` golden / a lone pad; RV_W_1 splits per pad seam on the
+  ring), 1379 density minima (no fill), 49 M5 at the VDD3 / VSS3 pad connections (pdngen cuts the pad strap 0.1um
+  from the core stripes, pieces 12.8um wide: M5_S_2/S_3/W_1b; the tech LEF has no wide metal SPACINGTABLE),
+  2 PO_S_9 between rows (SYMBI-29), 2 recommended rules (NW1_R_1 untapped top filler row, RV_R_1). The core has no
+  other marker. `Magic.StreamOut` is disabled in `demo_chip`: Magic
   takes the macro size from the PR boundary in the GDS, which is on layer 351/12, and reads no layer above 255.
-- KLayout DRC on the demos reports library-intrinsic findings with the 7-track libraries, so the demo configs set
-  `ERROR_ON_KLAYOUT_DRC: false`; LVS errors still fail the flow. The demos have not been re-run through LibreLane
-  since the decks became the generated ones (full rule set), so earlier marker counts no longer apply.
+- KLayout DRC on the demos reports vendor-intrinsic findings (IO pads, see above) and the density minima, so the
+  demo configs set `ERROR_ON_KLAYOUT_DRC: false`; LVS errors still fail the flow. demo_counter (2026-11-15):
+  KLayout DRC 12, Magic DRC 1094 (not classified).
 - 18 std cells per Vt library differ between vendor CDL and layout (listed in `testing/README.md`). Per cell, 15
   more have a series stack in another order than the CDL (NAND2X0P5 ...; KLayout per cell and netgen agree, the
   KLayout library-wrapper regression misses them, list in `hacking/magic/README.md`).
