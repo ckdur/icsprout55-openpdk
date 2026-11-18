@@ -113,11 +113,29 @@ Fixed since the previous build (c446888), from the `demo_counter` findings:
 - `V1_W_1` (a router VIA1 on a VIA1 inside the cell): the cuts are OBS in the LEF;
 - the pin access exclusions, as above.
 
-`demo_counter` has not been run on this build yet (on c446888: route DRC 0, Netgen and KLayout LVS 0,
-OpenROAD and KLayout antenna 0, power grid 0).
+`demo_counter` with either library (2026-11-18, run tags `debug_ics55t9` / `debug_ics55t7`):
 
-Still open: `M2_S_5` (MET2 line end spacing, not in the tech LEF rules), latches in the liberty
-(designs with latches do not synthesize), the 32 / 53 unreachable cells.
+| | ics55t9 | ics55t7 |
+|---|---|---|
+| Route DRC, LVS (Netgen, KLayout), antenna, power grid | 0 | 0 |
+| Max slew / max capacitance violations | 0 / 0 | 0 / 0 |
+| Setup / hold worst slack | 19.48 / 0.105 ns | 19.32 / 0.128 ns |
+| Cells, std cell area | 771, 6336 um2 | 927, 6272 um2 |
+| KLayout DRC | 6 | 5 |
+| Magic DRC | 936 | 1254 |
+
+KLayout DRC (sign-off): `CHIPEDGE_EN_1` (2, the die edge of the macro, as with the vendor 7-track
+library) and
+- ics55t9: `MET1_S_5` (4, all on pin `i` of `DEL005`): the router's VIA1 MET1 pad (0.17 high) on a
+  routing track sticks out 0.02 um past the end of the 0.10 um pin, and the new line end is 0.09 um
+  beside another MET1 shape of the cell (stdcell-gen STDCE-38);
+- ics55t7: `M2_S_5` (3): MET2 line end spacing, not in the tech LEF rules.
+
+Magic DRC reports only `NP_W_1` / `NP_S_1` / `PP_W_1` / `PP_S_1`, which KLayout does not (the Magic
+hierarchy artefact also seen next to the vendor tap cells).
+
+Still open: STDCE-38, `M2_S_5`, latches in the liberty (designs with latches do not synthesize), the
+32 / 53 unreachable cells.
 
 ## Regenerating
 
@@ -129,5 +147,5 @@ make -f Makefile.ics55t9 PYTHON3=<venv> deliverable                        # tmp
 ```
 
 Open items are tickets in the `stdcell` workspace of bugs.ckdur.dev: STDCE-16 (views and
-sign-off), STDCE-17 (pin access / site), STDCE-35 (latches), STDCE-36 (ties, tri-state enables,
+sign-off), STDCE-17 (pin access / site), STDCE-38 (DEL005 MET1_S_5 at a router via), STDCE-35 (latches), STDCE-36 (ties, tri-state enables,
 flip-flop internal power), STDCE-33 (ics55f, the 12-track library, not characterized).

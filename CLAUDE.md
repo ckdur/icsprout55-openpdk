@@ -222,8 +222,9 @@ Open work is tracked in the SymbioticEDA Plane tracker (bugs.ckdur.dev, workspac
 - Generated libraries `ics55t9` / `ics55t7` (stdcell-gen 9dcd1cd, 2026-11-18): pin access in the generator, 32 /
   53 cells still excluded for it (164 / 138 before); TAPCELL fills its implants (`PP_S_1` between stacked taps),
   the LEF has the VIA1 cuts as OBS (`V1_W_1`), tables from 0.5 fF / 12 ps with the loads scaled by drive
-  strength. Not run through `demo_counter` again yet. Open: `M2_S_5` (tech LEF), no latches in the liberty.
-  See `stdcell_gen/README.md`.
+  strength. `demo_counter` (2026-11-18) completes with both: route DRC, LVS, antenna, power grid, slew / cap 0;
+  KLayout DRC only `CHIPEDGE_EN_1` plus `MET1_S_5` at a router VIA1 on `DEL005` (ics55t9, STDCE-38) and
+  `M2_S_5` (ics55t7, tech LEF). Open: those, no latches in the liberty. See `stdcell_gen/README.md`.
 - `demo_chip` with OpenROAD 26Q4: the detailed routing crash (pad MET5 pins), the unconnected VDD pad and
   `PSM-0025` are fixed (`io_lef_openpdk.py`, `pad_supply_terminals.tcl`; PDN checked alone: both nets connected,
   no unconnected shapes). Full run 2026-11-15 (`runs/debug_ics`): route DRC 0, power grid 0, OpenROAD and KLayout
