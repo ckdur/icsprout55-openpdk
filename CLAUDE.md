@@ -74,11 +74,17 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
     configuration in `libs.tech/librelane/ics55_LLSC_H7C_common.tcl`, sourced by each library's `config.tcl`;
     the three Vt flavours differ only in the cell name suffix (`H7R`/`H7H`/`H7L`). The installed GDS and cell
     LEFs are the DRC fixed ones from `stdcell_fixed/` (made by `hacking/stdcell_fix/make_fixed.py`, see its
-    README; liberty and CDL stay the vendor ones): 609 of 785 cells per library are DRC clean, the other 176 keep
-    the vendor layout. `synth_exclude.cells` / `pnr_exclude.cells` (192) are those 176 plus the cells whose
-    layout does not match their CDL. Async reset flops map to the set flops with `QN` (no `DFFR*` is usable),
+    README; liberty and CDL stay the vendor ones): 606 of 785 cells per library are DRC clean (Calibre checked), the
+    other 179 are unusable (176 keep the vendor layout; XNOR2X0P5/X0P7/X1 have a Calibre-only NP_EN_3).
+    `synth_exclude.cells` / `pnr_exclude.cells` (209) are those 179 plus the cells whose layout does not match
+    their CDL (the 18 vendor mismatches and the 14 with a swapped series stack, found by per-cell LVS of every
+    usable cell). Async reset flops map to the set flops with `QN` (no `DFFR*` is usable),
     `latch_map.v` builds the negative enable reset latches from `LATHR*` / `LATHSR*`, `DECAP_CELLS` is
-    `FILLCAP4` only. No vendor endcap cells: the rows are closed with the plain fillers, `ENDCAP_CELL` =
+    `FILLCAP4` only. `FILL_CELLS` = `FILLDENS{4..64}` (density filler cells: floating well-type AA + field
+    poly, no devices, `hacking/stdcell_fix/density_fill.py`, own GDS / LEF / CDL added to the `CELL_*` lists)
+    plus `FILLER1` / `FILLER2` for gaps below 4 sites (OpenROAD fills largest first, so the bigger plain
+    fillers are left out): dummy fill cannot enter the rows, the AA / PO density of the core comes from them.
+    No vendor endcap cells: the rows are closed with the plain fillers, `ENDCAP_CELL` =
     `FILLER1` at the row ends and `ENDCAP_HORIZONTAL_CELLS` (the `FILLER*` family) filling the top / bottom row
     of every row block, which needs the plugin step `ICS55.TapEndcapInsertion` (all demos substitute it).
     NP / PP of the cells extend past the cell edge and are only complete with neighbours on all four sides;
@@ -104,6 +110,18 @@ The KLayout DRC/LVS regression (`libs.tech/klayout/tech/testing`) stays in this 
   `demo_chip/pdn_cfg.tcl`): BTerms for `VDD_NETS` / `GND_NETS` on the bond pads of the power pads. The Chip flow
   gives only netlist ports (`IOVDD`, `IOVSS`) a bond pad terminal; without one PSM has no source on VDD / VSS
   (`PSM-0025`, counted by `Checker.PowerGridViolations`). No `VSRC_LOC_FILES` needed.
+- WP4 (Chip flow): `KLAYOUT_FILLER_SCRIPT` = `libs.tech/klayout/tech/ics55_fill.py` (dummy AA / PO / MET1-5 /
+  T4M2 per the AADUM / PODUM / MnDUM / T4M2DUM rules; IO cells only get T4M2 fill), `KLAYOUT_DENSITY_RUNSET` =
+  `ics55.drc` with `select _D_[0-9]` (the DRC step runs with `densityRules False`; the former `densityRules 0`
+  had no effect), `KLAYOUT_SEALRING_SCRIPT` = `ics55_sealring.py` (DRM 3.3.46 / SRCK_*, drawn on the die edge,
+  `PAD_EDGE_SPACING 20`; the deck reads SRINGBLK from 354;13, the DRM table says 354;12, both drawn). All three
+  verified with Calibre (fill on demo_chip, filler cells next to every usable cell, ring on a test die: KLayout
+  and Calibre identical on all 712 rules). LibreLane's Tcl config only sees `set` / `dict set` on `::env`,
+  never `lappend`.
+- WP5 (KLayout runtime on chips): density windows through a box tree with a cache, an exact rewrite of the
+  `*DUM_S_7` rules (`rewrite_svrf`), and `-rd jobs=N` (rules in N KLayout processes, reports merged, IHP
+  style; LibreLane uses `jobs 4`, every process reads the layout). All verified identical against Calibre /
+  the single-process run, details in `hacking/svrf2klayout/README.md`.
 - KLayout DRC in LibreLane runs the deck flat (`KLAYOUT_DRC_DEFINES flat 1`), the mode it is verified in against
   Calibre (`compare.py` forces `flat=1`). Flat is single threaded (KLayout only uses `threads` when tiled):
   3 h 34 min on `demo_chip`. Deep mode used to report `LU_S_2_*` inside placed cells (`BUFX10/16H7R`) and lose
@@ -208,8 +226,9 @@ Open work is tracked in the SymbioticEDA Plane tracker (bugs.ckdur.dev, workspac
   demo configs set `ERROR_ON_KLAYOUT_DRC: false`; LVS errors still fail the flow. demo_counter (2026-11-15):
   KLayout DRC 12, Magic DRC 1094 (not classified).
 - 18 std cells per Vt library differ between vendor CDL and layout (listed in `testing/README.md`). Per cell, 15
-  more have a series stack in another order than the CDL (NAND2X0P5 ...; KLayout per cell and netgen agree, the
-  KLayout library-wrapper regression misses them, list in `hacking/magic/README.md`).
+  more have a series stack in another order than the CDL (NAND2X0P5 ...; KLayout per cell, netgen and Calibre
+  agree, the KLayout library-wrapper regression misses them, list in `hacking/magic/README.md`). All usable ones
+  are excluded since 2026-11-17 (AOI22X4 already was).
 - Magic: GDS layers > 255 need `hacking/magic/magic_gds.py`; netgen has no split-gate reduction, so LibreLane LVS with
   `MAGIC_EXT_USE_GDS: true` fails on cells with split stacks (the default abstract extraction is fine); Magic DRC
   covers ~160 Calibre rules, no RECTANGLE ENCLOSURE via rules, no antenna, no density.
@@ -222,7 +241,7 @@ Open work is tracked in the SymbioticEDA Plane tracker (bugs.ckdur.dev, workspac
   short to whatever MET1 the router already put in the gap. The plain `FILL*` cells have no devices and no MET1
   outside the rails. The same hazard exists for `FILLCAP4H7R` in the 7-track libraries, it just does not trigger on
   the demos.
-- 7-track DRC fix (`stdcell_fixed/`): 176 cells per library still fail DRC and are excluded, among them every
+- 7-track DRC fix (`stdcell_fixed/`): 179 cells per library still fail DRC and are excluded, among them every
   asynchronous reset / set+reset flop, the scan flops, most XOR / XNOR and `FILLCAP8/16/32`. Only left / right
   abutment is checked (`testing/abut_check.py`); poly ends of vertically adjacent rows can still meet `PO_S_9`
   (SYMBI-29). The per pin antenna areas (`antenna.pins`) were extracted from the vendor layout.

@@ -102,8 +102,8 @@ or waived.
 
 | Testcase | Markers | Rules | Largest contributors |
 |----------|---------|-------|----------------------|
-| `drc_stdcell_H7C{R,H,L}` | 52717 | 35 | LU_S_2_NTAP 14250, CT_EN_4a_4b_4c 13660, LU_S_2_PTAP 13548, CT_S_4 3752, MET1_S_4 1862, MET1_W_2 1145, NW1_R_1 909, MET1_S_5 906, MET1_A_1 487, PO_EX_1 394 |
-| `drc_stdcell_H7CR_M2`    | 53380 | 38 | as above plus V1_EN_2a_2b_2c 553, ... |
+| `drc_stdcell_H7C{R,H,L}` | 52720 | 35 | LU_S_2_NTAP 14250, CT_EN_4a_4b_4c 13660, LU_S_2_PTAP 13548, CT_S_4 3752, MET1_S_4 1862, MET1_W_2 1145, NW1_R_1 909, MET1_S_5 906, MET1_A_1 487, PO_EX_1 394 |
+| `drc_stdcell_H7CR_M2`    | 53383 | 38 | as above plus V1_EN_2a_2b_2c 553, ... |
 | `drc_stdcell_9T{S,H,L}VT` | 24854 / 24855 / 24855 | 13 | LU_S_2_NTAP 12611, LU_S_2_PTAP 10820, NW1_R_1 717, density minima |
 | `drc_io`                 | 3685 | 56 | SAB_S_5 720, SAB_S_6 422, CT_EN_4d 408, SAB_R_1 398, SAB_S_4 360, PO_S_11 268, POLYres_S_2 222 |
 
@@ -130,6 +130,8 @@ What is behind them:
   neighbours of different NW heights and, in `_M2`, `V1_S_3` 231 (vias
   0.055um from the cell side on 475 sides). The old golden files are in git
   history (before the std cell fix commit).
+- 2026-11-17: +3 `NP_EN_3` in `XNOR2X0P5/X0P7/X1` (the deck used to miss them, Calibre reports them:
+  poly meeting an NP / PP notch corner in one point); the three cells are unusable now.
 - Neighbour dependent markers (keys `A|B`) only cover the arrangement of the
   wrapper; `abut_check.py` checks every left / right side pair of a library.
 - The wrapper never leaves a cell without a neighbour; `rowend_check.py` checks the

@@ -64,7 +64,27 @@ library, antenna vehicle).
 
 DRC (`klayout -b -r ics55.drc -rd ...`): `input`, `topcell`, `report`, `thr`/`threads`,
 `flat=1`, `select=<regex>`, `unselect=<regex>`, `densityRules=False`, `dump=LAYER[,RULE:LAYER]`,
-and any deck switch, e.g. `-rd OPEN_RECOMMENDED_ON=YES`.
+`jobs=N`, `sv_verbose_flag=1` (time per rule and per slow layer), `log=<file>`, and any deck switch,
+e.g. `-rd OPEN_RECOMMENDED_ON=YES`.
+
+`jobs=N` (as the IHP sg13g2 runner does with its rule tables): the parent reads no layout, splits the
+selected rules into N groups (the density rules together, the others round-robin in deck order) and
+runs each in its own KLayout process (`-rd rules_file=...`, the threads divided among them), then
+merges the reports. Every process reads the layout and derives its own layers, so memory grows with
+N. Identical to the single-process run (filled `demo_counter`, all 712 rules vs Calibre).
+
+Chip-level runtime (WP5, filled `demo_chip`):
+* Density windows: the merged layer goes into a box tree and each window only clips the polygons it
+  overlaps; the window densities are cached per layer and window set (the `_min` / `_max` rules).
+  The former `(layer & window).area` per window scanned the whole layer ~1000 times per rule: all
+  density rules ~1 h -> ~15 min, results identical (the M3-M5 `_D_3` gradient differences to
+  Calibre are older, see the known approximations).
+* `MnDUM_S_7` / `T4M2DUM_S_7`: an exact rewrite of the rule text before parsing (`rewrite_svrf` in
+  `svrf2klayout.py`). `X1 = EXT MnALL < 0.6 ...` measured every pair of neighbouring dummies (M1
+  alone 443 s flat, M2 did not finish in 10 min); X3 is now taken from the pairs with a wide
+  polygon and the later uses of X1 from the polygons within 2.2 um of X4_near / X4_far. Checked on
+  a fill with ~10000 S_7 violations: Calibre with the original and with the rewritten rules and
+  the KLayout deck give the same markers.
 
 LVS (`klayout -b -r ics55.lvs -rd ...`): `input`, `schematic`, `report`, `target_netlist`,
 `topcell`, `run_mode=deep|flat`, `hier=1` (keep hierarchy; default flattens like Calibre),
@@ -144,6 +164,19 @@ DRC
   IO library 68 of 71. The others differ by a few markers (mostly 45-degree geometry).
 * Known approximations: DENSITY windows (BACKUP/GRADIENT), `DRAWN ACUTE/OFFGRID` (not supported),
   projection enclosure against diagonal edges, WITH WIDTH on non-orthogonal shapes.
+* Seal ring (`ics55_sealring.py`, 300 x 300 um test die): identical to Calibre on all 712 rules,
+  SRCK_* included (a 2.1 um outer ring is caught by SRCK_4 / SRCK_5 in both tools).
+* Runtime fixes of 2026-11-17, each settled with Calibre on `tests/micro`:
+  - `INTERACT` / `TOUCH` (no count): a contact in a single point (corner to corner, vertex on an
+    edge) is no interaction in Calibre (`exp_pttouch`; NP_EN_3 was missed on XNOR2X0P5H7R, whose
+    poly meets a PP notch corner and was taken for a poly crossing NP / PP).
+  - `HOLES ... INNER`: holes that contain no other hole (`exp_holes`; was all holes, so SRCK_6 took
+    the outer seal ring for the inner one). The micro comparison matches markers by overlapping
+    boxes and had hidden this: nested rings overlap.
+  - `ANGLED` constraint of dimensional checks (was ignored; SRCK_4 / 5 / 8 / 10 measured the joints of
+    straight and 45 degree edges).
+  - `WITH EDGE`: coincident edge parts extended 1 dbu into the polygon instead of the edge centres,
+    whose quarter points on 45 degree edges rounded off the polygon (`exp_srck3`).
 
 LVS
 * Per-cell runs (tap + cell + tap) of all 784 H7CR cells: same verdict as Calibre on 777

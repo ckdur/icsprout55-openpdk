@@ -127,9 +127,10 @@ CLOCK_PERIOD: 20
 FP_SIZING: absolute
 # 1.6mmx1.6mm as an example
 # For core area, we reduce the IO size, and some for the ring
-# 12.45*2 + 10*2 + 5 + 130 ~= 180
+# 12.45*2 + 10*2 + 5 + 130 ~= 180, plus the seal ring: the PDK sets PAD_EDGE_SPACING 20
+# (10 um ring + 10 um isolation, KLayout.SealRing draws it on the die edge) -> 200
 DIE_AREA: [0, 0, 1600, 1600]
-CORE_AREA: [180, 180, 1420, 1420]
+CORE_AREA: [200, 200, 1400, 1400]
 
 # Increase for more logic
 # on your die

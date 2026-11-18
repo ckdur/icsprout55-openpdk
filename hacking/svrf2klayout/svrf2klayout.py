@@ -20,6 +20,7 @@ Run-time variables (klayout -rd):
 
 import argparse
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -590,7 +591,14 @@ require 'logger'
 
 $sv_exec_start = Time.now
 
-if $input
+# -rd jobs=N: the parent splits the selected rules into N groups and runs each in its own
+# KLayout process (-rd rules_file=...), then merges their reports (sv_run_jobs). The parent
+# reads no layout.
+$sv_jobs = ($jobs || "1").to_i
+$sv_parent = $sv_jobs > 1 && !$rules_file
+$sv_deck = File.expand_path(__FILE__)
+
+if $input && !$sv_parent
   if $topcell
     source($input, $topcell)
   else
@@ -598,7 +606,9 @@ if $input
   end
 end
 
-if $report
+if $sv_parent
+  # the children write the reports, the parent merges them into $report
+elsif $report
   report("{name} DRC (translated from Calibre)", $report)
 else
   report("{name} DRC (translated from Calibre)")
@@ -612,6 +622,7 @@ else
 end
 
 nthr = ($threads || $thr || "4").to_i
+$sv_nthr = nthr
 threads(nthr)
 verbose(false)
 
@@ -636,6 +647,8 @@ $sv_defines = {{}}
 $sv_overrides = {{}}
 $sv_switches = {{}}
 {overrides}
+# options handed to the child processes of -rd jobs=N
+$sv_fwd_vars = %w[input topcell flat densityRules sv_verbose_flag strict break_points{fwd}]
 if $densityRules && $densityRules.to_s.downcase == "false"
   $sv_overrides["DENSITY_RULES"] = "NO"
 end
@@ -658,15 +671,58 @@ if $dump
     end
   end
 end
-nrules = sv_run_rules
+if $sv_parent
+  nrules = sv_run_jobs("{name} DRC (translated from Calibre)")
+else
+  nrules = sv_run_rules
+end
 log("SVRF: #{nrules} rules executed, #{$sv_failed.size} failed")
 $sv_failed.each { |n, m| log("  FAILED #{n}: #{m}") }
 log("SVRF: total runtime #{'%.1f' % (Time.now - $sv_exec_start)} s")
 '''
 
 
+# Exact performance rewrites of SVRF rule text (applied before parsing). Each one keeps the
+# result of the rule identical; settled against Calibre (README, tests/micro/exp_s7).
+#
+# MnDUM_S_7 / T4M2DUM_S_7 (space 0.6 between metal / dummy with a >= 1.5 run when one of them is
+# >= 1.5 wide): "X1 = EXT MnALL < 0.6 OPPOSITE REGION PARA ONLY" measures every pair of
+# neighbouring dummies (millions on a filled chip: hours). Only the space regions of pairs with a
+# wide polygon can give X3 (= edges >= 1.5 of X1 that lie on a wide polygon): X1W from the
+# polygons within 0.6 of X0. The later uses of X1 (X6_near, X7_edge, X8) only look within
+# 1.5 + 0.6 + 0.01 of X4_near / X4_far: X1 from the polygons within 2.2 of them. Polygons that
+# could shield a pair lie inside the same halo.
+_S7_RX = re.compile(r'(\n(?:M\d|T\dM\d)DUM_S_7 \{.*?\n\})', re.S)
+
+
+def _rewrite_s7(block):
+    m = re.search(r'\n(\s*)X1 = EXT (\w+) < 0\.6 OPPOSITE REGION PARA ONLY\n', block)
+    if not m or 'X2 = LENGTH X1 >= 1.5' not in block or 'X4_far' not in block:
+        return block
+    ind, lay = m.group(1), m.group(2)
+    block = block.replace(m.group(0), '\n%sX1W = EXT (%s INTERACT (SIZE X0 BY 0.6)) < 0.6 OPPOSITE REGION PARA ONLY\n' % (ind, lay))
+    block = block.replace('X2 = LENGTH X1 >= 1.5', 'X2 = LENGTH X1W >= 1.5')
+    far = re.search(r'\n(\s*)X4_far = [^\n]*\n', block)
+    block = block.replace(far.group(0), far.group(0) + '%sX1 = EXT (%s INTERACT (SIZE (X4_near OR X4_far) BY 2.2)) < 0.6 OPPOSITE REGION PARA ONLY\n' % (ind, lay))
+    return block
+
+
+def rewrite_svrf(text):
+    return _S7_RX.sub(lambda m: _rewrite_s7(m.group(1)), text)
+
+
 def generate(svrf, out, name='ICS55', runtime=None):
-    deck = P.Deck(svrf)
+    raw = open(svrf, encoding='latin-1').read()
+    new = rewrite_svrf(raw)
+    if new != raw:
+        import tempfile
+        tf = tempfile.NamedTemporaryFile('w', suffix='.svrf', delete=False, encoding='latin-1')
+        tf.write(new)
+        tf.close()
+        deck = P.Deck(tf.name)
+        os.unlink(tf.name)
+    else:
+        deck = P.Deck(svrf)
     if deck.errors:
         for e in deck.errors:
             print('parse error:', e, file=sys.stderr)
@@ -684,11 +740,12 @@ def generate(svrf, out, name='ICS55', runtime=None):
         var = d
         ov.append('$sv_overrides[%s] = $%s.to_s if defined?($%s) && $%s' % (rb_str(d), var, var, var))
     rt = open(runtime or os.path.join(HERE, 'svrf_runtime.rb')).read()
-    text = PRELUDE.format(name=name, src=os.path.basename(svrf), overrides='\n'.join(ov))
+    fwd = ''.join(' ' + d for d in sorted(set(x.upper() for x in defines)))
+    text = PRELUDE.format(name=name, src=os.path.basename(svrf), overrides='\n'.join(ov), fwd=fwd)
     text += rt + '\n'
     text += '$sv_G = SvScope.new(self, nil, "GLOBAL")\n'
     text += '\n'.join(g.out) + '\n'
-    text += POSTLUDE
+    text += POSTLUDE.replace('{name}', name)
     with open(out, 'w') as f:
         f.write(text)
     return g

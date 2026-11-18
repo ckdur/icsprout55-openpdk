@@ -410,6 +410,19 @@ end
 # Polygon selection (INTERACT, INSIDE, OUTSIDE, TOUCH, ENCLOSE, CUT)
 # ---------------------------------------------------------------------------
 
+# Polygons of a (none overlapping b) that share an edge part of positive length
+# with b. Calibre INTERACT / TOUCH do not count a contact in a single point
+# (corner to corner, or a vertex on an edge); KLayout "interacting" does
+# (tests/micro/exp_pttouch: NP_EN_3 missed on XNOR2X0P5H7R, whose PO meets a PP
+# notch corner only and was therefore taken for a PO crossing NP / PP).
+def sv_edge_touching(a, b)
+  cand = a.interacting(b)
+  return cand if cand.is_empty?
+  bb = b.interacting(cand)
+  ce = cand.edges & bb.edges
+  cand.interacting(ce)
+end
+
 def sv_sel(kind, a, b, cons, neg, opts = {})
   if sv_kind(a) == :edge
     return sv_edge_layer_sel(kind, a, b, neg, opts)
@@ -422,8 +435,10 @@ def sv_sel(kind, a, b, cons, neg, opts = {})
   when "interact"
     if mn || mx
       r = sv_cnt(a, :interacting, b, mn, mx)
-    else
+    elsif bk == :edge
       r = a.interacting(b)
+    else
+      r = a.overlapping(b) + sv_edge_touching(a.not_overlapping(b), b)
     end
     neg ? a - r : r
   when "inside"
@@ -444,9 +459,11 @@ def sv_sel(kind, a, b, cons, neg, opts = {})
   when "touch"
     if bk == :edge
       r = sv_cnt(a, :interacting, b, mn, mx)
-    else
+    elsif mn || mx
       c = a.not_overlapping(b)
       r = sv_cnt(c, :interacting, b, mn, mx)
+    else
+      r = sv_edge_touching(a.not_overlapping(b), b)
     end
     neg ? a - r : r
   when "cut"
@@ -515,8 +532,18 @@ def sv_esel(kind, a, b, cons, neg, opts = {})
     ap = sv_p(a)
     be = sv_e(b)
     mn, mx = sv_count_range(cons)
-    m = sv_mid(be)
-    r = sv_cnt(ap, :interacting, m, mn, mx)
+    # the coincident edge parts, extended by 1 dbu into their polygon (the polygon edges keep
+    # their orientation in the AND): selected by area, so a polygon touching only an end
+    # point is not taken. The former test with the edge centres (centers(0, 0.5)) rounded
+    # the quarter points of 45 degree edges off the polygon (tests/micro/exp_srck3: one of
+    # the four corner triangles of SRCK_3 was not found).
+    # The strips stay unmerged: WITH EDGE counts edges (AA_US / AA_OS: "== 1", "== 5"), and
+    # merged, the strips of two edges meeting in a corner would count once (ACT_S_4).
+    ce = ap.edges.data & be.data
+    st = ce.extended_in(1)
+    st.merged_semantics = false
+    m = sv_w(st)
+    r = sv_cnt(ap, :overlapping, m, mn, mx)
     return neg ? ap - r : r
   end
   ea = sv_e(a)
@@ -662,8 +689,14 @@ def sv_holes(a, opts = {})
   a = sv_p(a)
   h = a.holes
   if opts[:inner]
-    # innermost holes: holes that do not contain other holes
-    h = h.not_covering(h.holes) if false
+    # innermost holes: holes that do not contain another hole, i.e. no polygon of the layer
+    # that has a hole itself (a hole with a plain polygon inside is still inner). Calibre,
+    # tests/micro/exp_holes: the hole of an outer seal ring contains the inner ring and is
+    # not inner (SRCK_6 took the outer ring for the inner one).
+    # raw holes: with merged semantics a hole nested in an outer hole would vanish in it
+    d = h.data.dup
+    d.merged_semantics = false
+    h = sv_w(d.not_overlapping(a.with_holes(1, nil).data))
   end
   if opts[:empty]
     h = h.not_interacting(a.inside(h)) if false
@@ -898,6 +931,49 @@ end
 # Dimensional checks: EXT / INT / ENC
 # ---------------------------------------------------------------------------
 
+# ANGLED constraint of a dimensional check: keep the edge pairs whose number of non-orthogonal
+# edges (0, 1 or 2) satisfies it. The seal ring checks use "ANGLED < 1" so that the 45 degree
+# corners are not measured (SRCK_4 / 5 / 6 / 8 / 10: without it, the joints of the straight and
+# the 45 degree edges were measured, tests/sealring).
+def sv_angled(ep, cons)
+  ok = [0, 1, 2].select do |n|
+    cons.all? do |op, v|
+      case op
+      when "<" then n < v
+      when "<=" then n <= v
+      when ">" then n > v
+      when ">=" then n >= v
+      when "==" then n == v
+      when "!=" then n != v
+      else true
+      end
+    end
+  end
+  d = ep.data
+  ortho = RBA::Edges::OrthoEdges
+  # KLayout 0.30: with_angle(ORTHO, false) = at least one edge orthogonal, (.., true) = at
+  # least one edge not orthogonal; with_angle_both(ORTHO, false / true) = both edges
+  # orthogonal / both not orthogonal
+  r = case ok
+      when [0, 1, 2] then d
+      when [0] then d.with_angle_both(ortho, false)
+      when [0, 1] then d.with_angle(ortho, false)
+      when [1, 2] then d.with_angle(ortho, true)
+      when [2] then d.with_angle_both(ortho, true)
+      when [] then RBA::EdgePairs::new
+      else
+        # [1] / [0, 2]: count per pair (no constraint in the decks uses these)
+        f = d.is_deep? ? d.dup.tap { |x| x.flatten } : d
+        out = RBA::EdgePairs::new
+        f.each do |p|
+          n = [p.first, p.second].count { |e| e.dx != 0 && e.dy != 0 }
+          out.insert(p) if ok.include?(n)
+        end
+        out
+      end
+  sv_w(r)
+end
+
 def sv_check(kind, a, b, cons, opts = {})
   # distance limits
   lo = nil
@@ -1078,6 +1154,9 @@ def sv_check(kind, a, b, cons, opts = {})
   elsif opts[:perp] == "not"
     ep = ep.without_internal_angle(90)
   end
+  if opts[:angled]
+    ep = sv_angled(ep, opts[:angled])
+  end
   if opts[:not_projecting]
     # keep only pairs with no projection: approximation - corner pairs
     ep = ep.without_internal_angle(0)
@@ -1194,6 +1273,29 @@ end
 # DENSITY
 # ---------------------------------------------------------------------------
 
+# Density windows: the merged, flat layer in a box tree (a Shapes container of a scratch
+# layout), so each window only clips the polygons that overlap it. The former
+# "(whole layer & window).area" per window scanned the whole layer ~1000 times per rule (a
+# filled 1.6 mm chip: hours for the density rules alone).
+$sv_area_ly = nil
+def sv_area_index(region)
+  $sv_area_ly ||= RBA::Layout::new.tap { |x| x.dbu = 0.001 }
+  ly = $sv_area_ly
+  c = ly.create_cell("IDX")
+  li = ly.layer
+  f = region.dup
+  f.flatten if f.is_deep?
+  f.merged.each { |p| c.shapes(li).insert(p) }
+  [c, li]
+end
+
+def sv_area_local(idx, bx)
+  c, li = idx
+  loc = RBA::Region::new
+  c.shapes(li).each_overlapping(bx) { |sh| loc.insert(sh.polygon) }
+  loc & RBA::Region::new(bx)
+end
+
 def sv_density(layers, cons, opts = {})
   l = sv_p(layers[0])
   layers[1..-1].each { |x| l = l | sv_p(x) } if layers.size > 1
@@ -1206,8 +1308,6 @@ def sv_density(layers, cons, opts = {})
   return polygons if ext.empty?
   win = opts[:window]
   r = RBA::Region::new
-  lflat = l.data.dup
-  lflat.flatten
   bflat = nil
   if bound
     bflat = bound.data.dup
@@ -1253,14 +1353,30 @@ def sv_density(layers, cons, opts = {})
       x += sx
     end
   end
-  dens = {}
-  boxes.each do |bx|
-    wr = RBA::Region::new(bx)
-    wr = wr & bflat if bflat
-    wa = wr.area
-    next if wa <= 0
-    a = (lflat & wr).area
-    dens[bx] = a.to_f / wa
+  # window densities, cached: the _min / _max rules of a layer measure the same windows
+  # (the cache keeps the layer objects alive, so their object ids cannot be reused)
+  key = [l.data.object_id, bound ? bound.data.object_id : nil, boxes.size, boxes[0], boxes[-1]]
+  $sv_density_cache ||= {}
+  hit = $sv_density_cache[key]
+  dens = hit ? hit[2] : nil
+  unless dens
+    lidx = sv_area_index(l.data)
+    bidx = bound ? sv_area_index(bound.data) : nil
+    dens = {}
+    boxes.each do |bx|
+      if bidx
+        wr = sv_area_local(bidx, bx)
+        wa = wr.area
+        next if wa <= 0
+        a = (sv_area_local(lidx, bx) & wr).area
+      else
+        wa = bx.area
+        next if wa <= 0
+        a = sv_area_local(lidx, bx).area
+      end
+      dens[bx] = a.to_f / wa
+    end
+    $sv_density_cache[key] = [l.data, bound ? bound.data : nil, dens]
   end
   if opts[:gradient]
     # compare neighbouring windows
@@ -1582,13 +1698,107 @@ def sv_out_layer(name, desc, l)
   l.output(name, desc)
 end
 
+# -rd jobs=N (the IHP sg13g2 runner does the same with its rule tables): the selected rules in
+# N KLayout processes, each reading the layout and deriving its own layers, the reports merged.
+# The density rules stay in one group (their window cache is shared by the _min / _max rules),
+# the others are dealt round-robin in deck order, which spreads the families of heavy rules
+# (MnDUM_S_7, LU_S_2_*, ...) over the processes.
+def sv_run_jobs(title)
+  require 'tmpdir'
+  names = sv_selected_rules
+  dens, rest = names.partition { |x| x =~ /_D_[0-9]/ }
+  njobs = [$sv_jobs, names.size].min
+  groups = Array.new(njobs) { [] }
+  groups[0].concat(dens)
+  rest.each_with_index { |x, i| groups[(i + (dens.empty? ? 0 : 1)) % njobs] << x }
+  groups.reject!(&:empty?)
+  thr = [($sv_nthr || 4) / groups.size, 1].max
+  kl = ENV["KLAYOUT_BIN"] || "klayout"
+  dir = Dir.mktmpdir("sv_jobs")
+  log("SVRF: #{names.size} rules in #{groups.size} processes (#{thr} threads each), #{dir}")
+  jobs = groups.each_with_index.collect do |g, i|
+    rf = File.join(dir, "rules_#{i}.txt")
+    File.write(rf, g.join("\n") + "\n")
+    rep = File.join(dir, "report_#{i}.lyrdb")
+    lg = File.join(dir, "log_#{i}.txt")
+    args = [kl, "-b", "-r", $sv_deck, "-rd", "rules_file=#{rf}", "-rd", "report=#{rep}",
+            "-rd", "threads=#{thr}"]
+    $sv_fwd_vars.each do |v|
+      val = eval("$#{v}") rescue nil
+      args += ["-rd", "#{v}=#{val}"] unless val.nil?
+    end
+    [Process.spawn(*args, :out => lg, :err => [:child, :out]), rep, lg, g.size]
+  end
+  failed = []
+  jobs.each do |pid, rep, lg, n|
+    st = Process.wait2(pid)[1]
+    failed << lg unless st.success? && File.exist?(rep)
+  end
+  jobs.each do |pid, rep, lg, n|
+    File.readlines(lg).each { |l| $sv_failed << [l.split[3].to_s.chomp(":"), l.strip] if l =~ /SVRF rule .* FAILED/ }
+  end
+  raise "SVRF: #{failed.size} DRC processes failed, see #{failed.join(', ')}" unless failed.empty?
+  # merge the reports
+  rdb = RBA::ReportDatabase::new(title)
+  rdb.description = title
+  cells = {}
+  cats = {}
+  jobs.each do |pid, rep, lg, n|
+    c = RBA::ReportDatabase::new("")
+    c.load(rep)
+    rdb.top_cell_name = c.top_cell_name if rdb.top_cell_name.to_s.empty?
+    rdb.original_file = c.original_file if rdb.original_file.to_s.empty?
+    rdb.generator = c.generator if rdb.generator.to_s.empty?
+    cmap = {}
+    c.each_cell do |cc|
+      k = [cc.name, cc.variant]
+      cells[k] ||= rdb.create_cell(cc.name, cc.variant)
+      cmap[cc.rdb_id] = cells[k].rdb_id
+    end
+    kmap = {}
+    c.each_category do |cat|
+      unless cats[cat.name]
+        nc = rdb.create_category(cat.name)
+        nc.description = cat.description
+        cats[cat.name] = nc
+      end
+      kmap[cat.rdb_id] = cats[cat.name].rdb_id
+    end
+    c.each_item do |it|
+      ni = rdb.create_item(cmap[it.cell_id], kmap[it.category_id])
+      it.each_value { |v| ni.add_value(v) }
+    end
+  end
+  rdb.save($report) if $report
+  log("SVRF: reports of #{groups.size} processes merged")
+  require 'fileutils'
+  FileUtils.rm_rf(dir)   # kept when a process failed (raised above)
+  names.size
+end
+
+def sv_selected_rules
+  sel = $sv_select
+  unsel = $sv_unselect
+  $sv_rules.collect { |r| r[0] }.select { |n| !(sel && !(n =~ sel)) && !(unsel && (n =~ unsel)) }
+end
+
 def sv_run_rules
+  only = nil
+  if $rules_file
+    # child of -rd jobs=N: exactly the rules of this group
+    only = {}
+    File.read($rules_file).split("\n").each { |x| only[x.strip] = true unless x.strip.empty? }
+  end
   sel = $sv_select
   unsel = $sv_unselect
   n = 0
   $sv_rules.each do |name, desc, blk|
-    next if sel && !(name =~ sel)
-    next if unsel && (name =~ unsel)
+    if only
+      next unless only[name]
+    else
+      next if sel && !(name =~ sel)
+      next if unsel && (name =~ unsel)
+    end
     t0 = Time.now
     outs = []
     begin

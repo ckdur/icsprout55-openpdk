@@ -21,6 +21,15 @@ for lib in ics55_LLSC_H7CH ics55_LLSC_H7CL ics55_LLSC_H7CR; do
   done
 done
 
+# density filler cells (hacking/stdcell_fix/density_fill.py): own GDS / LEF / CDL per library
+for lib in ics55_LLSC_H7CH ics55_LLSC_H7CL ics55_LLSC_H7CR; do
+  mkdir -p icsprout55/libs.ref/$lib/spice
+  cp stdcell_fixed/$lib/filldens/${lib}_filldens.gds icsprout55/libs.ref/$lib/gds/
+  cp stdcell_fixed/$lib/filldens/${lib}_filldens.lef icsprout55/libs.ref/$lib/lef/
+  cp stdcell_fixed/$lib/filldens/${lib}_filldens.cdl icsprout55/libs.ref/$lib/cdl/
+  cp stdcell_fixed/$lib/filldens/${lib}_filldens.cdl icsprout55/libs.ref/$lib/spice/${lib}_filldens.spice
+done
+
 # The installed CDLs are converted from the vendor ones (LVS-ready, see hacking/cdl_convert.py)
 # and the ngspice-compatible copies are generated from the vendor CDLs too
 STD_SRC=icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100

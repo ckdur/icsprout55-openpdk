@@ -158,3 +158,33 @@ Before the endcaps the cells at the row ends had `NP/PP_EX_1_EX_1a` (8) and the 
 Poly ends of vertically adjacent rows (60 nm from the cell top / bottom, as in the vendor cells) can
 still meet `PO_S_9` in other placements; neither `abut_check.py` nor the regression covers rows above /
 below with real cells.
+
+## Calibre check of the usable cells (2026-11-17)
+
+The full Calibre deck on the H7CR library wrapper, markers mapped to the cells they fall in: besides
+the 4 known neighbour markers above (2 `PO_S_9`, 2 `MET1_S_5`), 3 `NP_EN_3` that only Calibre
+reported, in `XNOR2X0P5` / `X0P7` / `X1`: the poly meets an NP / PP notch corner in a single point and
+the KLayout deck took it for a poly crossing NP / PP (fixed in the runtime, NP_EN_3 now 181 / 181 like
+Calibre). The three cells are unusable now (179 per library).
+
+Per cell KLayout LVS (`tapless=true`) of every cell PnR may use: besides `SDFFRQX3` (only in the CDL,
+no layout / LEF / liberty) exactly the 14 cells with a series stack in another order than the CDL
+(`hacking/magic/README.md`; Calibre reports the swapped stack inputs too): `AOI211X6`, `AOI22X1/2/3/6`,
+`AOI2BB2X2/3`, `NAND2X0P5/6/8/12/16`, `OAI33X3/4`. They were not excluded and a design that maps onto
+them fails KLayout LVS (`demo_counter` did, once the XNOR2 cells were gone); now in `synth_exclude` /
+`pnr_exclude` (209 per library).
+
+## Density filler cells (`density_fill.py`)
+
+`FILLDENS4/8/16/32/64<sfx>`: the library's `FILLER<n>` plus floating well-type AA (N+ in the PW half, P+ in
+the NW half) and field poly that never crosses AA, AA 25.6 % / PO 27 % of the cell. LibreLane fills
+every free row site with filler cells and dummy fill cannot enter the rows, so these carry the AA /
+PO density minima of the core (`FILL_CELLS` = `FILLDENS*`, `FILLER1`, `FILLER2`: OpenROAD fills
+largest first, with `FILLER*` it took `FILLER64` / `FILLER32` and the core stayed at 2.6 % AA). Separate files
+`stdcell_fixed/<lib>/filldens/<lib>_filldens.{gds,lef,cdl}`, installed by `install.sh`.
+
+Verification (Calibre): `density_fill_test.py` puts every usable cell between `FILLDENS4` cells, as
+is and mirrored, with rows of `FILLDENS64` / `16` / `4` above and below; the same layout with the plain fillers is
+the baseline. H7CR / H7CH / H7CL: the same markers as the baseline at the same places, except the
+four AA / PO density rules, which only the baseline has. Calibre LVS extracts no device ("nothing in
+layout", like a plain filler), KLayout LVS matches the empty subcircuit.

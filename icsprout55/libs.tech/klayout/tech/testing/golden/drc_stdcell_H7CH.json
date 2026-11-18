@@ -2736,7 +2736,7 @@
   }
  },
  "NP_EN_3": {
-  "count": 178,
+  "count": 181,
   "cells": {
    "ADDHX1P4H7H": 1,
    "DFFNQX1H7H": 2,
@@ -2840,6 +2840,9 @@
    "TBUFX16H7H": 1,
    "TINVX0P5H7H": 1,
    "TINVX4H7H": 1,
+   "XNOR2X0P5H7H": 1,
+   "XNOR2X0P7H7H": 1,
+   "XNOR2X1H7H": 1,
    "XNOR2X1P4H7H": 1,
    "XNOR2X2H7H": 1,
    "XNOR2X3H7H": 1,
