@@ -61,6 +61,25 @@ python3 hacking/magic/lvs_netlist.py $IO_DST/spice/ICSIOA_N55_3P3.spice $IO_DST/
 cp hacking/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef icsprout55/libs.ref/ICsprout_55LLULP1233_IO_251013/lef/ICSIOA_N55_3P3_1P6M1TM_openpdk.lef
 
 # ----------------------------------------------------------------------------
+# Generated standard cells (stdcell-gen, stdcell_gen/README.md): ics55t9, ics55t7
+# ----------------------------------------------------------------------------
+# The views are used as delivered: the cell LEF has the per-pin antenna areas and
+# DATABASE MICRONS 1000, the liberty the max_capacitance limits and the ANTENNA diode,
+# the Verilog models no one-line "if" (stdcell-gen 9dcd1cd). Added here: the netgen
+# reference netlist.
+for lib in ics55t9 ics55t7; do
+  dst=icsprout55/libs.ref/$lib
+  rm -rf "$dst"
+  mkdir -p "$dst"
+  for view in gds lef liberty verilog cdl spice doc cell_list README.md; do
+    cp -r "stdcell_gen/$lib/$view" "$dst/"
+  done
+  # GDS and liberty are committed gzipped
+  find "$dst/gds" "$dst/liberty" -name '*.gz' -exec gunzip -f {} +
+  python3 hacking/magic/lvs_netlist.py "$dst/spice/$lib.spice" "$dst/spice/${lib}_lvs.spice"
+done
+
+# ----------------------------------------------------------------------------
 # Private standard cells (ICsprout_55LLULP1225_STD_0818, "ICsprout55 SC9T")
 # ----------------------------------------------------------------------------
 # Not part of the public release and not in the icsprout55-pdk submodule, so

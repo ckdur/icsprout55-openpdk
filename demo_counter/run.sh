@@ -11,5 +11,9 @@ librelane --pdk icsprout55 config.json --run-tag debug_ics --manual-pdk --overwr
 # library (installed by install.sh / "make openpdk" from ../../pdk/ICsprout_55LLULP1225_STD_0818):
 # librelane --pdk icsprout55 --scl ICsprout55_9TSVT_basic config.json --run-tag debug_ics_svt --manual-pdk --overwrite
 
+# The generated libraries (stdcell_gen/, installed by install.sh / "make openpdk"):
+# librelane --pdk icsprout55 --scl ics55t9 config.json --run-tag debug_ics55t9 --manual-pdk --overwrite
+# librelane --pdk icsprout55 --scl ics55t7 config.json --run-tag debug_ics55t7 --manual-pdk --overwrite
+
 # To contrast with the IHP PDK, you can run the following command:
 # librelane --pdk ihp-sg13g2 config.json --run-tag debug_ihp
